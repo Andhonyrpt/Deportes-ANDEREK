@@ -21,7 +21,7 @@ async function getProductById(req, res) {
         const product = await Product.findById(id);
 
         if (!product) {
-            return res.status(404).json({ error: 'Product not found' });
+            return res.status(404).json({ message: 'Product not found' });
         }
 
         res.json(product);
@@ -35,11 +35,11 @@ async function getProductByCategory(req, res) {
 
     try {
 
-        const id = req.params.id;
+        const id = req.params.idCategory;
         const products = await Product.findById({ category: id }).sort({ name: 1 });
 
-        if (!products) {
-            return res.status(404).json({ error: 'Product by category not found' });
+        if (products === 0) {
+            return res.status(404).json({ message: 'No products found for this category' });
         }
 
         res.json(products);
@@ -53,7 +53,7 @@ async function createProduct(req, res) {
 
     try {
 
-        const { name, description, price, stock, imagesUrl, category } = reqq.body;
+        const { name, description, price, stock, imagesUrl, category } = req.body;
 
         if (!name || !description || !price || !stock || !imagesUrl || !category) {
             return res.status(400).json({ error: 'All files are required' });
@@ -72,17 +72,17 @@ async function updateProduct(req, res) {
     try {
 
         const { id } = req.params;
-        const { name, description, price, stock, imagesUrl, category } = reqq.body;
+        const { name, description, price, stock, imagesUrl, category } = req.body;
 
         if (!name || !description || !price || !stock || !imagesUrl || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, stock, imagesUrl, category });
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, stock, imagesUrl, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);
         } else {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ message: 'Product not found' })
         }
 
     } catch (error) {
@@ -100,7 +100,7 @@ async function deleteProduct(req, res) {
         if (deletedProduct) {
             return res.status(204);
         } else {
-            return res.status(404).json({ error: 'Product not found' })
+            return res.status(404).json({ message: 'Product not found' })
         }
 
     } catch (error) {
@@ -108,14 +108,6 @@ async function deleteProduct(req, res) {
     }
 };
 
-/*module.exports = {
-    getProducts,
-    getProductById,
-    getProductByCategory,
-    createProduct,
-    updateProduct,
-    deleteProduct
-};*/
 
 export {
     getProducts,

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
     name: {
@@ -23,10 +23,11 @@ const productSchema = new mongoose.Schema({
     },
     imagesURL: [{
         type: String,
-        default: 'https://placehold.co/800x600.png'
+        default: 'https://placehold.co/800x600.png',
+        trim: true
     }],
     category: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true
     }

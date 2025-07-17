@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
     name: {
@@ -17,7 +17,7 @@ const categorySchema = new mongoose.Schema({
         default: 'https://placehold.co/800x600.png'
     },
     parentCategory: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         default: null
     }

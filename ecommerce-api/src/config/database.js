@@ -3,25 +3,18 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbUri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB;
-
-/*
-    try {
-        await mongoose.connect(`${dbUri}/${dbName}`, {});
-
-        console.log('MongoDB is connected');
-    } catch (error) {
-
-        console.log(error);
-        process.exit(1); // Salir del servidor
-
-    };
-*/
 
 async function dbConnection() {
     try {
-        await mongoose.connect(`${dbUri}/${dbName}`, {});
+
+        const dbUri = process.env.MONGODB_URI;
+        const dbName = process.env.MONGODB_DB;
+
+        await mongoose.connect(`${dbUri}/${dbName}`, {
+            // If you use MongoDB < 8 you have to use this:
+            //useNewUrlParser: true,
+            //useUnifiedTopology: true
+        });
 
         console.log('MongoDB is connected');
     } catch (error) {

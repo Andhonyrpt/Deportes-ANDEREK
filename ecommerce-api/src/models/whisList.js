@@ -25,4 +25,4 @@ const whisListSchema = new mongoose.Schema({
 
 const WhisList = mongoose.model('WhisList', whisListSchema);
 
-module.exports = WhisList;
+export default WhisList;
