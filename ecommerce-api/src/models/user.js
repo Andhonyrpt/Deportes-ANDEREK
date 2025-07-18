@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
-        match: [/^\d{10}$/],
+        match: [/^\d{10}$/, 'Please use a valid phone number'],
         max: 10
     },
     isActive: {

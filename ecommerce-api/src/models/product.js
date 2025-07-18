@@ -26,6 +26,20 @@ const productSchema = new mongoose.Schema({
         default: 'https://placehold.co/800x600.png',
         trim: true
     }],
+    soccerTeam: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    genre: {
+        type: String,
+        enum: ['Hombre', 'Mujer', 'Niño'],
+        default: 'Hombre'
+    },
+    sizeOptions: [{
+        type: String,
+        enum: ['S', 'M', 'L', 'XL', 'XXL']
+    }],
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
