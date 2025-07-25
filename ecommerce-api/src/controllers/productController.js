@@ -53,9 +53,9 @@ async function createProduct(req, res) {
 
     try {
 
-        const { name, description, price, stock, imagesUrl, soccerTeam, genre, sizeOptions, category } = req.body;
+        const { name, description, price, stock, imagesUrl, sizeOptions, category } = req.body;
 
-        if (!name || !description || !price || !stock || !imagesUrl || !category || !soccerTeam || !genre || !sizeOptions) {
+        if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
@@ -72,10 +72,10 @@ async function updateProduct(req, res) {
     try {
 
         const { id } = req.params;
-        const { name, description, price, stock, imagesUrl, soccerTeam, genre, sizeOptions, category } = req.body;
+        const { name, description, price, stock, imagesUrl, sizeOptions, category } = req.body;
 
 
-        if (!name || !description || !price || !stock || !imagesUrl || !category || !soccerTeam || !genre || !sizeOptions) {
+        if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
