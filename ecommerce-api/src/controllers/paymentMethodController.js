@@ -1,11 +1,12 @@
 import PaymentMethod from '../models/paymentMethod.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 async function getPaymentMethods(req, res) {
   try {
     const paymentMethods = await PaymentMethod.find({ isActive: true }).populate('user');
     res.json(paymentMethods);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -17,8 +18,8 @@ async function getPaymentMethodById(req, res) {
       return res.status(404).json({ message: 'Payment method not found' });
     }
     res.json(paymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -34,8 +35,8 @@ async function getPaymentMethodsByUser(req, res) {
       return res.status(404).json({ message: 'No payment methods found for this user' });
     }
     res.json(paymentMethods);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -115,8 +116,8 @@ async function createPaymentMethod(req, res) {
 
     await newPaymentMethod.populate('user');
     res.status(201).json(newPaymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -166,8 +167,8 @@ async function updatePaymentMethod(req, res) {
     ).populate('user');
 
     res.status(200).json(updatedPaymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -198,8 +199,8 @@ async function setDefaultPaymentMethod(req, res) {
     ).populate('user');
 
     res.status(200).json(updatedPaymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -219,8 +220,8 @@ async function deactivatePaymentMethod(req, res) {
     ).populate('user');
 
     res.status(200).json(updatedPaymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -234,8 +235,8 @@ async function deletePaymentMethod(req, res) {
     }
 
     res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -253,8 +254,8 @@ async function getDefaultPaymentMethod(req, res) {
     }
 
     res.json(defaultPaymentMethod);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 

@@ -10,11 +10,13 @@ import {
   markAllAsReadByUser,
   getUnreadNotificationsByUser,
 } from '../controllers/notificationController.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import isAdmin from '../middlewares/isAdminMiddleware.js';
 
 const router = express.Router();
 
 // Obtener todas las notificaciones (admin)
-router.get('/notifications', getNotifications);
+router.get('/notifications', authMiddleware, isAdmin, getNotifications);
 
 // Obtener notificaciones no leídas por usuario
 router.get('/notifications/unread/:userId', getUnreadNotificationsByUser);

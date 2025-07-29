@@ -1,11 +1,12 @@
 import Notification from '../models/notification.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 async function getNotifications(req, res) {
   try {
     const notifications = await Notification.find().populate('user').sort({ message: 1 });
     res.json(notifications);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -17,8 +18,8 @@ async function getNotificationById(req, res) {
       return res.status(404).json({ message: 'Notification not found' });
     }
     res.json(notification);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -30,8 +31,8 @@ async function getNotificationByUser(req, res) {
       return res.status(404).json({ message: 'No notifications found for this user' });
     }
     res.json(notifications);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -49,8 +50,8 @@ async function createNotification(req, res) {
 
     await newNotification.populate('user');
     res.status(201).json(newNotification);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -69,8 +70,8 @@ async function updateNotification(req, res) {
     } else {
       return res.status(404).json({ message: 'Notification not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -84,8 +85,8 @@ async function deleteNotification(req, res) {
     } else {
       return res.status(404).json({ message: 'Notification not found' });
     }
-  } catch (error) {
-    res.status(500).json({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -103,8 +104,8 @@ async function markAsRead(req, res) {
     } else {
       return res.status(404).json({ message: 'Notification not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -120,8 +121,8 @@ async function markAllAsReadByUser(req, res) {
       message: `${result.modifiedCount} notifications marked as read`,
       modifiedCount: result.modifiedCount
     });
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -137,8 +138,8 @@ async function getUnreadNotificationsByUser(req, res) {
       count: notifications.length,
       notifications
     });
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 

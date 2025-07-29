@@ -1,4 +1,5 @@
 import Product from '../models/product.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 async function getProducts(req, res) {
 
@@ -8,8 +9,8 @@ async function getProducts(req, res) {
 
         res.json(products);
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 
@@ -26,8 +27,8 @@ async function getProductById(req, res) {
 
         res.json(product);
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 
@@ -36,16 +37,16 @@ async function getProductByCategory(req, res) {
     try {
 
         const id = req.params.idCategory;
-        const products = await Product.findById({ category: id }).sort({ name: 1 });
+        const products = await Product.find({ category: id }).sort({ name: 1 });
 
-        if (products === 0) {
+        if (products.length === 0) {
             return res.status(404).json({ message: 'No products found for this category' });
         }
 
         res.json(products);
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 
@@ -59,11 +60,11 @@ async function createProduct(req, res) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const newProduct = await Product.create({ name, description, price, stock, imagesUrl, category });
+        const newProduct = await Product.create({ name, description, price, stock, imagesUrl, sizeOptions, category });
         res.status(201).json(newProduct);
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 
@@ -79,7 +80,7 @@ async function updateProduct(req, res) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, stock, imagesUrl, category }, { new: true });
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, stock, imagesUrl, sizeOptions, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);
@@ -87,8 +88,8 @@ async function updateProduct(req, res) {
             return res.status(404).json({ message: 'Product not found' })
         }
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 
@@ -100,13 +101,13 @@ async function deleteProduct(req, res) {
         const deletedProduct = await Product.findByIdAndDelete(id);
 
         if (deletedProduct) {
-            return res.status(204);
+            return res.status(204).send();
         } else {
             return res.status(404).json({ message: 'Product not found' })
         }
 
-    } catch (error) {
-        res.status(500).json({ error });
+    } catch (err) {
+        errorHandler(err, req, res);
     }
 };
 

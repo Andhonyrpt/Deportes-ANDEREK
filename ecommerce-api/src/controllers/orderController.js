@@ -1,4 +1,5 @@
 import Order from '../models/order.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 async function getOrders(req, res) {
   try {
@@ -9,8 +10,8 @@ async function getOrders(req, res) {
       .populate('paymentMethod')
       .sort({ status: 1 });
     res.json(orders);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -26,8 +27,8 @@ async function getOrderById(req, res) {
       return res.status(404).json({ message: 'Order not found' });
     }
     res.json(order);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -45,8 +46,8 @@ async function getOrdersByUser(req, res) {
       return res.status(404).json({ message: 'No orders found for this user' });
     }
     res.json(orders);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -98,8 +99,8 @@ async function createOrder(req, res) {
     await newOrder.populate('paymentMethod');
 
     res.status(201).json(newOrder);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -142,8 +143,8 @@ async function updateOrder(req, res) {
     } else {
       return res.status(404).json({ message: 'Order not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -177,8 +178,8 @@ async function cancelOrder(req, res) {
       .populate('paymentMethod');
 
     res.status(200).json(updatedOrder);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -209,8 +210,8 @@ async function updateOrderStatus(req, res) {
     } else {
       return res.status(404).json({ message: 'Order not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -241,8 +242,8 @@ async function updatePaymentStatus(req, res) {
     } else {
       return res.status(404).json({ message: 'Order not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -264,8 +265,8 @@ async function deleteOrder(req, res) {
 
     await Order.findByIdAndDelete(id);
     res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 

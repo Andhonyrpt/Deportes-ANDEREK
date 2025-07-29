@@ -1,11 +1,12 @@
 import Cart from '../models/cart.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 async function getCarts(req, res) {
   try {
     const carts = await Cart.find().populate('user').populate('products.product');
     res.json(carts);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -17,8 +18,8 @@ async function getCartById(req, res) {
       return res.status(404).json({ message: 'Cart not found' });
     }
     res.json(cart);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -30,8 +31,8 @@ async function getCartByUser(req, res) {
       return res.status(404).json({ message: 'No cart found for this user' });
     }
     res.json(cart);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -58,8 +59,8 @@ async function createCart(req, res) {
     await newCart.populate('products.product');
 
     res.status(201).json(newCart);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -88,8 +89,8 @@ async function updateCart(req, res) {
     } else {
       return res.status(404).json({ message: 'Cart not found' });
     }
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -103,8 +104,8 @@ async function deleteCart(req, res) {
     } else {
       return res.status(404).json({ message: 'Cart not found' });
     }
-  } catch (error) {
-    res.status(500).json({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 
@@ -145,8 +146,8 @@ async function addProductToCart(req, res) {
     await cart.populate('products.product');
 
     res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).send({ error });
+  } catch (err) {
+    errorHandler(err, req, res);
   }
 }
 

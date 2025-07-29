@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+import errorHandler from '../middlewares/errorHandler.js';
 
 const generateToken = (userId, displayName, role) => {
     return jwt.sign({ userId, displayName, role },
@@ -9,13 +10,15 @@ const generateToken = (userId, displayName, role) => {
     );
 };
 
+const checkUserExist = async (email) => {
+    const user = await User.findOne({ email });
+    console.log(user);
+    return user;
+};
+
 const generatePassword = async (password) => {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
-};
-
-const checkUserExist = async (email) => {
-    return (user = await User.findOne({ email }));
 };
 
 async function register(req, res) {
@@ -28,7 +31,7 @@ async function register(req, res) {
             return res.status(400).json({ message: 'User already exist' });
         }
 
-        const hashPassword = await generatePassword(body.password);
+        const hashPassword = await generatePassword(req.body.password);
 
         const newUser = new User({
             displayName,
@@ -43,7 +46,7 @@ async function register(req, res) {
         res.status(201).json(newUser);
 
     } catch (err) {
-        res.status(500).json({ error: 'Internal Server error' });
+        errorHandler(err, req, res);
     }
 
 };
@@ -55,7 +58,7 @@ async function login(req, res) {
 
         const userExist = await checkUserExist(email);
         if (!userExist) {
-            return res.status(400).json({ message: "User doesn't exist. Ypu have to sign in" });
+            return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
         }
 
         const isMatch = await bcrypt.compare(password, userExist.hashPassword);
@@ -66,7 +69,7 @@ async function login(req, res) {
         const token = generateToken(userExist._id, userExist.displayName, userExist.role);
         res.status(200).json({ token });
     } catch (err) {
-        res.status(500).json({ error: 'Internal Server error' });
+        errorHandler(err, req, res);
     }
 
 };
