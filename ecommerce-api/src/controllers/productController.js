@@ -56,7 +56,7 @@ async function createProduct(req, res) {
 
         const { name, description, price, stock, imagesUrl, sizeOptions, category } = req.body;
 
-        if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
+        if (!name || !description || !price || !stock || !imagesUrl || !sizeOptions || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 

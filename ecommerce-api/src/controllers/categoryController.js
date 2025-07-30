@@ -25,12 +25,13 @@ async function getCategoryById(req, res) {
 }
 
 async function createCategory(req, res) {
-    const { name, description, parentCategory, imageUrl } = req.body;
+    const { name, description, modelo, parentCategory, imageUrl } = req.body;
 
     try {
         const newCategory = new Category({
             name,
             description,
+            modelo,
             parentCategory: parentCategory || null,
             imageUrl: imageUrl || null,
         });
@@ -43,12 +44,12 @@ async function createCategory(req, res) {
 }
 
 async function updateCategory(req, res) {
-    const { name, description, parentCategory, imageUrl } = req.body;
+    const { name, description, modelo, parentCategory, imageUrl } = req.body;
 
     try {
         const updatedCategory = await Category.findByIdAndUpdate(
             req.params.id,
-            { name, description, parentCategory, imageUrl },
+            { name, description, modelo, parentCategory, imageUrl },
             { new: true }
         );
 

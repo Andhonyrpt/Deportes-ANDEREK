@@ -7,6 +7,7 @@ import notificationRoutes from './notificationRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import paymentMethodRoutes from './paymentMethodRoutes.js';
 import productRoutes from './productRoutes.js';
+import userRoutes from './userRoutes.js';
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.use(notificationRoutes);
 router.use(orderRoutes);
 router.use(paymentMethodRoutes);
 router.use(productRoutes);
+router.use(userRoutes);
 
 export default router;

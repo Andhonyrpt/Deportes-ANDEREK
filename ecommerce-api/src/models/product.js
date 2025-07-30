@@ -21,24 +21,19 @@ const productSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
-    imagesURL: [{
+    sizeOptions: [{
         type: String,
-        default: 'https://placehold.co/800x600.png',
-        trim: true
+        enum: ['S', 'M', 'L', 'XL', 'XXL']
     }],
-    soccerTeam: {
-        type: String,
-        required: true,
-        trim: true
-    },
     genre: {
         type: String,
         enum: ['Hombre', 'Mujer', 'Niño'],
         default: 'Hombre'
     },
-    sizeOptions: [{
+    imagesURL: [{
         type: String,
-        enum: ['S', 'M', 'L', 'XL', 'XXL']
+        default: 'https://placehold.co/800x600.png',
+        trim: true
     }],
     category: {
         type: mongoose.Schema.Types.ObjectId,

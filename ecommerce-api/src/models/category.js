@@ -11,6 +11,11 @@ const categorySchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    modelo: {
+        type: String,
+        enum: ['Local', 'Visitante'],
+        required: true
+    },
     imageURL: {
         type: String,
         trim: true,
