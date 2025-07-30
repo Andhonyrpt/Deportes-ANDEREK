@@ -54,13 +54,13 @@ async function createProduct(req, res) {
 
     try {
 
-        const { name, description, price, stock, imagesUrl, sizeOptions, category } = req.body;
+        const { name, description,modelo,sizes,genre, price, stock, imagesUrl, category } = req.body;
 
         if (!name || !description || !price || !stock || !imagesUrl || !sizeOptions || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const newProduct = await Product.create({ name, description, price, stock, imagesUrl, sizeOptions, category });
+        const newProduct = await Product.create({name, description,modelo,sizes,genre, price, stock, imagesUrl, category });
         res.status(201).json(newProduct);
 
     } catch (err) {
@@ -73,14 +73,14 @@ async function updateProduct(req, res) {
     try {
 
         const { id } = req.params;
-        const { name, description, price, stock, imagesUrl, sizeOptions, category } = req.body;
+        const { name, description,modelo,sizes,genre, price, stock, imagesUrl, category } = req.body;
 
 
         if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, stock, imagesUrl, sizeOptions, category }, { new: true });
+        const updatedProduct = await Product.findByIdAndUpdate(id, {name, description,modelo,sizes,genre, price, stock, imagesUrl, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);

@@ -11,6 +11,20 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    modelo: {
+        type: String,
+        enum: ['Local', 'Visitante'],
+        required: true
+    },
+    sizes: [{
+        type: String,
+        enum: ['S', 'M', 'L',]
+    }],
+    genre: {
+        type: String,
+        enum: ['Hombre', 'Mujer', 'Niño'],
+        default: 'Hombre'
+    },
     price: {
         type: Number,
         required: true,
@@ -20,15 +34,6 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0
-    },
-    sizeOptions: [{
-        type: String,
-        enum: ['S', 'M', 'L', 'XL', 'XXL']
-    }],
-    genre: {
-        type: String,
-        enum: ['Hombre', 'Mujer', 'Niño'],
-        default: 'Hombre'
     },
     imagesURL: [{
         type: String,
