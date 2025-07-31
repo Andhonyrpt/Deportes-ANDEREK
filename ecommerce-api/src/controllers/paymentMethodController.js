@@ -1,16 +1,15 @@
 import PaymentMethod from '../models/paymentMethod.js';
-import errorHandler from '../middlewares/errorHandler.js';
 
-async function getPaymentMethods(req, res) {
+async function getPaymentMethods(req, res, next) {
   try {
     const paymentMethods = await PaymentMethod.find({ isActive: true }).populate('user');
     res.json(paymentMethods);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function getPaymentMethodById(req, res) {
+async function getPaymentMethodById(req, res, next) {
   try {
     const id = req.params.id;
     const paymentMethod = await PaymentMethod.findById(id).populate('user');
@@ -19,11 +18,11 @@ async function getPaymentMethodById(req, res) {
     }
     res.json(paymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function getPaymentMethodsByUser(req, res) {
+async function getPaymentMethodsByUser(req, res, next) {
   try {
     const userId = req.params.userId;
     const paymentMethods = await PaymentMethod.find({
@@ -36,11 +35,11 @@ async function getPaymentMethodsByUser(req, res) {
     }
     res.json(paymentMethods);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function createPaymentMethod(req, res) {
+async function createPaymentMethod(req, res, next) {
   try {
     const {
       user,
@@ -117,11 +116,11 @@ async function createPaymentMethod(req, res) {
     await newPaymentMethod.populate('user');
     res.status(201).json(newPaymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function updatePaymentMethod(req, res) {
+async function updatePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -168,11 +167,11 @@ async function updatePaymentMethod(req, res) {
 
     res.status(200).json(updatedPaymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function setDefaultPaymentMethod(req, res) {
+async function setDefaultPaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -200,11 +199,11 @@ async function setDefaultPaymentMethod(req, res) {
 
     res.status(200).json(updatedPaymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function deactivatePaymentMethod(req, res) {
+async function deactivatePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -221,11 +220,11 @@ async function deactivatePaymentMethod(req, res) {
 
     res.status(200).json(updatedPaymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function deletePaymentMethod(req, res) {
+async function deletePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -236,11 +235,11 @@ async function deletePaymentMethod(req, res) {
 
     res.status(204).send();
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function getDefaultPaymentMethod(req, res) {
+async function getDefaultPaymentMethod(req, res, next) {
   try {
     const userId = req.params.userId;
     const defaultPaymentMethod = await PaymentMethod.findOne({
@@ -255,7 +254,7 @@ async function getDefaultPaymentMethod(req, res) {
 
     res.json(defaultPaymentMethod);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 

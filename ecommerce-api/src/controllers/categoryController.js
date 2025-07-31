@@ -1,16 +1,15 @@
 import Category from '../models/category.js'
-import errorHandler from '../middlewares/errorHandler.js';
 
-async function getCategories(req, res) {
+async function getCategories(req, res, next) {
     try {
         const categories = await Category.find().populate("parentCategory");
         res.status(200).json(categories);
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
-}
+};
 
-async function getCategoryById(req, res) {
+async function getCategoryById(req, res, next) {
     try {
         const category = await Category.findById(req.params.id).populate(
             "parentCategory"
@@ -20,36 +19,36 @@ async function getCategoryById(req, res) {
         }
         res.status(200).json(category);
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
-}
+};
 
-async function createCategory(req, res) {
-    const { name, description, modelo, parentCategory, imageUrl } = req.body;
+async function createCategory(req, res, next) {
+    const { name, description, imageUrl, parentCategory } = req.body;
 
     try {
         const newCategory = new Category({
             name,
             description,
-            modelo,
-            parentCategory: parentCategory || null,
             imageUrl: imageUrl || null,
+            parentCategory: parentCategory || null,
+
         });
 
         await newCategory.save();
         res.status(201).json(newCategory);
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
-}
+};
 
-async function updateCategory(req, res) {
-    const { name, description, modelo, parentCategory, imageUrl } = req.body;
+async function updateCategory(req, res, next) {
+    const { name, description, imageUrl, parentCategory } = req.body;
 
     try {
         const updatedCategory = await Category.findByIdAndUpdate(
             req.params.id,
-            { name, description, modelo, parentCategory, imageUrl },
+            { name, description, imageUrl, parentCategory },
             { new: true }
         );
 
@@ -59,21 +58,23 @@ async function updateCategory(req, res) {
 
         res.status(200).json(updatedCategory);
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
-}
+};
 
-async function deleteCategory(req, res) {
+async function deleteCategory(req, res, next) {
     try {
-        const category = await Category.findByIdAndDelete(req.params.id);
-        if (!category) {
+        const idCategory = req.params.id;
+        const deletedCategory = await Category.findByIdAndDelete(idCategory);
+
+        if (!deletedCategory) {
             return res.status(404).json({ message: "Category not found" });
         }
-        res.status(204).json({ message: "Category deleted successfully" });
+        res.status(204).send();
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
-}
+};
 
 
 export {
@@ -81,5 +82,5 @@ export {
     getCategoryById,
     createCategory,
     updateCategory,
-    deleteCategory,
+    deleteCategory
 };

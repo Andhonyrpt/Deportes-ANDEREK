@@ -1,107 +1,290 @@
 import User from '../models/user.js';
-import { generatePassword } from './authController.js';
-import errorHandler from '../middlewares/errorHandler.js';
+import bcrypt from 'bcrypt';
 
-
-async function getUsers(req, res) {
-
+// Obtener perfil del usuario autenticado
+const getUserProfile = async (req, res, next) => {
     try {
+        const userId = req.user.userId; // Asumiendo que tienes middleware de autenticación
 
-        const products = await User.find().sort({ name: 1 });
-
-        res.json(products);
-
-    } catch (err) {
-        errorHandler(err, req, res);
-    }
-};
-
-async function getUserById(req, res) {
-
-    try {
-
-        const id = req.params.id;
-        const user = await User.findById(id);
+        const user = await User.findById(userId).select('-hashPassword');
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json(user);
-
+        res.status(200).json({
+            message: 'User profile retrieved successfully',
+            user
+        });
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function createUser(req, res) {
+// Obtener todos los usuarios (solo admin)
+async function getUsers(req, res, next) {
 
     try {
 
-        //const { password } = req.body;
-        const { displayName, email, password, role, avatar, phone, isActive } = req.body;
-        const hashPassword = await generatePassword(password);
+        const { page = 1, limit = 10, role, isActive } = req.query;
 
-        if (!displayName || !email || !hashPassword || !role || !avatar || !phone || !isActive) {
-            return res.status(400).json({ error: 'All files are required' });
-        }
+        // Construir filtro
+        const filter = {};
+        if (role) filter.role = role;
+        if (isActive !== undefined) filter.isActive = isActive === 'true';
 
-        const newUser = await User.create({ displayName, email, hashPassword, role, avatar, phone, isActive });
-        res.status(201).json(newUser);
+        const users = await User.find(filter)
+            .select('-hashPassword')
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ _id: -1 });
+
+        const total = await User.countDocuments(filter);
+
+        res.status(200).json({
+            message: 'Users retrieved successfully',
+            users,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            total
+        });
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function updateUser(req, res) {
+// Obtener usuario por ID (solo admin)
+async function getUserById(req, res, next) {
 
     try {
 
-        const { id } = req.params;
-        const { displayName, email, password, role, avatar, phone, isActive } = req.body;
-        const hashPassword = await generatePassword(password);
+        const { userId } = req.params;
+        const user = await User.findById(userId).select('-hashPassword');
 
-
-        if (!displayName || !email || !hashPassword || !role || !avatar || !phone || !isActive) {
-            return res.status(400).json({ error: 'All files are required' });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, { displayName, email, hashPassword, role, avatar, phone, isActive }, { new: true });
-
-        if (updatedUser) {
-            return res.status(200).json(updatedUser);
-        } else {
-            return res.status(404).json({ message: 'User not found' })
-        }
+        res.status(200).json({
+            message: 'User retrieved successfully',
+            user
+        });
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function deleteUser(req, res) {
+async function updateUserProfile(req, res, next) {
 
     try {
 
-        const { id } = req.params;
-        const deletedUser = await User.findByIdAndDelete(id);
+        const userId = req.params.userId;
+        const { displayName, email, phone, avatar } = req.body;
 
-        if (deletedUser) {
-            return res.status(204).send();
-        } else {
-            return res.status(404).json({ message: 'User not found' })
+        // Verificar si el email ya existe (si se está cambiando)
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email, _id: { $ne: userId } });
+            if (emailExists) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+        }
+
+        // Actualizar campos
+        if (displayName) user.displayName = displayName;
+        if (email) user.email = email;
+        if (phone) user.phone = phone;
+        if (avatar) user.avatar = avatar;
+
+        await user.save();
+
+        // Devolver usuario sin password
+        const updatedUser = await User.findById(userId).select('-hashPassword');
+
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            user: updatedUser
+        });
+
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
+    }
+};
+
+// Cambiar contraseña
+const changePassword = async (req, res, next) => {
+
+    try {
+
+        const userId = req.user.userId;
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verificar contraseña actual
+        const isMatch = await bcrypt.compare(currentPassword, user.hashPassword);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        // Hash nueva contraseña
+        const saltRounds = 10;
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        user.hashPassword = hashedNewPassword;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Password changed successfully'
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Actualizar usuario (solo admin)
+const updateUser = async (req, res, next) => {
+
+    try {
+
+        const { userId } = req.params;
+        const { displayName, email, phone, avatar, role, isActive } = req.body;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verificar si el email ya existe (si se está cambiando)
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email, _id: { $ne: userId } });
+
+            if (emailExists) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+        }
+
+        // Actualizar campos
+        if (displayName) user.displayName = displayName;
+        if (email) user.email = email;
+        if (phone) user.phone = phone;
+        if (avatar) user.avatar = avatar;
+        if (role) user.role = role;
+        if (isActive !== undefined) user.isActive = isActive;
+
+        await user.save();
+
+        const updatedUser = await User.findById(userId).select('-hashPassword');
+
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: updatedUser
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Desactivar usuario
+const deactivateUser = async (req, res, next) => {
+
+    try {
+
+        const userId = req.user.userId;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.isActive = false;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Account deactivated successfully'
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Activar/Desactivar usuario (solo admin)
+const toggleUserStatus = async (req, res, next) => {
+
+    try {
+
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.isActive = !user.isActive;
+        await user.save();
+
+        const updatedUser = await User.findById(userId).select('-hashPassword');
+
+        res.status(200).json({
+            message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+            user: updatedUser
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Eliminar cuenta (soft delete)
+async function deleteUser(req, res, next) {
+
+    try {
+
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Soft delete - solo desactivar
+        user.isActive = false;
+        await user.save();
+
+        res.status(200).json({
+            message: 'User deleted successfully'
+        });
+
+    } catch (err) {
+        next(err);
     }
 };
 
 export {
+    getUserProfile,
     getUsers,
     getUserById,
-    createUser,
+    updateUserProfile,
+    changePassword,
     updateUser,
+    deactivateUser,
+    toggleUserStatus,
     deleteUser
 };

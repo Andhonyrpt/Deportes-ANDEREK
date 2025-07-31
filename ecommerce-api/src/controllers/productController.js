@@ -1,25 +1,44 @@
 import Product from '../models/product.js';
-import errorHandler from '../middlewares/errorHandler.js';
 
-async function getProducts(req, res) {
+async function getProducts(req, res, next) {
 
     try {
+        //req.params
+        //req.query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        const products = await Product.find().sort({ name: 1 });
+        const products = await Product.find()
+            .populate('category')
+            .populate(skip)
+            .limit(limit)
+            .sort({ name: 1 });
 
-        res.json(products);
+        const totalResults = await Product.countDocuments(); // Conocer cuantos productos hay en la base de datos
+        const totalPages = Math.ceil(totalResults / limit);
+
+        res.json({
+            products,
+            pagination: {
+                totalPages,
+                totalResults,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        });
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function getProductById(req, res) {
+async function getProductById(req, res, next) {
 
     try {
 
         const id = req.params.id;
-        const product = await Product.findById(id);
+        const product = await Product.findById(id).populate('category');
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -28,16 +47,16 @@ async function getProductById(req, res) {
         res.json(product);
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function getProductByCategory(req, res) {
+async function getProductByCategory(req, res, next) {
 
     try {
 
         const id = req.params.idCategory;
-        const products = await Product.find({ category: id }).sort({ name: 1 });
+        const products = await Product.find({ category: id }).populate('category').sort({ name: 1 });
 
         if (products.length === 0) {
             return res.status(404).json({ message: 'No products found for this category' });
@@ -46,41 +65,41 @@ async function getProductByCategory(req, res) {
         res.json(products);
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function createProduct(req, res) {
+async function createProduct(req, res, next) {
 
     try {
 
-        const { name, description,modelo,sizes,genre, price, stock, imagesUrl, category } = req.body;
+        const { name, description, modelo, sizes, genre, price, stock, imagesUrl, category } = req.body;
 
         if (!name || !description || !price || !stock || !imagesUrl || !sizeOptions || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const newProduct = await Product.create({name, description,modelo,sizes,genre, price, stock, imagesUrl, category });
+        const newProduct = await Product.create({ name, description, modelo, sizes, genre, price, stock, imagesUrl, category });
         res.status(201).json(newProduct);
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function updateProduct(req, res) {
+async function updateProduct(req, res, next) {
 
     try {
 
         const { id } = req.params;
-        const { name, description,modelo,sizes,genre, price, stock, imagesUrl, category } = req.body;
+        const { name, description, modelo, sizes, genre, price, stock, imagesUrl, category } = req.body;
 
 
         if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, {name, description,modelo,sizes,genre, price, stock, imagesUrl, category }, { new: true });
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, sizes, genre, price, stock, imagesUrl, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);
@@ -89,11 +108,11 @@ async function updateProduct(req, res) {
         }
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 
-async function deleteProduct(req, res) {
+async function deleteProduct(req, res, next) {
 
     try {
 
@@ -107,7 +126,7 @@ async function deleteProduct(req, res) {
         }
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 };
 

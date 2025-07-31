@@ -1,7 +1,6 @@
 import Order from '../models/order.js';
-import errorHandler from '../middlewares/errorHandler.js';
 
-async function getOrders(req, res) {
+async function getOrders(req, res, next) {
   try {
     const orders = await Order.find()
       .populate('user')
@@ -11,13 +10,13 @@ async function getOrders(req, res) {
       .sort({ status: 1 });
     res.json(orders);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function getOrderById(req, res) {
+async function getOrderById(req, res, next) {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const order = await Order.findById(id)
       .populate('user')
       .populate('products.productId')
@@ -28,11 +27,11 @@ async function getOrderById(req, res) {
     }
     res.json(order);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function getOrdersByUser(req, res) {
+async function getOrdersByUser(req, res, next) {
   try {
     const userId = req.params.userId;
     const orders = await Order.find({ user: userId })
@@ -47,11 +46,11 @@ async function getOrdersByUser(req, res) {
     }
     res.json(orders);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function createOrder(req, res) {
+async function createOrder(req, res, next) {
   try {
     const {
       user,
@@ -100,11 +99,11 @@ async function createOrder(req, res) {
 
     res.status(201).json(newOrder);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function updateOrder(req, res) {
+async function updateOrder(req, res, next) {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -144,11 +143,11 @@ async function updateOrder(req, res) {
       return res.status(404).json({ message: 'Order not found' });
     }
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function cancelOrder(req, res) {
+async function cancelOrder(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -179,11 +178,11 @@ async function cancelOrder(req, res) {
 
     res.status(200).json(updatedOrder);
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function updateOrderStatus(req, res) {
+async function updateOrderStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -211,11 +210,11 @@ async function updateOrderStatus(req, res) {
       return res.status(404).json({ message: 'Order not found' });
     }
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function updatePaymentStatus(req, res) {
+async function updatePaymentStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { paymentStatus } = req.body;
@@ -243,11 +242,11 @@ async function updatePaymentStatus(req, res) {
       return res.status(404).json({ message: 'Order not found' });
     }
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
-async function deleteOrder(req, res) {
+async function deleteOrder(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -266,7 +265,7 @@ async function deleteOrder(req, res) {
     await Order.findByIdAndDelete(id);
     res.status(204).send();
   } catch (err) {
-    errorHandler(err, req, res);
+    next(err);
   }
 }
 
@@ -279,5 +278,5 @@ export {
   cancelOrder,
   updateOrderStatus,
   updatePaymentStatus,
-  deleteOrder,
+  deleteOrder
 };

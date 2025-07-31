@@ -11,8 +11,8 @@ import isAdmin from '../middlewares/isAdminMiddleware.js';
 
 const router = express.Router();
 
-router.get('/categories', getCategories);
-router.get('/categories/:id', getCategoryById);
+router.get('/categories', authMiddleware, getCategories);
+router.get('/categories/:id', authMiddleware, isAdmin, getCategoryById);
 router.post('/categories', authMiddleware, isAdmin, createCategory);
 router.put('/categories/:id', authMiddleware, isAdmin, updateCategory);
 router.delete('/categories/:id', authMiddleware, isAdmin, deleteCategory);

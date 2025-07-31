@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
-import errorHandler from '../middlewares/errorHandler.js';
 
 const generateToken = (userId, displayName, role) => {
     return jwt.sign({ userId, displayName, role },
@@ -21,37 +20,37 @@ const generatePassword = async (password) => {
     return await bcrypt.hash(password, saltRounds);
 };
 
-async function register(req, res) {
+async function register(req, res, next) {
 
     try {
-        const { displayName, email, role, avatar, phone } = req.body;
+        const { displayName, email, password, phone } = req.body;
 
         const userExist = await checkUserExist(email);
         if (userExist) {
             return res.status(400).json({ message: 'User already exist' });
         }
 
-        const hashPassword = await generatePassword(req.body.password);
+        let role = 'guest';
+        const hashPassword = await generatePassword(password);
 
         const newUser = new User({
             displayName,
             email,
             hashPassword,
             role,
-            avatar,
             phone
         });
         await newUser.save();
 
-        res.status(201).json(newUser);
+        res.status(201).json({ displayName, email, phone });
 
     } catch (err) {
-        errorHandler(err, req, res);
+        next(err);
     }
 
 };
 
-async function login(req, res) {
+async function login(req, res, next) {
 
     try {
         const { email, password } = req.body;
@@ -69,9 +68,10 @@ async function login(req, res) {
         const token = generateToken(userExist._id, userExist.displayName, userExist.role);
         res.status(200).json({ token });
     } catch (err) {
-        errorHandler(err, req, res);
+        console.log(err);
+        next(err);
     }
 
 };
 
-export { register, login, generatePassword };
+export { register, login };
