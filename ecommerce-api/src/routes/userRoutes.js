@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, param, query } from 'express-validator';
-import validate from '../middlewares/validation.js';
+import validate from '../middlewares/validations.js';
 import {
     getUserProfile,
     getUsers,
@@ -12,7 +12,7 @@ import {
     toggleUserStatus,
     deleteUser
 } from '../controllers/userController.js';
-import authMiddleware from '../middlewares/auth.js'; // Middleware de autenticación
+import authMiddleware from '../middlewares/authMiddleware.js'; // Middleware de autenticación
 import isAdmin from '../middlewares/isAdminMiddleware.js'; // Middleware de admin
 
 const router = express.Router();

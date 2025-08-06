@@ -22,6 +22,14 @@ app.get('/', (req, res) => {
 
 app.use('/api', routes);
 
+app.use((req, res) => {
+    res.status(404).json({
+        error: 'Ruta no encontrada',
+        method: req.method,
+        url: req.originalUrl
+    });
+});
+
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {

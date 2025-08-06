@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validation.js';
+import validate from '../middlewares/validations.js';
 import {
     getUserWishList,
     addToWishList,
@@ -9,7 +9,7 @@ import {
     checkProductInWishList,
     moveToCart
 } from '../controllers/wishListController.js';
-import authMiddleware from '../middlewares/auth.js'; // Middleware de autenticación
+import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

@@ -1,4 +1,6 @@
 import express from 'express';
+import { body, param } from 'express-validator';
+import validate from '../middlewares/validations.js';
 import {
     getCategories,
     getCategoryById,
@@ -11,10 +13,39 @@ import isAdmin from '../middlewares/isAdminMiddleware.js';
 
 const router = express.Router();
 
+const validateCategory = [
+    body('name')
+        .notEmpty().withMessage('El nombre es obligatorio')
+        .isString().withMessage('El nombre debe ser una cadena de texto')
+        .trim(),
+
+    body('description')
+        .notEmpty().withMessage('La descripción es obligatoria')
+        .isString().withMessage('La descripción debe ser una cadena de texto')
+        .trim(),
+
+    body('imageUrl')
+        .optional()
+        .isURL().withMessage('La URL de la imagen no es válida'),
+
+    body('parentCategory')
+        .optional()
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
+];
+
 router.get('/categories', authMiddleware, getCategories);
-router.get('/categories/:id', authMiddleware, isAdmin, getCategoryById);
-router.post('/categories', authMiddleware, isAdmin, createCategory);
-router.put('/categories/:id', authMiddleware, isAdmin, updateCategory);
-router.delete('/categories/:id', authMiddleware, isAdmin, deleteCategory);
+router.get('/categories/:id', [
+    param('id')
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
+], validate, authMiddleware, isAdmin, getCategoryById);
+router.post('/categories', validateCategory,validate, authMiddleware, isAdmin, createCategory);
+router.put('/categories/:id', [
+    param('id')
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
+], validateCategory, validate, authMiddleware, isAdmin, updateCategory);
+router.delete('/categories/:id', [
+    param('id')
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
+], validate, authMiddleware, isAdmin, deleteCategory);
 
 export default router;
