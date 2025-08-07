@@ -73,13 +73,13 @@ async function createProduct(req, res, next) {
 
     try {
 
-        const { name, description, modelo, sizes, genre, price, stock, imagesUrl, category } = req.body;
+        const { name, description, modelo, sizes, genre, price, stock, imagesURL, category } = req.body;
 
-        if (!name || !description || !price || !stock || !imagesUrl || !sizeOptions || !category) {
+        if (!name || !description || !price || !stock || !sizes || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const newProduct = await Product.create({ name, description, modelo, sizes, genre, price, stock, imagesUrl, category });
+        const newProduct = await Product.create({ name, description, modelo, sizes, genre, price, stock, imagesURL, category });
         res.status(201).json(newProduct);
 
     } catch (err) {
@@ -92,14 +92,14 @@ async function updateProduct(req, res, next) {
     try {
 
         const { id } = req.params;
-        const { name, description, modelo, sizes, genre, price, stock, imagesUrl, category } = req.body;
+        const { name, description, modelo, sizes, genre, price, stock, imagesURL, category } = req.body;
 
 
-        if (!name || !description || !price || !stock || !imagesUrl || !category || !sizeOptions) {
+        if (!name || !description || !price || !stock || !category || !sizes) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, sizes, genre, price, stock, imagesUrl, category }, { new: true });
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, sizes, genre, price, stock, imagesURL, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);

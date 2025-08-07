@@ -35,18 +35,17 @@ const productSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
-    imagesURL: [{
-        type: String,
-        default: 'https://placehold.co/800x600.png',
+    imagesURL: {
+        type: [String],
+        default: ['https://placehold.co/800x600.png'],
         trim: true
-    }],
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true
     }
-}, {
-    timestamps: true // <-- agrega createdAt y updatedAt
+    
 });
 
 

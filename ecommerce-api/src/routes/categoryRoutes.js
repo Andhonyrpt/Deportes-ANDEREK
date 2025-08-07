@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import validate from '../middlewares/validations.js';
 import {
     getCategories,
@@ -35,6 +35,7 @@ const validateCategory = [
 ];
 
 router.get('/categories', authMiddleware, getCategories);
+
 router.get('/categories/search', [
     query('q')
         .optional()
@@ -62,15 +63,19 @@ router.get('/categories/search', [
         .isInt({ min: 1 })
         .withMessage('Limit must be a positive integer')
 ], validate, searchCategories);
+
 router.get('/categories/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
 ], validate, authMiddleware, isAdmin, getCategoryById);
+
 router.post('/categories', validateCategory, validate, authMiddleware, isAdmin, createCategory);
+
 router.put('/categories/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
 ], validateCategory, validate, authMiddleware, isAdmin, updateCategory);
+
 router.delete('/categories/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')

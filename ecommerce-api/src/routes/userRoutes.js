@@ -46,7 +46,7 @@ router.get('/profile/:userId', [
         .isMongoId().withMessage('User ID must be a valid MongoDB ObjectId')
 ], validate, authMiddleware, getUserProfile);
 
-router, get('/search', [
+router.get('/search', [
     query('q')
         .optional()
         .isString().withMessage('Search term must be a string'),
