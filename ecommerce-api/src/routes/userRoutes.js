@@ -10,7 +10,8 @@ import {
     updateUser,
     deactivateUser,
     toggleUserStatus,
-    deleteUser
+    deleteUser,
+    searchUsers
 } from '../controllers/userController.js';
 import authMiddleware from '../middlewares/authMiddleware.js'; // Middleware de autenticación
 import isAdmin from '../middlewares/isAdminMiddleware.js'; // Middleware de admin
@@ -40,7 +41,43 @@ const profileValidations = [
         .isURL().withMessage('Avatar must be a valid URL')
 ];
 
-router.get('/profile/:userId', authMiddleware, getUserProfile);
+router.get('/profile/:userId', [
+    param('userId')
+        .isMongoId().withMessage('User ID must be a valid MongoDB ObjectId')
+], validate, authMiddleware, getUserProfile);
+
+router, get('/search', [
+    query('q')
+        .optional()
+        .isString().withMessage('Search term must be a string'),
+
+    query('role')
+        .optional()
+        .isIn(['admin', 'customer', 'guest']) // Ajusta según tus roles definidos
+        .withMessage('Inavlid role'),
+
+    query('isActive')
+        .optional()
+        .isIn(['true', 'false']).withMessage('isActive must be "true" o "false".'),
+
+    query('sort')
+        .optional()
+        .isIn(['email', 'displayName' /*, 'createdAt'*/]) // Ajusta según campos ordenables
+        .withMessage('Invalid sort field'),
+
+    query('order')
+        .optional()
+        .isIn(['asc', 'desc']).withMessage('order must be "asc" o "desc".'),
+
+    query('page')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Page must be a positive integer'),
+    query('limit')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Limit must be a positive integer'),
+], validate, searchUsers)
 
 router.get('/users', [
     query('page')

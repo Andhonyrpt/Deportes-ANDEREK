@@ -130,6 +130,93 @@ async function deleteProduct(req, res, next) {
     }
 };
 
+async function searchProducts(req, res, next) {
+    try {
+        const {
+            q,
+            category,
+            minPrice,
+            maxPrice,
+            inStock,
+            sort,
+            order,
+            page = 1,
+            limit = 10,
+        } = req.query;
+        console.log(inStock);
+
+        let filters = {};
+
+        if (q) {
+            filters.$or = [
+                { name: { $regex: q, $options: "i" } },
+                { description: { $regex: q, $options: "i" } },
+            ];
+        }
+
+        if (category) {
+            filters.category = category;
+        }
+
+
+        if (minPrice || maxPrice) {
+            filters.price = {};
+            if (minPrice) filters.price.$gte = parseFloat(minPrice);
+            if (maxPrice) filters.price.$lte = parseFloat(maxPrice);
+        }
+        const bool = Boolean(inStock);
+        if (inStock === 'true') {
+            filters.stock = { $gt: 0 };
+        } else {
+            filters.stock = { $gte: 0 };
+        }
+
+        let sortOptions = {};
+        if (sort) {
+            const sortOrder = order === "desc" ? -1 : 1;
+            sortOptions[sort] = sortOrder;
+        } else {
+            sortOptions.createdAt = -1;
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const products = await Product.find(filters)
+            .populate("category")
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const totalResults = await Product.countDocuments(filters);
+        const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+        res.status(200).json({
+            products,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages,
+                totalResults,
+                hasNext: parseInt(page) < totalPages,
+                hasPrev: parseInt(page) > 1,
+            },
+            filters: {
+                searchTerm: q || null,
+                category: category || null,
+                priceRange: {
+                    min: minPrice ? parseFloat(minPrice) : null,
+                    max: maxPrice ? parseFloat(maxPrice) : null,
+                },
+                inStock: inStock === "true",
+                sort: sort || "createdAt",
+                order: order || "desc",
+            },
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+
 
 export {
     getProducts,
@@ -137,5 +224,6 @@ export {
     getProductByCategory,
     createProduct,
     updateProduct,
+    searchProducts,
     deleteProduct
 };

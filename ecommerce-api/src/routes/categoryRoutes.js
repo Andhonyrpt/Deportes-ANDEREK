@@ -7,6 +7,7 @@ import {
     createCategory,
     updateCategory,
     deleteCategory,
+    searchCategories
 } from '../controllers/categoryController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
@@ -34,11 +35,38 @@ const validateCategory = [
 ];
 
 router.get('/categories', authMiddleware, getCategories);
+router.get('/categories/search', [
+    query('q')
+        .optional()
+        .isString().withMessage('Search term must be a string'),
+
+    query('parentCategory')
+        .optional()
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+
+    query('sort')
+        .optional()
+        .isIn(['name', 'description' /*, 'createdAt'*/]) // ajusta según tu modelo real
+        .withMessage('Invalid sort fields'),
+
+    query('order')
+        .optional()
+        .isIn(['asc', 'desc']).withMessage('Order must be "asc" o "desc".'),
+
+    query('page')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Page must be a positive integer'),
+    query('limit')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Limit must be a positive integer')
+], validate, searchCategories);
 router.get('/categories/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
 ], validate, authMiddleware, isAdmin, getCategoryById);
-router.post('/categories', validateCategory,validate, authMiddleware, isAdmin, createCategory);
+router.post('/categories', validateCategory, validate, authMiddleware, isAdmin, createCategory);
 router.put('/categories/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')

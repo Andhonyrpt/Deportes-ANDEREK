@@ -7,7 +7,8 @@ import {
     getProductByCategory,
     createProduct,
     updateProduct,
-    deleteProduct,
+    searchProducts,
+    deleteProduct
 } from '../controllers/productController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
@@ -59,22 +60,65 @@ const validateProduct = [
 ];
 
 router.get('/products', getProducts);
+
 router.get('/products/:id', [
     param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
 
 ], validate, getProductById);
+
 router.get('/products/category/:idCategory', [
     param('idCategory')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
 
 ], validate, getProductByCategory);
+
+router.get('/products/search', [
+    query('q')
+        .optional()
+        .isString().withMessage('Search term must be a string'),
+
+    query('category')
+        .optional()
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+
+    query('minPrice')
+        .optional()
+        .isFloat({ min: 0 }).withMessage('minPrice must be a number greater than or equal to 0'),
+
+    query('maxPrice')
+        .optional()
+        .isFloat({ min: 0 }).withMessage('maxPrice must be a number greater than or equal to 0'),
+
+    query('inStock')
+        .optional()
+        .isIn(['true', 'false']).withMessage('inStock must be "true" o "false".'),
+
+    query('sort')
+        .optional()
+        .isIn(['name', 'price', 'stock' /*, 'createdAt'*/]).withMessage('Invalid sort field'),
+
+    query('order')
+        .optional()
+        .isIn(['asc', 'desc']).withMessage('order msut be "asc" o "desc".'),
+
+    query('page')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+
+    query('limit')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
+], validate, searchProducts);
+
 router.post('/products', validateProduct, validate, authMiddleware, isAdmin, createProduct);
+
 router.put('/products/:id', [
     param('idCategory')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
 
 ], validateProduct, validate, authMiddleware, isAdmin, updateProduct);
+
 router.delete('/products/:id', [
     param('idCategory')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),

@@ -76,11 +76,79 @@ async function deleteCategory(req, res, next) {
     }
 };
 
+async function searchCategories(req, res, next) {
+
+    try {
+        const {
+            q,
+            parentCategory,
+            sort,
+            order,
+            limit = 10,
+            page = 1
+        } = req.query;
+
+        let filters = {};
+
+        if (q) {
+            filters.$or = [
+                { name: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } }
+            ];
+
+            if (parentCategory) {
+                filters.parentCategory = parentCategory;
+            }
+
+            let sortOptions = {};
+
+            if (sort) {
+                const sortOrder = order === 'desc' ? -1 : 1;
+                sortOptions[sort] = sortOrder;
+            }
+            else {
+                sortOptions.name = -1;
+            }
+
+            const skip = (parseInt(page) - 1) * parseInt(limit);
+
+            const categories = await Category.find(filters)
+                .populate('parentCategory')
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(parseInt(limit));
+
+            const totalResults = await Category.countDocuments(filters);
+            const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+            res.status(200).json({
+                categories,
+                pagination: {
+                    currrentPage: parseInt(page),
+                    totalPages,
+                    totalResults,
+                    hasNext: parseInt(page) < totalPages,
+                    hasPrev: parseInt(page) < 1
+                },
+                filters: {
+                    serchTerm: q || null,
+                    parentCategory: parentCategory || null,
+                    sort: sort || 'name',
+                    order: order || 'desc'
+                }
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+
 
 export {
     getCategories,
     getCategoryById,
     createCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    searchCategories
 };

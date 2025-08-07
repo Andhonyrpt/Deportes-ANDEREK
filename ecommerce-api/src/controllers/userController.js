@@ -277,6 +277,82 @@ async function deleteUser(req, res, next) {
     }
 };
 
+async function searchUsers(req, res, next) {
+    try {
+        const {
+            q,
+            role,
+            isActive,
+            sort,
+            order,
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        let filters = {};
+
+        if (q) {
+            filters.$or = [
+                { displayName: { $regex: q, $options: 'i' } },
+                { email: { $regex: q, $options: 'i' } },
+                { phone: { $regex: q } }
+            ];
+        };
+
+        if (role) {
+            filters.role = role;
+        };
+
+        if (isActive === 'true') {
+            filters.isActive = true;
+        }
+        else if (isActive === 'false') {
+            filters.isActive = false;
+        }
+
+        let sortOptions = {};
+
+        if (sort) {
+            const sortOrder = order === 'desc' ? -1 : 1;
+            sortOptions[sort] = sortOrder;
+        }
+        else {
+            sortOptions.email = -1;
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const users = await User.find(filters)
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const totalResults = await User.countDocuments(filters);
+        const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+        res.status(200).json({
+            users,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages,
+                totalResults,
+                hasNext: parseInt(page) < totalPages,
+                hasPrev: parseInt(page) > 1
+            },
+            filters: {
+                searcTerm: q || null,
+                role: role || null,
+                isActive,
+                sort: sort || 'email',
+                order: order || 'desc'
+            }
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 export {
     getUserProfile,
     getUsers,
@@ -286,5 +362,6 @@ export {
     updateUser,
     deactivateUser,
     toggleUserStatus,
-    deleteUser
+    deleteUser,
+    searchUsers
 };
