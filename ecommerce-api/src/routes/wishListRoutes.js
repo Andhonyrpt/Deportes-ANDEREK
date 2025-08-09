@@ -14,7 +14,7 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 // Obtener la wishlist del usuario
-router.get('/', authMiddleware, getUserWishList);
+router.get('/wishlist', authMiddleware, getUserWishList);
 
 // Agregar producto a la wishlist
 router.post('/add', [

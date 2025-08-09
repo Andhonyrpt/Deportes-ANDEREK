@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validation.js';
+import validate from '../middlewares/validations.js';
 import {
     createReview,
     getProductReviews,
@@ -8,7 +8,7 @@ import {
     updateReview,
     deleteReview
 } from '../controllers/reviewController.js';
-import authMiddleware from '../middlewares/auth.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -29,7 +29,7 @@ router.post('/review', [
 ], validate, authMiddleware, createReview);
 
 // Obtener reviews de un producto específico
-router.get('/product/:productId', [
+router.get('/review-product/:productId', [
     param('productId')
         .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
 ], validate, getProductReviews);

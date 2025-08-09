@@ -1,5 +1,6 @@
-import WishList from '../models/wishList.js';
+import WishList from '../models/whisList.js';
 import Product from '../models/product.js';
+import Cart from '../models/cart.js';
 
 // Obtener la wishlist del usuario
 const getUserWishList = async (req, res, next) => {
@@ -178,6 +179,26 @@ const moveToCart = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found in wishlist' });
         }
 
+        // Buscar o crear carrito del usuario
+        let cart = await Cart.findOne({ user: userId });
+        if (!cart) {
+            cart = new Cart({ user: userId, products: [] });
+        }
+
+        // Verificar si el producto ya está en el carrito
+        const productInCart = cart.products.find(
+            item => item.product.toString() === productId
+        );
+
+        if (productInCart) {
+            productInCart.quantity += 1;
+        } else {
+            cart.products.push({ product: productId, quantity: 1 });
+        }
+
+        // Guardar carrito actualizado
+        await cart.save();
+
         // Aquí podrías agregar lógica para mover al carrito
         // Por ahora solo removemos de la wishlist
         wishList.products.splice(productIndex, 1);
@@ -185,7 +206,7 @@ const moveToCart = async (req, res, next) => {
 
         res.status(200).json({
             message: 'Product moved to cart and removed from wishlist',
-            // cart: updatedCart, // Si tienes funcionalidad de carrito
+            cart,
             wishList
         });
     } catch (err) {

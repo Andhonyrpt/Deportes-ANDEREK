@@ -84,8 +84,7 @@ router.get('/user-address/:addressId', [
 router.put('/user-address/:addressId', [
     param('addressId')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-    ...addressValidations
-], validate, authMiddleware, updateShippingAddress);
+], addressValidations, validate, authMiddleware, updateShippingAddress);
 
 // Marcar dirección como default
 router.patch('/default/:addressId', [

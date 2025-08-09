@@ -6,7 +6,7 @@ const whisListSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    product: [
+    products: [
         {
             product: {
                 type: mongoose.Schema.Types.ObjectId,
