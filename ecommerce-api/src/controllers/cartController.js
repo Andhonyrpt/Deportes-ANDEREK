@@ -24,7 +24,7 @@ async function getCartById(req, res, next) {
 
 async function getCartByUser(req, res, next) {
   try {
-    const userId = req.params.id;
+    const userId = req.params.userId;
     const cart = await Cart.findOne({ user: userId }).populate('user').populate('products.product');
     if (!cart) {
       return res.status(404).json({ message: 'No cart found for this user' });

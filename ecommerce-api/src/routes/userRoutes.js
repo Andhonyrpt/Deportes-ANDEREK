@@ -103,7 +103,10 @@ router.get('/users/:userId', [
         .isMongoId().withMessage('User ID must be a valid MongoDB ObjectId')
 ], validate, authMiddleware, isAdmin, getUserById);
 
-router.put('/profile', profileValidations, validate, authMiddleware, updateUserProfile);
+router.put('/users/profile/:userId', [
+    param('userId')
+        .isMongoId().withMessage('User ID must be a valid MongoDB ObjectId')
+], profileValidations, validate, authMiddleware, updateUserProfile);
 
 router.put('/change-password/:userId', [
     body('currentPassword')

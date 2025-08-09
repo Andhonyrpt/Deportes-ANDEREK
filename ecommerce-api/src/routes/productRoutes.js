@@ -61,18 +61,6 @@ const validateProduct = [
 
 router.get('/products', getProducts);
 
-router.get('/products/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-], validate, getProductById);
-
-router.get('/products/category/:idCategory', [
-    param('idCategory')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-], validate, getProductByCategory);
-
 router.get('/products/search', [
     query('q')
         .optional()
@@ -111,16 +99,30 @@ router.get('/products/search', [
         .isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
 ], validate, searchProducts);
 
+router.get('/products/:id', [
+    param('id')
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+
+], validate, getProductById);
+
+router.get('/products/category/:idCategory', [
+    param('idCategory')
+        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+
+], validate, getProductByCategory);
+
+
+
 router.post('/products', validateProduct, validate, authMiddleware, isAdmin, createProduct);
 
 router.put('/products/:id', [
-    param('idCategory')
+    param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
 
 ], validateProduct, validate, authMiddleware, isAdmin, updateProduct);
 
 router.delete('/products/:id', [
-    param('idCategory')
+    param('id')
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
 
 ], validate, authMiddleware, isAdmin, deleteProduct);
