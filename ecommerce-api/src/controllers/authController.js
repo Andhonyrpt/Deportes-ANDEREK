@@ -68,7 +68,6 @@ async function login(req, res, next) {
         const token = generateToken(userExist._id, userExist.displayName, userExist.role);
         res.status(200).json({ token });
     } catch (err) {
-        console.log(err);
         next(err);
     }
 
