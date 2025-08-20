@@ -68,7 +68,7 @@ router.get('/products/search', [
 
     query('category')
         .optional()
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
 
     query('minPrice')
         .optional()
@@ -101,13 +101,13 @@ router.get('/products/search', [
 
 router.get('/products/:id', [
     param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
 
 ], validate, getProductById);
 
 router.get('/products/category/:idCategory', [
     param('idCategory')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
 
 ], validate, getProductByCategory);
 
@@ -117,13 +117,13 @@ router.post('/products', validateProduct, validate, authMiddleware, isAdmin, cre
 
 router.put('/products/:id', [
     param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+        .isMongoId().withMessage(' ID must be a valid MongoDB ObjectId'),
 
 ], validateProduct, validate, authMiddleware, isAdmin, updateProduct);
 
 router.delete('/products/:id', [
     param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+        .isMongoId().withMessage(' ID must be a valid MongoDB ObjectId'),
 
 ], validate, authMiddleware, isAdmin, deleteProduct);
 
