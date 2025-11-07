@@ -1,0 +1,32 @@
+.product-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--elev-1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.product-card:hover {
+    box-shadow: var(--elev-2);
+    transform: translateY(-2px);
+}
+
+.product-card-image{
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--r2);
+    margin-bottom: 12px;
+    background: white;
+}
+
+/* .search-container {
+    margin: 25px 10px 25px 10px;
+} */
+
+/* .product-card {
+    display: flex;
+} */

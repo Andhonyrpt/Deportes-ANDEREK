@@ -1,0 +1,218 @@
+[
+    {
+        "_id": "68b0d4189b825d20ce1e573e",
+        "name": "Jersey Real Madrid Local 2024",
+        "description": "Camiseta oficial del Real Madrid temporada 2024. Diseño clásico blanco con detalles dorados.",
+        "price": 1299,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/real-madrid-white-home-jersey.jpg",
+            "/img/products/real-madrid-jersey-detail.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5701",
+            "name": "Real Madrid",
+            "description": "Jerseys del Real Madrid",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e572a"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5736",
+        "name": "Jersey Barcelona Local 2024",
+        "description": "Camiseta local del FC Barcelona. Diseño blaugrana tradicional con rayas azules y rojas.",
+        "price": 1349,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/barcelona-blaugrana-home-jersey.jpg",
+            "/img/products/barcelona-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5703",
+            "name": "Barcelona",
+            "description": "Jerseys del Barcelona",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e572a"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5734",
+        "name": "Jersey Selección México 2024",
+        "description": "Camiseta oficial de la Selección Mexicana. Verde tradicional con diseño moderno.",
+        "price": 1199,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/mexico-national-team-green-jersey.jpg",
+            "/img/products/mexico-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5705",
+            "name": "Selección Nacional de México",
+            "description": "Jerseys de la Selección Nacional de México",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e572c"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e573c",
+        "name": "Jersey Manchester United Local 2024",
+        "description": "Camiseta del Manchester United. Rojo característico con detalles negros.",
+        "price": 1249,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/manchester-united-red-home-jersey.jpg",
+            "/img/products/manchester-united-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5707",
+            "name": "Manchester United",
+            "description": "Jerseys del Manchester United",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e5724"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e573a",
+        "name": "Jersey Liverpool Visitante 2024",
+        "description": "Camiseta visitante del Liverpool FC. Diseño menta elegante y moderno.",
+        "price": 1199,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/liverpool-mint-away-jersey.jpg",
+            "/img/products/liverpool-away-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5709",
+            "name": "Liverpool",
+            "description": "Jerseys del Liverpool",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e5724"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5732",
+        "name": "Jersey Bayern Munich Local 2024",
+        "description": "Camiseta del Bayern Munich. Rojo intenso con detalles blancos y dorados.",
+        "price": 1249,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/bayern-munich-red-home-jersey.jpg",
+            "/img/products/bayern-munich-jersey-detail.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e570c",
+            "name": "Bayern Munich",
+            "description": "Jerseys del Bayer Munich",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e5726"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5730",
+        "name": "Jersey Juventus Local 2024",
+        "description": "Camiseta de la Juventus. Rayas blancas y negras icónicas.",
+        "price": 1299,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/juventus-striped-home-jersey.jpg",
+            "/img/products/juventus-jersey-detail.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e570e",
+            "name": "Juventus",
+            "description": "Jerseys del Juventus",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "65b0d4189b825d20ce1e5710"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e5738",
+        "name": "Jersey Club América Local 2024",
+        "description": "Camiseta del Club América. Amarillo tradicional con detalles azules.",
+        "price": 1099,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/club-america-yellow-home-jersey.jpg",
+            "/img/products/america-jersey-detail.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5711",
+            "name": "América",
+            "description": "Jerseys del Club América",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "65b0d4189b825d20ce1e5713"
+        }
+    },
+    {
+        "_id": "68b0d4189b825d20ce1e572e",
+        "name": "Jersey Chivas Guadalajara Local 2024",
+        "description": "Camiseta de las Chivas. Rayas rojas y blancas clásicas.",
+        "price": 1099,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/chivas-guadalajara-striped-jersey.jpg",
+            "/img/products/chivas-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5714",
+            "name": "Chivas",
+            "description": "Jerseys de las Chivas de Guadalajara",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "65b0d4189b825d20ce1e5713"
+        }
+    },
+    {
+        "_id": "659f8a3c9b1d7d56a2f14e8b",
+        "name": "Jersey PSG Local 2024",
+        "description": "Camiseta del Paris Saint-Germain. Azul marino con franja roja central.",
+        "price": 1399,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/psg-paris-blue-home-jersey.jpg",
+            "/img/products/psg-jersey-back.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5716",
+            "name": "PSG",
+            "description": "Jerseys del Paris Saint-Germain",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "659f8a3c9b1d7d56a2f14e8c"
+        }
+    },
+    {
+        "_id": "659f8a3c9b1d7d56a2f14e8d",
+        "name": "Jersey Argentina Campeón Mundial 2022",
+        "description": "Camiseta de la selección argentina. Diseño con las tres estrellas de campeón mundial.",
+        "price": 1499,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/argentina-world-cup-champion-jersey.jpg",
+            "/img/products/argentina-jersey-stars.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e5718",
+            "name": "Selección de Argentina",
+            "description": "Jerseys de la Selección de Argentina",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "68b0d4189b825d20ce1e572c"
+        }
+    },
+    {
+        "_id": "659f8a3c9b1d7d56a2f14e8f",
+        "name": "Jersey Inter de Milán Local 2024",
+        "description": "Camiseta del Inter de Milán. Rayas azules y negras legendarias.",
+        "price": 1249,
+        "stock": 25,
+        "imagesUrl": [
+            "/img/products/inter-milan-striped-home-jersey.jpg",
+            "/img/products/inter-milan-jersey-detail.jpg"
+        ],
+        "category": {
+            "_id": "65b0d4189b825d20ce1e571a",
+            "name": "Inter de Milán",
+            "description": "Jerseys del Inter de Milán",
+            "imageUrl": "/img/products/placeholder.svg",
+            "parentCategory": "65b0d4189b825d20ce1e5710"
+        }
+    }
+]

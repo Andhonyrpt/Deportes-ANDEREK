@@ -1,0 +1,50 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    border-bottom: 1px solid linear-gradient(90deg,var(--color-primary-900));
+    background: linear-gradient(90deg, var(--color-primary-900), var(--color-primary-600));
+    color: white;
+    backdrop-filter: 5px;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+    gap: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.header-content {
+    display: flex;
+    gap: 5px;
+}
+
+.logo-text {
+    color: white;
+    font-size: 20px;
+    font-weight: 570;
+    text-decoration: none;
+}
+
+.header-actions {
+    width: 10%;
+    margin-right: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart {
+    color: white;
+}
+
+.user {
+    color: white;
+}
