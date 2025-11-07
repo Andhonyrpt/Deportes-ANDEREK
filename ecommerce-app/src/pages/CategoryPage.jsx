@@ -77,7 +77,7 @@ const CategoryPage = () => {
                         <List
                             title={`Jerseys de ${currentCategory.name}`}
                             products={displayedProducts}
-                            layout="grid"></List>
+                            layout="vertical"></List>
                     </div>
                 ) : (
                     <ErrorMessage>{`No hay productos relacionados a la categoría: ${currentCategory.name}`}</ErrorMessage>
