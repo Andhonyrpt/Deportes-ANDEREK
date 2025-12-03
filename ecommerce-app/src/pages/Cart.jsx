@@ -19,10 +19,15 @@ export default function Cart() {
     if (cartItems.length === 0) {
         return (
             <div className="cart-empty">
-                <Icon name="shopping-cart" size="small"></Icon>
+                <Icon name="cart" size={100}></Icon>
                 <h2>Tu carrito está vacío</h2>
                 <p>Agrega algunos productos para empezar a comprar</p>
-                <Button to="/" variant="primary">Continuar comprando</Button>
+                <Button
+                    variant="primary"
+                    onClick={() => navigate("/")}
+                >
+                    Continuar comprando
+                </Button>
             </div>
         );
     }
@@ -30,14 +35,27 @@ export default function Cart() {
     return (
         <div className="cart">
             <div className="cart-header">
-                <Icon name="cart" size={50}></Icon>
-                <h2>Carrito de Compras</h2>
-                <span>{`Tu carrito tiene ${getTotalItems()} articulo(s)`}</span>{""}
-                <Button variant="primary" size="sm"
-                    onClick={clearCart}
-                >
-                    Limpiar carrito
-                </Button>
+                <div className="cart-header-title">
+                    <Icon name="cart" size={32}></Icon>
+                    <h1>Carrito de Compras</h1>
+                </div>
+
+                <div className="cart-header-info">
+                    <span className="cart-items-count">
+                        {getTotalItems()} {getTotalItems === 1 ? "artículo" : "artículos"}
+                    </span>
+
+                    <Button
+                        variant="ghost"
+                        className="danger clear-cart-btn"
+                        onClick={clearCart}
+                        title="Vaciar carrito"
+                        size="sm"
+                    >
+                        <Icon name="trash" size={18} />
+                        <span>Vaciar carrito</span>
+                    </Button>
+                </div>
             </div>
 
             <div className="cart-items">
@@ -45,17 +63,27 @@ export default function Cart() {
 
                 <div className="cart-summary">
                     <div className="cart-total">
-                    <h2>Total: ${getTotalPrice().toFixed(2)}</h2>
-                </div>
+                        <span className="cart-total-subtitle">Total a pagar</span>
+                        <h2>${getTotalPrice().toFixed(2)}</h2>
+                    </div>
 
-                <Button variant="primary"
-                    onClick={() => navigate("/orders")}
-                    size="md"
-                >
-                    Proceder al pago
-                </Button>
+                    <div className="cart-actions">
+                        <Button
+                            variant="primary"
+                            onClick={() => navigate("/checkout")}
+                            size="lg"
+                            disabled={!cartItems || cartItems.length === 0}
+                            title={!cartItems || cartItems.length === 0 ?
+                                "Agrega productos al carrito para continuar" :
+                                "Proceder al pago"
+                            }
+                        >
+                            <Icon name="creditCard" size={20} />
+                            <span>Proceder al pago</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
     );
-}
+};

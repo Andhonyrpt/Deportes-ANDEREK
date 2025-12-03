@@ -1,29 +1,35 @@
+import { fetchUsers } from "../services/userService";
+
 const validUsers = {
-    "admin@gmail.com": "admin123",
-    "cliente@gmail.com": "cliente123",
-    "test@gmail.com": "test123"
+    "admin@email.com": "admin123",
+    "cliente@email.com": "cliente123",
 }
 
-export function login(email, password) {
+export async function login(email, password) {
 
-    if (validUsers[email] === password) {
-        const token = btoa(`${email}:${Date.now()}`);
+    if (!validUsers[email] || validUsers[email] !== password) {
 
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userData', JSON.stringify({
-            email,
-            name: email.split("@")[0],
-            loginDate: new Date().toISOString(),
-            role: email.includes('admin') ? 'admin' : 'cliente'
-        }));
-
-        return { success: true, user: email };
+        return {
+            success: false,
+            error: "Email o contraseña incorrectos"
+        };
     }
-    return {
-        success: false,
-        user: email,
-        error: "Email or password it is not correct"
-    };
+
+    const users = await fetchUsers();
+    const user = users.find((u) => u.email === email);
+
+    if (user) {
+
+        const token = btoa(`${email}:${Date.now()}`);
+        const userWithLoginDate = { ...user, loginDate: new Date().toISOString() };
+        localStorage.setItem('authToken', token);
+        localStorage.setItem("userData", JSON.stringify(userWithLoginDate));
+        return { success: true, user: userWithLoginDate };
+
+    }
+
+    return { success: false, error: "Usuario no encontrado" };
+
 }
 
 export function logout() {

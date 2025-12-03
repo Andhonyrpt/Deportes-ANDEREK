@@ -1,0 +1,218 @@
+.orders-page {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+    padding: clamp(16px, 4vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 3vw, 24px);
+    margin-bottom: 50px;
+}
+
+.orders-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap);
+}
+
+.orders-header .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    margin: 0;
+    color: var(--color-primary-600);
+}
+
+.orders-header h1 {
+    margin: 4px 0;
+    color: var(--color-primary-600);
+}
+
+.orders-content {
+    display: flex;
+    gap: var(--gap);
+    flex-wrap: wrap;
+}
+
+.orders-list {
+    flex: 2 1 420px;
+    min-width: 320px;
+}
+
+.orders-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--gap);
+}
+
+.orders-list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.order-card {
+    width: 100%;
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    background: var(--surface);
+    transition: border-color 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+}
+
+.order-card:hover {
+    border-color: var(--light-peach);
+}
+
+.order-card-active {
+    border-color: var(--brass-gold);
+    background: var(--pale-gold);
+    border-radius: var(--radius);
+    padding: 14px;
+}
+
+.order-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.order-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+.order-date {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.order-status {
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    padding: 4px 8px;
+    background: var(--color-fresh-mint);
+    border-radius: var(--r2);
+    color: var(--text);
+}
+
+.order-status-confirmed {
+    background: var(--color-fresh-mint);
+    color: var(--color-primary-600);
+}
+
+.order-status-delivered {
+    background: rgba(62, 183, 234, 0.2);
+    color: #0369a1;
+}
+
+.order-status-cancelled,
+.order-status-canceled {
+    background: rgba(220, 38, 38, 0.2);
+    color: #b91c1c;
+}
+
+.order-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+}
+
+.order-section {
+    margin-top: var(--gap);
+}
+
+.order-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-summary-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-muted);
+}
+
+.order-summary-total {
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.order-address {
+    font-style: normal;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.order-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.order-items li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+}
+
+.order-items p {
+    margin: 0 0 4px 0;
+    font-weight: 500;
+}
+
+.order-items span {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.orders-empty {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(24px, 5vw, 48px);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+}
+
+.orders-link {
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .orders-header {
+        flex-direction: column;
+    }
+
+    .order-card-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}

@@ -4,7 +4,7 @@
         "name": "Real Madrid",
         "description": "Jerseys del Real Madrid",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e572a",
             "name": "LaLiga (España)",
             "description": "Equipos de la Primera División de España",
@@ -17,7 +17,7 @@
         "name": "Barcelona",
         "description": "Jerseys del Barcelona",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e572a",
             "name": "LaLiga (España)",
             "description": "Equipos de la Primera División de España",
@@ -30,7 +30,7 @@
         "name": "Selección Nacional de México",
         "description": "Jerseys de la Selección Nacional de México",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e572c",
             "name": "Selecciones",
             "description": "Jerseys de Selecciones de Fútbol",
@@ -43,7 +43,7 @@
         "name": "Manchester United",
         "description": "Jerseys del Manchester United",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e5724",
             "name": "Premier League (Inglaterra)",
             "description": "Equipos de la Primera División de Inglaterra",
@@ -56,7 +56,7 @@
         "name": "Liverpool",
         "description": "Jerseys del Liverpool",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e5724",
             "name": "Premier League (Inglaterra)",
             "description": "Equipos de la Primera División de Inglaterra",
@@ -69,7 +69,7 @@
         "name": "Bayern Munich",
         "description": "Jerseys del Bayer Munich",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e5726",
             "name": "Bundesliga (Alemania)",
             "description": "Equipos de la Primera División de Alemania",
@@ -82,7 +82,7 @@
         "name": "Juventus",
         "description": "Jerseys del Juventus",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "65b0d4189b825d20ce1e5710",
             "name": "Serie A (Italia)",
             "description": "Equipos de la Primera División de Italia",
@@ -95,7 +95,7 @@
         "name": "América",
         "description": "Jerseys del Club América",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "65b0d4189b825d20ce1e5713",
             "name": "Liga MX (México)",
             "description": "Equipos de la Primera División de México",
@@ -108,7 +108,7 @@
         "name": "Chivas",
         "description": "Jerseys de las Chivas de Guadalajara",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "65b0d4189b825d20ce1e5713",
             "name": "Liga MX (México)",
             "description": "Equipos de la Primera División de México",
@@ -121,7 +121,7 @@
         "name": "PSG",
         "description": "Jerseys del Paris Saint-Germain",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "659f8a3c9b1d7d56a2f14e8c",
             "name": "Ligue 1 (Francia)",
             "description": "Equipos de la Primera División de Francia",
@@ -134,7 +134,7 @@
         "name": "Selección de Argentina",
         "description": "Jerseys de la Selección de Argentina",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "68b0d4189b825d20ce1e572c",
             "name": "Selecciones",
             "description": "Jerseys de Selecciones de Fútbol",
@@ -147,7 +147,7 @@
         "name": "Inter de Milán",
         "description": "Jerseys del Inter de Milán",
         "imageUrl": "/img/products/placeholder.svg",
-        "parentcategory": {
+        "parentCategory": {
             "_id": "65b0d4189b825d20ce1e5710",
             "name": "Serie A (Italia)",
             "description": "Equipos de la Primera División de Italia",

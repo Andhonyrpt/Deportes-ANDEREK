@@ -1,0 +1,116 @@
+.order-confirmation {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gap);
+    margin-bottom: 50px;
+}
+
+.confirmation-content {
+    text-align: center;
+    max-width: 600px;
+    padding: calc(var(--gap) * 2);
+    background: #EDE7DE;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--elev-1);
+}
+
+.confirmation-icon {
+    margin-bottom: var(--gap);
+}
+
+.confirmation-icon .success {
+    color: var(--color-primary-400);
+}
+
+.confirmation-content h1 {
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 600;
+    margin-bottom: var(--gap);
+    color: var(--color-primary-600);
+    letter-spacing: -0.4px;
+}
+
+.confirmation-message {
+    font-size: clamp(16px, 2vw, 18px);
+    color: var(--color-primary-600);
+    margin-bottom: calc(var(--gap) * 1.5);
+}
+
+.confirmation-details {
+    color: var(--color-gray);
+    margin-bottom: calc(var(--gap) * 2);
+    padding: var(--gap);
+    border-radius: var(--radius);
+    text-align: left;
+}
+
+.order-info {
+    margin: var(--gap) 0;
+}
+
+.order-info p {
+    margin: calc(var(--gap) * 0.5) 0;
+}
+
+address {
+    margin: calc(var(--gap) * 0.5) 0;
+    font-style: normal;
+    line-height: 1.5;
+    color: var(--color-primary-600);
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: var(--gap);
+    justify-content: center;
+    margin-top: calc(var(--gap) * 1.5);
+}
+
+.confirmation-actions .button {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--gap) * 0.5);
+    padding: calc(var(--gap) * 0.75) var(--gap);
+    border-radius: var(--r2);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.confirmation-actions .primary {
+    background: var(--color-primary-600);
+    color: var(--accent-contrast);
+}
+
+.confirmation-actions .secondary {
+    background: var(--pale-gold);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.confirmation-actions .primary:hover {
+    background: var(--color-primary-400);
+}
+
+.confirmation-actions .secondary:hover {
+    background: var(--brass-gold);
+    border-color: var(--pale-gold);
+}
+
+@media (max-width: 768px) {
+    .confirmation-actions {
+        flex-direction: column;
+    }
+
+    .confirmation-content {
+        padding: var(--gap);
+        margin: var(--gap);
+    }
+
+    .confirmation-details {
+        padding: calc(var(--gap) * 0.75);
+    }
+}

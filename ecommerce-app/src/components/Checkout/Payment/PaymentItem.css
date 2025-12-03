@@ -1,0 +1,57 @@
+.payment-item {
+  border: 1px solid var(--light-sepia);
+  border-radius: var(--radius);
+  padding: var(--gap);
+  margin-bottom: var(--gap);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--warm-gray);
+  transition: all 0.2s ease;
+}
+
+.payment-item:hover {
+  box-shadow: var(--elev-2);
+}
+
+/* Eliminamos el estilo de contenedor para .default para evitar confusión con .selected */
+/* El badge es suficiente indicador */
+
+.payment-item.selected {
+  border-color: var(--brass-gold);
+  background-color: var(--color-light-beige);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.payment-item.selected:hover {
+  box-shadow: var(--elev-golden);
+}
+
+.payment-content h4 {
+  margin: 0 0 8px 0;
+  color: var(--color-primary-600);
+}
+
+.payment-content p {
+  margin: 4px 0;
+  color: var(--text-muted);
+}
+
+.isDefault-badge {
+  display: inline-block;
+  background-color: var(--color-purple);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.payment-actions button {
+  min-width: 100px;
+}

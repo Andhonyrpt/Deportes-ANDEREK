@@ -1,7 +1,28 @@
 .list-container {
-    padding: 32px 20px;
+    padding: 15px 20px;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.list-header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.list-title {
+    font-family: system-ui, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.list-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
 }
 
 .list-grid {
@@ -29,4 +50,103 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--elev-1);
+    transition: all 0.3s ease;
+}
+
+.list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elev-2);
+    border-color: var(--accent);
+}
+
+.list-item__image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.list-item__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-item__title {
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--color-dark);
+}
+
+.list-item__description {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.list-item__price {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-darker);
+    margin-bottom: 8px;
+}
+
+.list-item__stock {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.list-item__stock--in-stock {
+    background-color: #155724;
+    color: #d4edda;
+}
+
+.list-item__stock--out-of-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.list-item__button {
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+    .list-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .list-item__image {
+        width: 100%;
+        max-width: 200px;
+        height: 200px;
+    }
+
+    .list-item__button {
+        margin-left: 0;
+        margin-top: 16px;
+    }
 }

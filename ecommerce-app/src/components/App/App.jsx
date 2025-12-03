@@ -7,8 +7,12 @@ import Login from '../../pages/Login';
 import ProtectedRoute from '../../pages/ProtectedRoute';
 import Profile from '../../pages/Profile';
 import CategoryPage from '../../pages/CategoryPage';
-
+import SearchResults from '../../pages/SearchResults';
+import Product from '../../pages/Product';
 import './App.css';
+import Checkout from '../../pages/Checkout';
+import Orders from '../../pages/Orders';
+import OrderConfirmation from '../../pages/OrderConfirmation';
 
 function App() {
   return (
@@ -19,15 +23,31 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/login' element={<Login />} />
-            {/* Ruta search */}
-            {/* Ruta producto */}
+            <Route path='/search' element={<SearchResults />} />
+            <Route path='/product/:productId' element={<Product />} />
             <Route path='category/:categoryId' element={<CategoryPage />} />
             <Route path='/profile'
               element={
-                <ProtectedRoute redirectTo='/login' allowedRoles={["admin", "customer", "Cliente"]}>
+                <ProtectedRoute redirectTo='/login' allowedRoles={["admin", "customer", "cliente"]}>
                   <Profile />
                 </ProtectedRoute>
               } />
+            <Route path='/checkout'
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              } />
+            <Route
+              path='/orders'
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/order-confirmation' element={<OrderConfirmation />} />
             <Route path='*' element={<div>Ruta no encontrada</div>} />
           </Routes>
         </Layout>

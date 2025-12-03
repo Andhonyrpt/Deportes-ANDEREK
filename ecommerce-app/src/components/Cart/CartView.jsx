@@ -11,12 +11,19 @@ export default function CartView() {
     } = useCart();
 
     return (
-        <>
+        <div className="cart-view">
+
+            <div className="cart-view-header">
+                <h2>
+                    {cartItems.length} {cartItems.length === 1 ? "artículo" : "artículos"}
+                </h2>
+            </div>
+
             {cartItems && cartItems.map((item) => (
                 <div className="cart-item" key={item._id}>
 
                     <div className="cart-item-image">
-                        <img src={item.imagesUrl[0]} alt={item.name} />
+                        <img src={item.imagesUrl[0]} alt={item.name} loading="lazy" />
                     </div>
 
                     <div className="cart-item-info">
@@ -44,14 +51,14 @@ export default function CartView() {
                         ${(item.price * item.quantity).toFixed(2)}
                     </div>
 
-                    <Button size="sm"
+                    <Button variant="ghost" className="danger" size="sm"
                         onClick={() => removeFromCart(item._id)}
+                        title="Eliminar articulo"
                     >
                         <Icon name="trash" size={15}></Icon>
-                        Eliminar del carrito
                     </Button>
                 </div>
             ))}
-        </>
+        </div>
     );
 };

@@ -4,27 +4,42 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
 
-    const [cartItems, setCartItems] = useState([]);
-
-    useEffect(() => {
+    // Inicializamos el estado con los datos del localStorage directamente
+    const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem("cart");
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
 
-        if (savedCart) {
-            setCartItems(JSON.parse(savedCart));
-        }
-    }, []);
+    // Calcular el total basado en los items del carrito
+    const calculateTotal = (items) => {
+        return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    };
 
+    // Mantener el total actualizado
+    const [total, setTotal] = useState(() => {
+        const savedCart = localStorage.getItem("cart");
+        const items = savedCart ? JSON.parse(savedCart) : [];
+        return calculateTotal(items);
+    });
+
+    // Actualizar localStorage cuando cambie el carrito
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
+
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+        setTotal(calculateTotal(cartItems));
+
     }, [cartItems]);
 
     const removeFromCart = (productId) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item._id !== productId));
+        setCartItems((prevItems) =>
+            prevItems.filter((item) => item._id !== productId)
+        );
     };
 
     const updateQuantity = (productId, newQuantity) => {
         if (newQuantity <= 0) {
             removeFromCart(productId);
+            return;
         }
 
         setCartItems((prevItems) =>
@@ -62,6 +77,7 @@ export function CartProvider({ children }) {
 
     const value = {
         cartItems,
+        total: getTotalPrice(),
         addToCart,
         removeFromCart,
         updateQuantity,

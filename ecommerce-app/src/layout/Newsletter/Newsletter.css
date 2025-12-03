@@ -1,0 +1,72 @@
+.newsletter-content {
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.newsletter-form {
+    min-width: min(400px, 100%);
+}
+
+.newsletter-input-group {
+    display: flex;
+    width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--elev-2);
+}
+
+.newsletter-input {
+    width: 85%;
+    background: transparent;
+    border: 1px solid #DFE7F1;
+    color: #DFE7F1;
+    border-radius: var(--radius) 0 0 var(--radius);
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+.newsletter-input::placeholder {
+    color: #DFE7F1;
+    opacity: 1;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border: 1px solid #DFE7F1;
+}
+
+.newsletter-btn {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    background: #F4C74A;
+    color: #1A1F29;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-size: 16px;
+}
+
+.newsletter-btn:hover {
+    background: #f0c300;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .newsletter-content {
+        text-align: center;
+        gap: 32px;
+    }
+
+    .newsletter-input-group {
+        flex-direction: row;
+    }
+
+    .newsletter-btn {
+        border-radius: 0 0 var(--radius) var(--radius);
+        width: auto;
+    }
+}

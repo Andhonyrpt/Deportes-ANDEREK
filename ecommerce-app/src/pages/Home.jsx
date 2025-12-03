@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchProducts } from '../services/productService';
 import Loading from "../components/common/Loading/Loading";
 import ErrorMessage from "../components/common/ErrorMessage/ErrorMessage";
 import List from "../components/List/List";
 import Navigation from "../layout/Navigation/Navigation";
+import SearchForm from "../components/SearchForm/SearchForm";
 
 export default function Home() {
 
     const [products, setProducts] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -32,6 +36,18 @@ export default function Home() {
 
     }, [])
 
+    const handleSearch = (e) => {
+        e.preventDefault(); // Prevenir muchos clicks
+        const query = searchQuery.trim();
+
+        if (query === 0) {
+            navigate("/search");
+            return;
+        }
+
+        navigate(`/search?q=${encodeURIComponent(query)}`);
+    };
+
     const handleMobileMenuOpen = () => {
         setIsMobileMenuOpen(true);
     };
@@ -41,39 +57,16 @@ export default function Home() {
     };
 
     return (
-        <div>
-            <div className="search-container">
-                <form className="search-form"
-                // onSubmit={handleSearch}
-                >
-                    <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Buscar jerseys..."
-                    // value={searchQuery}
-                    // onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    {/* <button
-                        type="submit"
-                        className="search-btn"
-                        aria-label="Buscar"
-                    >
-                        <Icon name="search" size={18} />
-                    </button> */}
+        <div className="home-container">
 
-                    <button>
-                        Limpiar
-                    </button>
-                </form>
-            </div>
+            <SearchForm
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                handleSearch={handleSearch}
+            />
 
-            <Navigation/>
 
-            {/* <nav>
-                <Navigation
-                    onLinkClick={handleMobileMenuClose}
-                />
-            </nav> */}
+            <Navigation />
 
             {loading ? (
                 <Loading>Cargando Productos...</Loading>
@@ -81,6 +74,7 @@ export default function Home() {
                 <ErrorMessage>{error}</ErrorMessage>
             ) : products.length > 0 ? (
                 <List
+                    title="Catálogo de jerseys"
                     products={products}
                     layout="grid"
                 ></List>

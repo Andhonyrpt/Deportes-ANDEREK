@@ -1,6 +1,8 @@
 .product-card {
-    background: white;
-    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border:1px solid var(--border);
     border-radius: var(--radius);
     padding: 16px;
     box-shadow: var(--elev-1);
@@ -10,11 +12,12 @@
 }
 
 .product-card:hover {
-    box-shadow: var(--elev-2);
+    box-shadow: var(--elev-golden);
+    border-color: var(--pale-gold);
     transform: translateY(-2px);
 }
 
-.product-card-image{
+.product-card-image {
     max-width: 100%;
     height: auto;
     object-fit: cover;
@@ -23,10 +26,77 @@
     background: white;
 }
 
-/* .search-container {
-    margin: 25px 10px 25px 10px;
-} */
-
-/* .product-card {
+.product-card-content {
+    flex: 1;
     display: flex;
-} */
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.product-card-price {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--color-darker);
+    margin: 8px 0;
+}
+
+.product-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.product-card-actions button{
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.product-card-actions button--primary:hover{
+    background-color: black;
+}
+
+/* Horizontal variant */
+.product-card--horizontal {
+    display: grid;
+    grid-template-columns: 140px 1fr 180px;
+    gap: 32px;
+    align-items: center;
+    padding: 28px 48px;
+    min-width: 700px;
+    max-width: 1200px;
+    min-height: 200px;
+}
+
+.product-card--horizontal .product-card-image{
+    min-width: 150px;
+    height: 180px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.product-card--horizontal .product-card-title{
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.product-card--horizontal .product-card-actions{
+    margin-top: 0;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

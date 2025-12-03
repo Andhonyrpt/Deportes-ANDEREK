@@ -1,0 +1,56 @@
+.address-item {
+    border: 1px solid var(--light-sepia);
+    border-radius: var(--radius);
+    padding: var(--gap);
+    margin-bottom: var(--gap);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--warm-gray);
+    transition: all 0.2s ease;
+}
+
+.address-item:hover {
+    box-shadow: var(--elev-2);
+}
+
+/* Eliminamos el estilo de contenedor para .default para evitar confusión con .selected */
+/* El badge es suficiente indicador */
+
+.address-item.selected {
+    border-color: var(--brass-gold);
+    background-color: var(--color-light-beige);
+}
+
+.address-item.selected:hover {
+    box-shadow: var(--elev-golden);
+}
+
+.address-content h4 {
+    margin: 0 0 8px 0;
+    color: var(--color-primary-600);
+}
+
+.address-content p {
+    margin: 4px 0;
+    color: var(--text-muted);
+}
+
+.default-badge {
+    display: inline-block;
+    background-color: var(--color-purple);
+    color: white;
+    padding: 5px 9px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.address-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.address-actions button {
+    min-width: 100px;
+}

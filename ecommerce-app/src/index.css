@@ -30,16 +30,50 @@ code {
   --color-primary-900: #0B1220;
   --color-primary-600: #0F4D2F;
   --color-primary-400: #2EA34A;
-  --color-accent: #F4C542;
+  --color-warning: #F4C542;
   --color-danger: #D00000;
   --color-success: #2E8B57;
+  --color-yellow: #e7e000;
+  --color-green: #79bf87;
+  --color-light-green: #C8E6C9;
+  --color-fresh-mint: #A8DAB0;
+  --color-golden-beige: #d4b293;
+  --color-light-beige: #e8d1b9;
+  --color-purple: #8f4e9f;
+  --color-blue: #3eb7ea;
+  --color-red: #dc2626;
+  --color-light-red: #ffebeb;
+  --color-light-gray: #ededed;
+  --color-disabled: #EAEAEA;
+  --color-strong-gray: #d1d2d2;
+  --color-gray: #6b7280;
+  --color-dark: #1f2937;
+  --color-darker: #111827;
+  --pale-gold: #e0c283;
+  --brass-gold: #c8a356;
+  --warm-gray: #e9e4dc;
+  --light-sepia: #d1cbc0;
+  --soft-sand: #f3ebd7;
+  --deep-olive: #d0905e;
+  --pale-olive: #f5f5e0;
+  --light-peach: #d0905e;
 
 
   --bg: #f8f3e7;
   --muted: #6B7280;
   --surface: #FBFDF9;
-  --border: #E6E9EE;
+  --border: #c9cbce;
+  --border-light-red: #ffadad;
+  --border-disabled: #D3D3D3;
+  --accent: #6366f1;
+  --accent-contrast: #ffffff;
   --text: #0F1724;
+  --text-disabled: #A0A0A0;
+  --text-muted: #475569;
+  --text-light: #64748b;
+  --button-danger: #dc3545;
+  --button-danger-hover: #bd2130;
+  --button-danger-hover-bg: rgba(220, 53, 69, 0.1);
 
 
   /* Variables adicionales */
@@ -57,4 +91,53 @@ code {
   --elev-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   --elev-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   --elev-5: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  --elev-golden: 0 3px 6px var(--brass-gold);
+}
+
+/* 3) Utilidades (espaciado, layout, tipografía) */
+
+.container {
+  max-width: 1200px;
+  padding: 30px 0 0 34px;
+}
+
+/* Tipografía */
+.h1 {
+  font-size: clamp(30px, 4vw, 38px);
+  font-weight: 700;
+  margin: 0 0 12px;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.h2 {
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 600;
+  margin: 0 0 8px;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+}
+
+.muted {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* Componentes base */
+.home-container{
+  padding-bottom: 64px; 
+    margin-bottom: 32px;
+}
+
+.card {
+  background: var(--warm-gray);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-1);
+  padding: 16px;
+}
+
+a {
+  color: var(--text-muted);
+  transition: all 0.2s ease;
 }

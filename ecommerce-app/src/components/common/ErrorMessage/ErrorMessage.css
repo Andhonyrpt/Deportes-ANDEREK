@@ -1,0 +1,10 @@
+.error-container {
+    text-align: center;
+    padding: 30px;
+    background: var(--color-light-red);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light-red);
+    color: var(--color-danger);
+    font-size: 15px;
+    font-weight: 500;
+}
