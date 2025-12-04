@@ -30,35 +30,70 @@ export function CartProvider({ children }) {
 
     }, [cartItems]);
 
-    const removeFromCart = (productId) => {
+    const removeFromCart = (itemId) => {
         setCartItems((prevItems) =>
-            prevItems.filter((item) => item._id !== productId)
+            prevItems.filter((item) => item.itemId !== itemId)
         );
     };
 
-    const updateQuantity = (productId, newQuantity) => {
+    const updateQuantity = (itemId, newQuantity) => {
         if (newQuantity <= 0) {
-            removeFromCart(productId);
+            removeFromCart(itemId);
             return;
         }
 
         setCartItems((prevItems) =>
-            prevItems.map((item) => item._id === productId ?
+            prevItems.map((item) => item.itemId === itemId ?
                 { ...item, quantity: newQuantity } : item)
         );
     };
 
-    const addToCart = (product, quantity = 1) => {
+    const addToCart = (product, quantity = 1, size = 'UNICA') => {
+
+        const itemId = `${product._id}-${size}`;
 
         setCartItems((prevItems) => {
-            const existingItem = prevItems.find((item) => item._id === product._id);
+            const existingItem = prevItems.find((item) => `${item._id}-${item.selectedSize}` === itemId);
 
             if (existingItem) {
-                return prevItems.map((item) => item._id === product._id ?
+                return prevItems.map((item) => `${item._id}-${item.selectedSize}` === itemId ?
                     { ...item, quantity: item.quantity + quantity } : item);
 
             } else {
-                return [...prevItems, { ...product, quantity }];
+                return [...prevItems, { ...product, quantity, selectedSize: size }];
+            }
+        });
+    };
+
+    const changeItemSize = (productId, oldSize, newSize) => {
+
+        const oldItemId = `${productId}-${oldSize}`;
+        const newItemId = `${productId}-${newSize}`;
+
+        setCartItems((prevItems) => {
+            const itemToChange = prevItems.find((item) => `${item._id}-${item.selectedSize}` === oldItemId);
+            const existingItemWithNewSize = prevItems.find((item) => `${item._id}-${item.selectedSize}` === newItemId);
+
+            if (!itemToChange) return prevItems;
+
+            const quantityToMove = itemToChange.quantity;
+
+            let updatedItems = prevItems.filter((item) => `${item._id}-${item.selectedSize}` !== oldItemId);
+
+            if (existingItemWithNewSize) {
+                return updatedItems.map((item) =>
+                    `${item._id}-${item.selectedSize}` === newItemId
+                        ? { ...item, quantity: item.quantity + quantityToMove }
+                        : item
+                );
+            } else {
+                const updatedItem = {
+                    ...itemToChange,
+                    itemId: newItemId,
+                    selectedSize: newSize,
+                };
+
+                return [...updatedItems, updatedItem];
             }
         });
     };
@@ -81,6 +116,7 @@ export function CartProvider({ children }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        changeItemSize,
         clearCart,
         getTotalItems,
         getTotalPrice

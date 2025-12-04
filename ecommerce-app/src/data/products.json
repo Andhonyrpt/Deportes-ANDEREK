@@ -4,7 +4,24 @@
         "name": "Jersey Real Madrid Local 2024",
         "description": "Camiseta oficial del Real Madrid temporada 2024. Diseño clásico blanco con detalles dorados.",
         "price": 1299,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/real-madrid-white-home-jersey.jpg",
             "/img/products/real-madrid-jersey-detail.jpg"
@@ -28,7 +45,24 @@
         "name": "Jersey Barcelona Local 2024",
         "description": "Camiseta local del FC Barcelona. Diseño blaugrana tradicional con rayas azules y rojas.",
         "price": 1349,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/barcelona-blaugrana-home-jersey.jpg",
             "/img/products/barcelona-jersey-back.jpg"
@@ -52,7 +86,24 @@
         "name": "Jersey Selección México 2024",
         "description": "Camiseta oficial de la Selección Mexicana. Verde tradicional con diseño moderno.",
         "price": 1199,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/mexico-national-team-green-jersey.jpg",
             "/img/products/mexico-jersey-back.jpg"
@@ -76,7 +127,24 @@
         "name": "Jersey Manchester United Local 2024",
         "description": "Camiseta del Manchester United. Rojo característico con detalles negros.",
         "price": 1249,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/manchester-united-red-home-jersey.jpg",
             "/img/products/manchester-united-jersey-back.jpg"
@@ -100,7 +168,24 @@
         "name": "Jersey Liverpool Visitante 2024",
         "description": "Camiseta visitante del Liverpool FC. Diseño menta elegante y moderno.",
         "price": 1199,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/liverpool-mint-away-jersey.jpg",
             "/img/products/liverpool-away-jersey-back.jpg"
@@ -124,7 +209,24 @@
         "name": "Jersey Bayern Munich Local 2024",
         "description": "Camiseta del Bayern Munich. Rojo intenso con detalles blancos y dorados.",
         "price": 1249,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/bayern-munich-red-home-jersey.jpg",
             "/img/products/bayern-munich-jersey-detail.jpg"
@@ -148,7 +250,24 @@
         "name": "Jersey Juventus Local 2024",
         "description": "Camiseta de la Juventus. Rayas blancas y negras icónicas.",
         "price": 1299,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/juventus-striped-home-jersey.jpg",
             "/img/products/juventus-jersey-detail.jpg"
@@ -172,7 +291,24 @@
         "name": "Jersey Club América Local 2024",
         "description": "Camiseta del Club América. Amarillo tradicional con detalles azules.",
         "price": 1099,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/club-america-yellow-home-jersey.jpg",
             "/img/products/america-jersey-detail.jpg"
@@ -196,7 +332,24 @@
         "name": "Jersey Chivas Guadalajara Local 2024",
         "description": "Camiseta de las Chivas. Rayas rojas y blancas clásicas.",
         "price": 1099,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/chivas-guadalajara-striped-jersey.jpg",
             "/img/products/chivas-jersey-back.jpg"
@@ -220,7 +373,24 @@
         "name": "Jersey PSG Local 2024",
         "description": "Camiseta del Paris Saint-Germain. Azul marino con franja roja central.",
         "price": 1399,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/psg-paris-blue-home-jersey.jpg",
             "/img/products/psg-jersey-back.jpg"
@@ -244,7 +414,24 @@
         "name": "Jersey Argentina Campeón Mundial 2022",
         "description": "Camiseta de la selección argentina. Diseño con las tres estrellas de campeón mundial.",
         "price": 1499,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/argentina-world-cup-champion-jersey.jpg",
             "/img/products/argentina-jersey-stars.jpg"
@@ -268,7 +455,24 @@
         "name": "Jersey Inter de Milán Local 2024",
         "description": "Camiseta del Inter de Milán. Rayas azules y negras legendarias.",
         "price": 1249,
-        "stock": 25,
+        "variants": [
+            {
+                "size": "S",
+                "stock": 10
+            },
+            {
+                "size": "M",
+                "stock": 15
+            },
+            {
+                "size": "L",
+                "stock": 5
+            },
+            {
+                "size": "XL",
+                "stock": 0
+            }
+        ],
         "imagesUrl": [
             "/img/products/inter-milan-striped-home-jersey.jpg",
             "/img/products/inter-milan-jersey-detail.jpg"

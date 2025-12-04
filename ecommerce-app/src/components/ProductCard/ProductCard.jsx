@@ -1,13 +1,31 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
 import './ProductCard.css';
 
-export default function ProductCard({ product, orientation  }) {
+export default function ProductCard({ product, orientation }) {
 
     const { addToCart } = useCart();
-    const { name, price, stock, imagesUrl, description } = product;
+    const { name, price, variants, imagesUrl, description } = product;
+
+
+    // Inicializar y Determinar si hay alguna variante disponible (stock > 0)
+    const availableVariants = variants?.filter(v => v.stock > 0) || [];
+    const totalStockAvailable = availableVariants.length > 0;
+
+    // Estado para almacenar la talla seleccionada
+    const [selectedVariant, setSelectedVariant] = useState(
+        availableVariants.length > 0 ? availableVariants[0] : null
+    );
+
+    // Establecer la primera talla disponible como valor inicial al cargar
+    useEffect(() => {
+        if (availableVariants.length > 0 && !selectedVariant) {
+            setSelectedVariant(availableVariants[0]);
+        }
+    }, [availableVariants, selectedVariant]);
 
     // Validación de props básica
     if (!product) {
@@ -22,15 +40,25 @@ export default function ProductCard({ product, orientation  }) {
 
     // Determinar el estado del stock
     const stockBadge =
-        stock > 0
+        totalStockAvailable > 0
             ? { text: "En stock", variant: "success" }
             : { text: "Agotado", variant: "error" };
 
     // Si hay descuento, agregar badge de descuento (ejemplo)
     const hasDiscount = product.discount && product.discount > 0;
 
+    // Manejar el cambio de selección en el <select>
+    const handleSizeChange = (e) => {
+
+        // Encontrar el objeto de variante completo (talla y stock)
+        const variantFound = variants.find((v) => v.size === e.target.value);
+        setSelectedVariant(variantFound);
+    }
+
     const handleAddToCart = () => {
-        addToCart(product, 1);
+        if (selectedVariant && selectedVariant.stock > 0) {
+            addToCart(product, 1, selectedVariant.size);
+        }
     };
 
     const productLink = `/product/${product._id}`;
@@ -67,7 +95,32 @@ export default function ProductCard({ product, orientation  }) {
                     </p>
                 )}
 
-                <div className="product-card-price">${price}</div>
+                <div className="card-footer-details">
+                    <div className="product-card-price">${price}</div>
+
+                    {variants && variants.length > 0 && (
+
+                        <div className="size-select">
+                            <label htmlFor="">Selecciona talla</label>
+                            <select
+                                value={selectedVariant?.size || ""}
+                                onChange={handleSizeChange}
+                                className="size-selector"
+                                aria-label="Seleccionar talla"
+                            >
+                                {variants.map((variant) => (
+                                    <option
+                                        key={variant.size}
+                                        value={variant.size}
+                                        disabled={variant.stock === 0}
+                                    >
+                                        {variant.size} {variant.stock === 0 ? "Agotada" : ""}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                </div>
 
             </div>
 
@@ -82,7 +135,8 @@ export default function ProductCard({ product, orientation  }) {
                 </div>
 
                 <Button variant="primary" size="sm"
-                    disabled={stock === 0} onClick={handleAddToCart}
+                    disabled={!selectedVariant || selectedVariant.stock === 0}
+                    onClick={handleAddToCart}
                 >
                     Agregar al Carrito
                 </Button>

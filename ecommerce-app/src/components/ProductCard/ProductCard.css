@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     background: var(--surface);
-    border:1px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 16px;
     box-shadow: var(--elev-1);
@@ -44,8 +44,46 @@
 .product-card-price {
     font-size: 19px;
     font-weight: 700;
-    color: var(--color-darker);
+    color: var(--color-primary-600);
     margin: 8px 0;
+}
+
+.card-footer-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.size-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.size-select label {
+    color: var(--color-primary-600);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.size-selector {
+    text-align: center;
+    width: 90%;
+    height: 25px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    transition: background 0.2s;
+}
+
+.size-select select {
+    border: 1px solid var(--border);
+    outline: none;
+    border-radius: var(--radius);
+}
+
+.size-select select:hover {
+    background: var(--warm-gray);
 }
 
 .product-card-actions {
@@ -56,13 +94,13 @@
     margin-top: 12px;
 }
 
-.product-card-actions button{
+.product-card-actions button {
     padding: 12px;
     font-size: 12px;
     font-weight: 600;
 }
 
-.product-card-actions button--primary:hover{
+.product-card-actions button--primary:hover {
     background-color: black;
 }
 
@@ -78,20 +116,20 @@
     min-height: 200px;
 }
 
-.product-card--horizontal .product-card-image{
+.product-card--horizontal .product-card-image {
     min-width: 150px;
     height: 180px;
     margin-bottom: 0;
     flex-shrink: 0;
 }
 
-.product-card--horizontal .product-card-title{
+.product-card--horizontal .product-card-title {
     margin-top: 0;
     margin-bottom: 8px;
     font-size: 20px;
 }
 
-.product-card--horizontal .product-card-actions{
+.product-card--horizontal .product-card-actions {
     margin-top: 0;
     justify-content: space-between;
     align-items: flex-end;

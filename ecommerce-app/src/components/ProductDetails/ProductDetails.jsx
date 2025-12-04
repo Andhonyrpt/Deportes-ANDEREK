@@ -17,6 +17,7 @@ export default function ProductDetails({ productId }) {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedVariant, setSelectedVariant] = useState(null);
 
     useEffect(() => {
 
@@ -29,6 +30,12 @@ export default function ProductDetails({ productId }) {
                 setError("Producto no encontrado");
             } else {
                 setProduct(foundProduct)
+
+                if (foundProduct.variants && foundProduct.variants.length > 0) {
+                    const initialVariant = foundProduct.variants.find((v) =>
+                        v.stock > 0) || foundProduct.variants[0];
+                    setSelectedVariant(initialVariant);
+                }
             }
         })
             .catch(() => setError("Ocurrió un error al cargar el producto"))
@@ -47,15 +54,21 @@ export default function ProductDetails({ productId }) {
         );
     }, [product]);
 
+    const handleSizeChange = (e) => {
+        const variantFound = product.variants.find((v) => v.size === e.target.value);
+        setSelectedVariant(variantFound);
+    };
 
     const handleAddToCart = () => {
-        if (product) addToCart(product, 1);
+        if (product && selectedVariant && selectedVariant.stock > 0) {
+            addToCart(product, 1, selectedVariant.size);
+        }
     };
 
     if (loading) {
         return (
             <div className="product-details-container">
-                <Loading message="Cargando producto..." />
+                <Loading >Cargando producto...</Loading>
             </div>
         );
     }
@@ -74,9 +87,12 @@ export default function ProductDetails({ productId }) {
 
     if (!product) return null;
 
-    const { name, description, price, stock, imagesUrl, category } = product;
-    const stockBadge = stock > 0 ? "success" : "error";
-    const stockLabel = stock > 0 ? "En stock" : "Agotado";
+    const { name, description, price, variants, imagesUrl, category } = product;
+
+    const currentStock = selectedVariant ? selectedVariant.stock : 0;
+    const stockBadge = currentStock > 0 ? "success" : "error";
+    const stockLabel = currentStock > 0 ? "En stock" : "Agotado";
+    const hasAvailableVariants = variants?.some(v => v.stock > 0);
 
     return (
         <div className="product-details-container">
@@ -106,15 +122,41 @@ export default function ProductDetails({ productId }) {
 
                     <div className="product-details-stock">
                         <Badge text={stockLabel} variant={stockBadge} />
-                        {stock > 0 && (
-                            <span className="muted">{stock} unidades disponibles</span>
+                        {currentStock > 0 && (
+                            <span className="muted">{currentStock} unidades disponibles</span>
                         )}
                     </div>
 
                     <div className="product-details-price">${price}</div>
+
+                    {variants && variants.length > 0 && (
+                        <div className="product-details-variant-selector">
+                            <label htmlFor="size-select" className="muted" >
+                                Selecciona Talla:
+                            </label>
+                            <select
+                                className="product-details-select"
+                                id="size-select"
+                                value={selectedVariant?.size || ''}
+                                onChange={handleSizeChange}
+                                disabled={!hasAvailableVariants}
+                            >
+                                {variants.map((variant) => (
+                                    <option
+                                        key={variant.size}
+                                        value={variant.size}
+                                        disabled={variant.stock === 0}
+                                    >
+                                        {variant.size} {variant.stock === 0 ? "(Agotada)" : ""}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     <div className="product-details-actions">
                         <Button variant="primary" size="lg"
-                            disabled={stock === 0}
+                            disabled={!selectedVariant || selectedVariant.stock === 0}
                             onClick={handleAddToCart}
                         >
                             Agregar al carrito
