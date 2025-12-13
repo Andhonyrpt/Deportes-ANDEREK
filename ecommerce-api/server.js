@@ -6,7 +6,7 @@ import logger from './src/middlewares/logger.js';
 import errorHandler from './src/middlewares/errorHandler.js';
 import setupGlobalErrorHandlers from "./src/middlewares/globalerrorHandler.js";
 
-dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependecia con "npm install dotenv"
+dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependencia con "npm install dotenv"
 
 setupGlobalErrorHandlers();
 
