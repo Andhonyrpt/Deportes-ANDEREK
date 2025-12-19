@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+const variantSchema = new mongoose.Schema({
+    size: {
+        type: String,
+        enum: ['S', 'M', 'L', 'XL'],
+        required: true
+    },
+    stock: {
+        type: Number,
+        required: true,
+        min: 0
+    }
+}, { _id: false }); // _id: false para que las tallas no generen un ID propio y el JSON sea más limpio
+
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,10 +29,10 @@ const productSchema = new mongoose.Schema({
         enum: ['Local', 'Visitante'],
         required: true
     },
-    sizes: [{
-        type: String,
-        enum: ['S', 'M', 'L',]
-    }],
+    variants: {
+        type: [variantSchema],
+        required: true
+    },
     genre: {
         type: String,
         enum: ['Hombre', 'Mujer', 'Niño'],
@@ -30,19 +43,14 @@ const productSchema = new mongoose.Schema({
         required: true,
         min: 1
     },
-    stock: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    imagesURL: {
+    imagesUrl: {
         type: [String],
         default: ['https://placehold.co/800x600.png'],
         trim: true
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
+        ref: 'subCategory',
         required: true
     }
 });

@@ -13,6 +13,11 @@ const cartSchema = new mongoose.Schema({
                 ref: 'Product',
                 required: true
             },
+            size: { 
+                type: String, 
+                enum: ['S', 'M', 'L', 'XL'], 
+                required: true 
+            },
             quantity: {
                 type: Number,
                 required: true,

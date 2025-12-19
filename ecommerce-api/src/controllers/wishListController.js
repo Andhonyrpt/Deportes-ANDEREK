@@ -1,4 +1,4 @@
-import WishList from '../models/whisList.js';
+import WishList from '../models/whishList.js';
 import Product from '../models/product.js';
 import Cart from '../models/cart.js';
 
@@ -61,7 +61,7 @@ const addToWishList = async (req, res, next) => {
         }
 
         await wishList.save();
-        await wishList.populate('products.product', 'name price images category inStock');
+        await wishList.populate('products.product', 'name price imagesUrl category variants');
 
         res.status(200).json({
             message: 'Product added to wishlist successfully',

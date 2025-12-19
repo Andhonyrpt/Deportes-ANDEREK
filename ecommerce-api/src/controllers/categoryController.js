@@ -24,9 +24,16 @@ async function getCategoryById(req, res, next) {
 };
 
 async function createCategory(req, res, next) {
-    const { name, description, imageUrl, parentCategory } = req.body;
 
     try {
+    console.log("Cuerpo recibido:", req.body);
+
+        const { name, description, imageUrl, parentCategory } = req.body;
+
+        if (!name || !description) {
+            return res.status(400).json({ message: 'All files are required' });
+        }
+
         const newCategory = new Category({
             name,
             description,
@@ -43,9 +50,14 @@ async function createCategory(req, res, next) {
 };
 
 async function updateCategory(req, res, next) {
-    const { name, description, imageUrl, parentCategory } = req.body;
 
     try {
+        const { name, description, imageUrl, parentCategory } = req.body;
+
+        if (!name || !description || !parentCategory) {
+            return res.status(400).json({ message: 'All files are required' });
+        }
+
         const updatedCategory = await Category.findByIdAndUpdate(
             req.params.id,
             { name, description, imageUrl, parentCategory },
@@ -65,6 +77,14 @@ async function updateCategory(req, res, next) {
 async function deleteCategory(req, res, next) {
     try {
         const idCategory = req.params.id;
+
+        const hasChildren = await Category.exists({ parentCategory: idCategory });
+        if (hasChildren) {
+            return res.status(400).json({
+                message: 'Cannot delete category with subcategories'
+            });
+        }
+
         const deletedCategory = await Category.findByIdAndDelete(idCategory);
 
         if (!deletedCategory) {
@@ -95,49 +115,49 @@ async function searchCategories(req, res, next) {
                 { name: { $regex: q, $options: 'i' } },
                 { description: { $regex: q, $options: 'i' } }
             ];
-
-            if (parentCategory) {
-                filters.parentCategory = parentCategory;
-            }
-
-            let sortOptions = {};
-
-            if (sort) {
-                const sortOrder = order === 'desc' ? -1 : 1;
-                sortOptions[sort] = sortOrder;
-            }
-            else {
-                sortOptions.name = -1;
-            }
-
-            const skip = (parseInt(page) - 1) * parseInt(limit);
-
-            const categories = await Category.find(filters)
-                .populate('parentCategory')
-                .sort(sortOptions)
-                .skip(skip)
-                .limit(parseInt(limit));
-
-            const totalResults = await Category.countDocuments(filters);
-            const totalPages = Math.ceil(totalResults / parseInt(limit));
-
-            res.status(200).json({
-                categories,
-                pagination: {
-                    currrentPage: parseInt(page),
-                    totalPages,
-                    totalResults,
-                    hasNext: parseInt(page) < totalPages,
-                    hasPrev: parseInt(page) < 1
-                },
-                filters: {
-                    serchTerm: q || null,
-                    parentCategory: parentCategory || null,
-                    sort: sort || 'name',
-                    order: order || 'desc'
-                }
-            });
         }
+
+        if (parentCategory) {
+            filters.parentCategory = parentCategory;
+        }
+
+        let sortOptions = {};
+
+        if (sort) {
+            const sortOrder = order === 'desc' ? -1 : 1;
+            sortOptions[sort] = sortOrder;
+        }
+        else {
+            sortOptions.name = -1;
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const categories = await Category.find(filters)
+            .populate('parentCategory')
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const totalResults = await Category.countDocuments(filters);
+        const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+        res.status(200).json({
+            categories,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages,
+                totalResults,
+                hasNext: parseInt(page) < totalPages,
+                hasPrev: parseInt(page) > 1
+            },
+            filters: {
+                searchTerm: q || null,
+                parentCategory: parentCategory || null,
+                sort: sort || 'name',
+                order: order || 'desc'
+            }
+        });
     } catch (err) {
         next(err);
     }

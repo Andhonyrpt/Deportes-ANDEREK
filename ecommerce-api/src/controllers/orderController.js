@@ -1,4 +1,5 @@
 import Order from '../models/order.js';
+import Product from '../models/product.js';
 
 async function getOrders(req, res, next) {
   try {
@@ -70,11 +71,27 @@ async function createOrder(req, res, next) {
 
     // Validar estructura de productos
     for (const item of products) {
-      if (!item.productId || !item.quantity || !item.price || item.quantity < 1) {
+      if (!item.productId || !item.size || !item.quantity || !item.price || item.quantity < 1) {
         return res.status(400).json({
           error: 'Each product must have productId, quantity >= 1, and price'
         });
       }
+
+      const product = await Product.findById(item.productId);
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      const variant = product.variants.find((v) => v.size === item.size);
+
+      if (!variant || variant.stock < item.quantity) {
+        return res.status(400).json({ error: `Insufficient stock in size ${item.size}` });
+      }
+
+      variant.stock -= item.quantity;
+
+      await product.save();
     }
 
     // Calcular precio total

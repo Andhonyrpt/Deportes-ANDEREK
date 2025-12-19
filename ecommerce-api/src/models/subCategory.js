@@ -1,18 +1,17 @@
 import mongoose from "mongoose";
 
-const categorySchema = new mongoose.Schema({
+const subCategorySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         trim: true,
-        unique: true
     },
     description: {
         type: String,
         required: true,
         trim: true
     },
-    imageUrl: {
+    imageURL: {
         type: String,
         trim: true,
         default: 'https://placehold.co/800x600.png'
@@ -20,15 +19,11 @@ const categorySchema = new mongoose.Schema({
     parentCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        default: null
+        required: true
     }
 });
-//, {
-//    timestamps: true // <-- agrega createdAt y updatedAt
-
-//});
 
 
-const Category = mongoose.model('Category', categorySchema);
+const SubCategory = mongoose.model('SubCategory', subCategorySchema);
 
-export default Category;
+export default SubCategory;

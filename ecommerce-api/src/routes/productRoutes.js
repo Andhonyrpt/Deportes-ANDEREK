@@ -30,12 +30,6 @@ const validateProduct = [
         .notEmpty().withMessage('El modelo es obligatorio.')
         .isIn(['Local', 'Visitante']).withMessage('El modelo debe ser "Local" o "Visitante".'),
 
-    body('sizes')
-        .optional()
-        .isArray().withMessage('Sizes debe ser un arreglo.')
-        .custom((arr) => arr.every(size => ['S', 'M', 'L'].includes(size)))
-        .withMessage('Tallas válidas: S, M, L.'),
-
     body('genre')
         .optional()
         .isIn(['Hombre', 'Mujer', 'Niño']).withMessage('Género no válido.'),
@@ -44,11 +38,7 @@ const validateProduct = [
         .notEmpty().withMessage('El precio es obligatorio.')
         .isFloat({ min: 1 }).withMessage('El precio debe ser mayor o igual a 1.'),
 
-    body('stock')
-        .notEmpty().withMessage('El stock es obligatorio.')
-        .isInt({ min: 0 }).withMessage('El stock debe ser un número entero mayor o igual a 0.'),
-
-    body('imagesURL')
+    body('imagesUrl')
         .optional()
         .isArray().withMessage('imagesURL debe ser un arreglo.')
         .custom((arr) => arr.every(url => typeof url === 'string'))
@@ -88,7 +78,7 @@ router.get('/products/search', [
 
     query('order')
         .optional()
-        .isIn(['asc', 'desc']).withMessage('order msut be "asc" o "desc".'),
+        .isIn(['asc', 'desc']).withMessage('order must be "asc" o "desc".'),
 
     query('page')
         .optional()

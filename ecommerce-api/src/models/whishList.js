@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const whisListSchema = new mongoose.Schema({
+const whishListSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -23,6 +23,6 @@ const whisListSchema = new mongoose.Schema({
 });
 
 
-const WhisList = mongoose.model('WhisList', whisListSchema);
+const WhishList = mongoose.model('WhishList', whishListSchema);
 
-export default WhisList;
+export default WhishList;

@@ -1,4 +1,5 @@
 import Product from '../models/product.js';
+import SubCategory from '../models/subCategory.js';
 
 async function getProducts(req, res, next) {
 
@@ -10,7 +11,10 @@ async function getProducts(req, res, next) {
         const skip = (page - 1) * limit;
 
         const products = await Product.find()
-            .populate('category')
+            .populate({
+                path: 'category',
+                populate: { path: 'parentCategory' } // liga
+            })
             .populate(skip)
             .limit(limit)
             .sort({ name: 1 });
@@ -38,7 +42,10 @@ async function getProductById(req, res, next) {
     try {
 
         const id = req.params.id;
-        const product = await Product.findById(id).populate('category');
+        const product = await Product.findById(id).populate({
+            path: 'category',
+            populate: { path: 'parentCategory' }
+        });
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -73,13 +80,19 @@ async function createProduct(req, res, next) {
 
     try {
 
-        const { name, description, modelo, sizes, genre, price, stock, imagesURL, category } = req.body;
+        const { name, description, modelo, variants, genre, price, imagesUrl, category } = req.body;
 
-        if (!name || !description || !price || !stock || !sizes || !category) {
+        if (!name || !description || !modelo || !variants || !price || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const newProduct = await Product.create({ name, description, modelo, sizes, genre, price, stock, imagesURL, category });
+        const subCategoryExists = await SubCategory.findById(category);
+
+        if (!subCategoryExists) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        const newProduct = await Product.create({ name, description, modelo, variants, genre, price, imagesUrl, category });
         res.status(201).json(newProduct);
 
     } catch (err) {
@@ -92,14 +105,20 @@ async function updateProduct(req, res, next) {
     try {
 
         const { id } = req.params;
-        const { name, description, modelo, sizes, genre, price, stock, imagesURL, category } = req.body;
+        const { name, description, modelo, variants, genre, price, imagesUrl, category } = req.body;
 
 
-        if (!name || !description || !price || !stock || !category || !sizes) {
+        if (!name || !description || !modelo || !price || !variants || !category) {
             return res.status(400).json({ error: 'All files are required' });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, sizes, genre, price, stock, imagesURL, category }, { new: true });
+        const subCategoryExists = await SubCategory.findById(category);
+
+        if (!subCategoryExists) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, variants, genre, price, imagesUrl, category }, { new: true });
 
         if (updatedProduct) {
             return res.status(200).json(updatedProduct);
@@ -166,9 +185,7 @@ async function searchProducts(req, res, next) {
         }
         const bool = Boolean(inStock);
         if (inStock === 'true') {
-            filters.stock = { $gt: 0 };
-        } else {
-            filters.stock = { $gte: 0 };
+            filters.variants = { $elemMatch: { stock: { $gt: 0 } } };
         }
 
         let sortOptions = {};
