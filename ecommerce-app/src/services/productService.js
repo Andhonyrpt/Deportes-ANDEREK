@@ -1,34 +1,43 @@
 import products from "../data/products.json";
+import { http } from "./http";
 
-export const fetchProducts = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(products);
-        }, 2000);
+export const fetchProducts = async (page = 1, limit = 10) => {
+    const data = await http.get(`products?page=${page}&limit=${limit}`);
+    return data.data || { products: [], pagination: {} };
+};
+
+export const searchProducts = async (
+    q = '',
+    category = '',
+    minPrice,
+    maxPrice,
+    inStock,
+    sort,
+    order,
+    page = 1,
+    limit = 10,
+) => {
+    const params = new URLSearchParams({
+        ...(q && { q }),
+        ...(category && { category }),
+        ...(minPrice && { minPrice }),
+        ...(maxPrice && { maxPrice }),
+        ...(inStock !== undefined && { inStock }),
+        ...(sort && { sort }),
+        ...(order && { order }),
+        page,
+        limit
     });
+    const data = await http.get(`products/search?${params}`);
+    return data || [];
 };
 
-export const searchProducts = async (query) => {
-    const lowerQuery = query.trim().toLowerCase();
-
-    return fetchProducts().then((data) =>
-        data.filter(
-            (product) =>
-                product.name.toLowerCase().includes(lowerQuery) ||
-                product.description?.toLowerCase().includes(lowerQuery)
-        )
-    );
-};
-
-export const getProductsByCategory = async (categoryId) => {
-    return fetchProducts().then((data) =>
-        data.filter((product) => product.category?._id === categoryId)
-    );
+export const getProductsByCategory = async (categoryId, page = 1, limit = 10) => {
+    const data = await http.get(`products/category/${categoryId}`);
+    return data || [];
 };
 
 export async function getProductById(id) {
-    // Simulación de delay y búsqueda en mock data
-    await new Promise((res) => setTimeout(res, 300));
-    const products = await fetchProducts();
-    return products.find((p) => p._id === id);
+    const data = await http.get(`products/${id}`);
+    return data || [];
 }

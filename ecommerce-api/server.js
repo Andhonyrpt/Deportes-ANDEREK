@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from 'cors';
 import routes from './src/routes/index.js';
 import dbConnection from './src/config/database.js';
 import logger from './src/middlewares/logger.js';
@@ -10,10 +11,12 @@ dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependencia c
 
 setupGlobalErrorHandlers();
 
-const app = express();
+export const app = express();
 dbConnection();
+
 app.use(express.json());
 app.use(logger);
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 
 app.get('/', (req, res) => {

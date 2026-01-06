@@ -6,6 +6,7 @@ import ErrorMessage from "../components/common/ErrorMessage/ErrorMessage";
 import List from "../components/List/List";
 import Navigation from "../layout/Navigation/Navigation";
 import SearchForm from "../components/SearchForm/SearchForm";
+import Button from "../components/common/Button";
 
 export default function Home() {
 
@@ -17,24 +18,38 @@ export default function Home() {
 
     const navigate = useNavigate();
 
+
+    const loadProducts = async () => {
+        setLoading(true);
+        setError(null);
+        const productsData = await fetchProducts();
+        setProducts(productsData.products);
+    };
+
     useEffect(() => {
-        const loadProducts = async () => {
+
+        let ignore = false;
+
+        (async () => {
             try {
-                setLoading(true);
-                setError(null);
-                const productsData = await fetchProducts();
-                setProducts(productsData);
-            } catch (error) {
-                setError("No se pudieron cargar los productos. Intenta más tarde");
-                setProducts([]);
-            } finally {
+                await loadProducts();
+                console.log(products)
                 setLoading(false);
+            } catch (err) {
+                if (!ignore) {
+                    setError('No se pudieron cargar los productos');
+                    console.error(err);
+                    setProducts([]);
+                    setLoading(false);
+                }
             }
+        })();
+
+        return () => {
+            ignore = true;
         };
 
-        loadProducts();
-
-    }, [])
+    }, []);
 
     const handleSearch = (e) => {
         e.preventDefault(); // Prevenir muchos clicks
@@ -71,7 +86,23 @@ export default function Home() {
             {loading ? (
                 <Loading>Cargando Productos...</Loading>
             ) : error ? (
-                <ErrorMessage>{error}</ErrorMessage>
+                <ErrorMessage>
+                    <span>{error}</span>
+                    <Button
+                        type='button'
+                        variant='primary'
+                        onClick={(e) => {
+                            loadProducts().then(setLoading(false)).catch((err) => {
+                                setError('No se pudieron cargar los productos');
+                                console.error(err);
+                                setProducts([]);
+                                setLoading(false);
+                            });
+                        }}
+                    >
+                        Volver a cargar
+                    </Button>
+                </ErrorMessage>
             ) : products.length > 0 ? (
                 <List
                     title="Catálogo de jerseys"
