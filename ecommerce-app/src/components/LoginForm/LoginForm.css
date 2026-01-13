@@ -22,26 +22,6 @@
     color: var(--color-primary-600);
 }
 
-.demo-users {
-    background: var(--color-fresh-mint);
-    padding: 9px 11px;
-    border-radius: 10px;
-    margin-bottom: 18px;
-    font-size: 0.98em;
-    color: var(--text-muted);
-    box-shadow: 0 5px 8px var(--color-green);
-}
-
-.demo-users h4 {
-    margin: 0 0 8px 0;
-    color: var(--accent);
-    font-size: 1em;
-}
-
-.user-demo {
-    margin-bottom: 4px;
-}
-
 .login-form {
     display: flex;
     flex-direction: column;

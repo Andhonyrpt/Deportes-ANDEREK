@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../utils/auth";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from '../common/Input';
+import { getProfile, login } from "../../services/userService";
 import "./LoginForm.css";
 
-export default function LoginForm() {
+export default function LoginForm({ onSuccess }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,32 +20,24 @@ export default function LoginForm() {
         setLoading(true);
         setError('');
 
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        const result = await login(email, password);
-
-        if (result.success) {
-            navigate("/")
+        try {
+            await login(email, password);
+            await getProfile();
+            onSuccess();
             window.location.reload();
-        } else {
-            setError(result.error);
+        } catch (err) {
+            setError(
+                typeof err === 'string' ? err : err?.message || 'Error desconocido'
+            );
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
         <div className="login-container">
             <div className="login-card">
                 <h2>Iniciar Sesión</h2>
-                <div className="demo-users">
-                    <h4>Usuarios de prueba:</h4>
-                    <div className="user-demo">
-                        <strong>Cliente:</strong> cliente@email.com / cliente123
-                    </div>
-                    <div className="user-demo">
-                        <strong>Admin:</strong> admin@email.com / admin123
-                    </div>
-                </div>
 
                 <form className="login-form" onSubmit={onSubmit}>
                     <div className="form-group">

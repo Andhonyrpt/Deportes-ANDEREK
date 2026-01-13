@@ -41,10 +41,8 @@ const profileValidations = [
         .isURL().withMessage('Avatar must be a valid URL')
 ];
 
-router.get('/profile/:userId', [
-    param('userId')
-        .isMongoId().withMessage('User ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getUserProfile);
+// Obtener perfil del usuario autenticado
+router.get('/users/profile', authMiddleware, getUserProfile);
 
 router.get('/search', [
     query('q')
@@ -54,7 +52,7 @@ router.get('/search', [
     query('role')
         .optional()
         .isIn(['admin', 'customer', 'guest']) // Ajusta según tus roles definidos
-        .withMessage('Inavlid role'),
+        .withMessage('Invalid role'),
 
     query('isActive')
         .optional()
