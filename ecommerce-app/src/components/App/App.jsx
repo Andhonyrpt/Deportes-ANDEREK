@@ -3,6 +3,7 @@ import { CartProvider } from '../../context/CartContext';
 import Home from '../../pages/Home';
 import Layout from '../../layout/Layout';
 import Cart from '../../pages/Cart';
+import Register from '../../pages/Register';
 import Login from '../../pages/Login';
 import ProtectedRoute from '../../pages/ProtectedRoute';
 import Profile from '../../pages/Profile';
@@ -23,7 +24,8 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/cart' element={<Cart />} />
-            <Route path='/login' element={<GuestOnly><Login /></GuestOnly>} />
+            <Route path='/register' element={<Register />} />
+            <Route path='/login' element={<Login />} />
             <Route path='/search' element={<SearchResults />} />
             <Route path='/product/:productId' element={<Product />} />
             <Route path='category/:categoryId' element={<CategoryPage />} />

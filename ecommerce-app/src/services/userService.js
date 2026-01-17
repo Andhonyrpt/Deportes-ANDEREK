@@ -1,19 +1,19 @@
 import { http } from "./http";
 import users from "../data/users.json";
 
-export const login = async (email, password) => {
-  try {
-    const { data } = await http.post('auth/login', {
-      email, password
-    });
-    const token = data.token
-    if (!token) throw new Error("No se recibió un token")
-    localStorage.setItem('authToken', token);
-    return data;
-  } catch (err) {
-    throw err?.message || String(err);
-  }
-};
+// export const login = async (email, password) => {
+//   try {
+//     const { data } = await http.post('auth/login', {
+//       email, password
+//     });
+//     const token = data.token
+//     if (!token) throw new Error("No se recibió un token")
+//     localStorage.setItem('authToken', token);
+//     return data;
+//   } catch (err) {
+//     throw err?.message || String(err);
+//   }
+// };
 
 export const getProfile = async () => {
   try {

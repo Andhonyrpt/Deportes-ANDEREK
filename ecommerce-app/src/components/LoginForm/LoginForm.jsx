@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { login } from "../../services/auth";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from '../common/Input';
-import { getProfile, login } from "../../services/userService";
+import { getProfile } from "../../services/userService";
 import "./LoginForm.css";
 
 export default function LoginForm({ onSuccess }) {
@@ -21,14 +22,13 @@ export default function LoginForm({ onSuccess }) {
         setError('');
 
         try {
+            // debugger;
             await login(email, password);
             await getProfile();
             onSuccess();
             window.location.reload();
         } catch (err) {
-            setError(
-                typeof err === 'string' ? err : err?.message || 'Error desconocido'
-            );
+            setError(err.message);
         } finally {
             setLoading(false);
         }
@@ -66,7 +66,7 @@ export default function LoginForm({ onSuccess }) {
 
                     {error && <ErrorMessage>{error}</ErrorMessage>}
 
-                    <Button disabled={loading} type="submit" variant="primary">
+                    <Button onClick={(e)=>onSubmit(e)} disabled={loading} type="submit" variant="primary">
                         {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                     </Button>
                 </form>
