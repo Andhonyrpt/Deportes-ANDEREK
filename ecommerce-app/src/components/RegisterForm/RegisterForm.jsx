@@ -23,11 +23,10 @@ export default function RegisterForm({ onSuccess }) {
     const navigate = useNavigate();
 
     // Helpers de validación
-
     const isValidEmail = (value) => {
-        return value.match(
-            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
+        const v = value.trim();
+
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     };
 
     const isValidPhoneNumber = (value) => {
@@ -68,14 +67,22 @@ export default function RegisterForm({ onSuccess }) {
 
         if (validity.valueMissing && messages.valueMissing) {
             input.setCustomValidity(messages.valueMissing);
+            return;
         }
 
         if (validity.typeMismatch && messages.typeMismatch) {
             input.setCustomValidity(messages.typeMismatch);
+            return;
+        }
+
+        if (validity.tooShort && messages.tooShort) {
+            input.setCustomValidity(messages.tooShort);
+            return;
         }
 
         if (validity.patternMismatch && messages.patternMismatch) {
             input.setCustomValidity(messages.patternMismatch);
+            return;
         }
 
         input.setCustomValidity(messages.default ?? "Campo inválido")
@@ -101,9 +108,9 @@ export default function RegisterForm({ onSuccess }) {
         setLoading(true);
 
         try {
-            await register({ displayName, email, password });
+            const result = await register({ displayName, email, password });
             // onSuccess();
-            window.location.reload();
+            // window.location.reload();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -117,6 +124,7 @@ export default function RegisterForm({ onSuccess }) {
                 <h2>Registrar usuario</h2>
 
                 <form className="register-form" onSubmit={onSubmit} >
+                    {/* Display name */}
                     <div className="form-group">
                         <Input
                             id="displayName"
@@ -138,6 +146,7 @@ export default function RegisterForm({ onSuccess }) {
                         />
                     </div>
 
+                    {/* Email */}
                     <div className="form-group">
                         <Input
                             id="email"
@@ -160,6 +169,7 @@ export default function RegisterForm({ onSuccess }) {
                         />
                     </div>
 
+                    {/* Password */}
                     <div className="form-group">
                         <Input
                             id="password"
@@ -172,18 +182,22 @@ export default function RegisterForm({ onSuccess }) {
                             }}
                             placeholder="Ingresa tu contraseña"
                             required
+                            minLength={8}
                             onInvalid={(e) => setCustomMessage(e, {
                                 valueMissing: "La contraseña es obligatoria",
+                                tooShort: "La contraseña debe tener al menos 8 caracteres.",
                                 default: "Ingresa una contraseña"
-                            })}
+                            })
+                            }
                             onInput={clearCustomMessage}
                         />
                     </div>
 
+                    {/* Verify Password*/}
                     <div className="form-group">
                         <Input
-                            id="password"
-                            label="Repite contraseña: "
+                            id="verifyPassword"
+                            label="Repite tu contraseña: "
                             type="password"
                             value={verifyPassword}
                             onChange={(e) => {
@@ -192,10 +206,13 @@ export default function RegisterForm({ onSuccess }) {
                             }}
                             placeholder="Ingresa nuevamente tu contraseña"
                             required
+                            minLength={8}
                             onInvalid={(e) => setCustomMessage(e, {
                                 valueMissing: "Repite tu contraseña",
-                                default: "Ingresa nuevamente tu contraseña"
-                            })}
+                                tooShort: "La contraseña debe tener al menos 8 caracteres.",
+                                default: "Confirma tu contraseña correctamente."
+                            })
+                            }
                             onInput={clearCustomMessage}
                         />
                     </div>
@@ -227,7 +244,7 @@ export default function RegisterForm({ onSuccess }) {
                     {error && <ErrorMessage>{error}</ErrorMessage>}
 
                     <Button disabled={loading} type="submit" variant="primary">
-                        {loading ? "Creando cuenta..." : "Crear cuenta"}
+                        {loading ? "Registrando..." : "Registrar"}
                     </Button>
                 </form>
 
