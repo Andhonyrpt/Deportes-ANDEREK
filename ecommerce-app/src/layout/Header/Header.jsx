@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, useRef, useEffect, use } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Icon from '../../components/common/Icon';
 import { getCurrentUser, isAuthenticated, logout } from '../../utils/auth';
 import { useCart } from '../../context/CartContext';
@@ -210,13 +210,14 @@ export default function Header() {
                                                     <Icon name="logIn" size={16} />
                                                     Iniciar Sesión
                                                 </Link>
-                                                <button
+                                                <Link
+                                                    to="/register"
                                                     className="auth-btn secondary"
                                                     onClick={handleRegister}
                                                 >
                                                     <Icon name="userPlus" size={16} />
                                                     Crear Cuenta
-                                                </button>
+                                                </Link>
                                             </div>
                                         ) : (
                                             <div className='user-section'>

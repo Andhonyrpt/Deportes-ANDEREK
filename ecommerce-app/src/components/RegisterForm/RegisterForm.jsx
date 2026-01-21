@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../../services/auth";
+import { checkEmail, register } from "../../services/auth";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from '../common/Input';
-// import { getProfile } from "../../services/userService";
 import "./RegisterForm.css";
 
 export default function RegisterForm({ onSuccess }) {
@@ -18,6 +17,7 @@ export default function RegisterForm({ onSuccess }) {
     // Estados para el UX
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [emailCheck, setEmailCheck] = useState({ status: "idle", message: "" })
 
     // Navegación
     const navigate = useNavigate();
@@ -49,8 +49,13 @@ export default function RegisterForm({ onSuccess }) {
             return false;
         }
 
+        if (password.length < 8) {
+            setError("La contraseña debe tener al menos 8 caracteres.")
+            return false;
+        }
+
         if (password !== verifyPassword) {
-            setError("Parece que tus contraseñas no coinciden o están vacías");
+            setError("Tus contraseñas no coinciden.");
             return false;
         }
 
@@ -58,6 +63,12 @@ export default function RegisterForm({ onSuccess }) {
             setError("El número de telefono debe contener solo números");
             return false;
         }
+
+        if (emailCheck.status === "taken") {
+            setError("Ese email ya esta registrado.");
+            return false;
+        }
+
         return true;
     };
 
@@ -92,8 +103,37 @@ export default function RegisterForm({ onSuccess }) {
         e.target.setCustomValidity("");
     }
 
+    const runEmailAvailabilityCheck = async (emailValue, inputEl) => {
+        console.log(emailValue, inputEl);
+        console.log(emailCheck);
+        const value = emailValue.trim();
+
+        if (!isValidEmail(value)) {
+            setEmailCheck({ status: "idle", message: "" });
+            inputEl?.setCustomValidity("Invalid email");
+            return;
+        }
+
+        setEmailCheck({ status: "checking", message: "Validando email..." })
+        console.log(emailCheck);
+        const taken = await checkEmail(value);
+
+        if (taken === null) {
+            setEmailCheck({ status: "idle", message: "" });
+            inputEl?.setCustomValidity("");
+            return;
+        } else if (taken) {
+            setEmailCheck({ status: "taken", message: "Ese email ya está registrado." });
+            inputEl?.setCustomValidity("Ese email ya está registrado.");
+            console.log(emailCheck);
+        } else {
+            setEmailCheck({ status: "available", message: "Email disponible" });
+            inputEl?.setCustomValidity("");
+            console.log(emailCheck);
+        }
+    }
+
     const onSubmit = async (e) => {
-        console.log(e)
         e.preventDefault();
 
         if (!e.currentTarget.checkValidity()) {
@@ -108,9 +148,10 @@ export default function RegisterForm({ onSuccess }) {
         setLoading(true);
 
         try {
-            const result = await register({ displayName, email, password });
-            // onSuccess();
-            // window.location.reload();
+            const result = await register({ displayName, email, password, phone });
+            console.log(result);
+            onSuccess();
+            window.location.reload();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -159,6 +200,14 @@ export default function RegisterForm({ onSuccess }) {
                             }}
                             placeholder="Ingresa tu email"
                             required
+                            onBlur={(e) => {
+                                //Aqui se valida con la API
+                                runEmailAvailabilityCheck(e.target.value, e.target);
+                            }}
+                            onFocus={() => {
+                                //Solo UX: limpiamos estado y mensajes anteriores
+                                setEmailCheck({ status: "idle", message: "" });
+                            }}
                             onInvalid={(e) => setCustomMessage(e, {
                                 valueMissing: "El email es obligatorio",
                                 typeMismatch: "Ese email no parece válido. Ej: nombre@dominio.com",
@@ -186,7 +235,7 @@ export default function RegisterForm({ onSuccess }) {
                             onInvalid={(e) => setCustomMessage(e, {
                                 valueMissing: "La contraseña es obligatoria",
                                 tooShort: "La contraseña debe tener al menos 8 caracteres.",
-                                default: "Ingresa una contraseña"
+                                default: "Captura una contraseña válida"
                             })
                             }
                             onInput={clearCustomMessage}
@@ -207,12 +256,13 @@ export default function RegisterForm({ onSuccess }) {
                             placeholder="Ingresa nuevamente tu contraseña"
                             required
                             minLength={8}
-                            onInvalid={(e) => setCustomMessage(e, {
-                                valueMissing: "Repite tu contraseña",
-                                tooShort: "La contraseña debe tener al menos 8 caracteres.",
-                                default: "Confirma tu contraseña correctamente."
-                            })
-                            }
+                            onInvalid={(e) => {
+                                setCustomMessage(e, {
+                                    valueMissing: "Repite tu contraseña",
+                                    tooShort: "La contraseña debe tener al menos 8 caracteres.",
+                                    default: "Confirma tu contraseña correctamente."
+                                })
+                            }}
                             onInput={clearCustomMessage}
                         />
                     </div>

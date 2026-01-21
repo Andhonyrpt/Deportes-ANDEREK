@@ -22,7 +22,6 @@ export default function LoginForm({ onSuccess }) {
         setError('');
 
         try {
-            // debugger;
             await login(email, password);
             await getProfile();
             onSuccess();
