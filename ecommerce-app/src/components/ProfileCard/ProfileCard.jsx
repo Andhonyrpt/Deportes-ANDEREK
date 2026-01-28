@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
+import { getUserProfile } from '../../services/userService';
 import { getCurrentUser } from '../../utils/auth';
 import Button from '../common/Button';
+import Loading from '../common/Loading/Loading';
 import './ProfileCard.css';
 
 const ROLE_COLORS = {
@@ -22,7 +25,42 @@ const ROLE_ACTIONS = {
 };
 
 export default function ProfileCard({ user }) {
-    const currentUser = user || getCurrentUser();
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                setLoading(true)
+                const userData = await getUserProfile();
+                setCurrentUser(userData);
+            } catch (err) {
+                console.error("Error al obtener el perfil", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (!user) {
+            fetchProfile();
+        } else {
+            setLoading(false);
+        }
+
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="product-details-container">
+                <Loading >Cargando perfil...</Loading>
+            </div>
+        )
+    }
+
+    if (!currentUser && !loading) {
+        return <div className="profile-container">No se pudo cargar la información del usuario.</div>;
+    }
+
     const role = currentUser.role || "guest";
     const actions = ROLE_ACTIONS[role] || [];
 

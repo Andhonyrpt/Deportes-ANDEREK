@@ -50,7 +50,6 @@
 /* Header actions */
 .header-actions {
     margin-top: -15px;
-    margin-right: 30px;
     display: flex;
     align-items: center;
     gap: 20px;

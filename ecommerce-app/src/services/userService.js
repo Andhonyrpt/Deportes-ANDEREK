@@ -1,25 +1,24 @@
 import { http } from "./http";
 import users from "../data/users.json";
 
-// export const login = async (email, password) => {
-//   try {
-//     const { data } = await http.post('auth/login', {
-//       email, password
-//     });
-//     const token = data.token
-//     if (!token) throw new Error("No se recibió un token")
-//     localStorage.setItem('authToken', token);
-//     return data;
-//   } catch (err) {
-//     throw err?.message || String(err);
-//   }
-// };
+export function isAuthenticated() {
+  const token = localStorage.getItem('authToken');
+  return token !== null;
+}
 
-export const getProfile = async () => {
+export const getUserProfile = async () => {
+  //requiresAuth: true
   try {
-    const { data } = await http.get('users/profile', { requiresAuth: true });
-    if (!data || !data.user) { throw new Error("No se pudo obtener el perfil"); }
-    localStorage.setItem('userData', JSON.stringify(data.user));
+    const res = await http.get('users/profile', {requiresAuth: true });
+    const { message, user } = res.data;
+
+    if (!user) {
+      throw new Error("No se pudo obtener el perfil");
+    }
+
+    localStorage.setItem('userData', JSON.stringify(user));
+    return user;
+
   } catch (err) {
     throw err?.message || String(err);
   }

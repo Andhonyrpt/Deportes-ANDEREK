@@ -15,7 +15,7 @@ http.interceptors.request.use(
         // Siempre intenta agregar el token si existe
         const token = localStorage.getItem('authToken');
         if (token) {
-            config.headers = config.headers || {};
+            // config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -27,12 +27,13 @@ http.interceptors.request.use(
 );
 
 http.interceptors.response.use(
-    (res) => res,
+    (res) => { return res },
     (err) => {
         // Manejar errores de autentificación
         if (err.response?.status === 401) {
             localStorage.removeItem('authToken');
-            localStorage.removeItem('userData')
+            window.location.href = "/login";
+            localStorage.removeItem('userData');
         }
         const message = err.response?.data?.message || err.message || 'Error de red';
         return Promise.reject(new Error(message));
