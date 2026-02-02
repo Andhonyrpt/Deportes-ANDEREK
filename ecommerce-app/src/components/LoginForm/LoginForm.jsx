@@ -1,38 +1,32 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../services/auth";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from '../common/Input';
-import { getUserProfile } from "../../services/userService";
+// import { getUserProfile } from "../../services/userService";
 import "./LoginForm.css";
 
 export default function LoginForm({ onSuccess }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const { login, loading } = useAuth();
 
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setError('');
 
-        try {
-            const result = await login(email, password);
-            if (result) {
-                await getUserProfile();
-                onSuccess();
-                window.location.reload();
-            }
+        const result = await login(email, password);
 
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
+        if (result.success) {
+            if (onSuccess) onSuccess();
+            navigate("/");
+        } else {
+            setError(result.error);
         }
     };
 
@@ -68,7 +62,7 @@ export default function LoginForm({ onSuccess }) {
 
                     {error && <ErrorMessage>{error}</ErrorMessage>}
 
-                    <Button onClick={(e) => onSubmit(e)} disabled={loading} type="submit" variant="primary">
+                    <Button disabled={loading} type="submit" variant="primary">
                         {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                     </Button>
                 </form>

@@ -2,6 +2,13 @@ import axios from 'axios';
 
 const APP_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+let logoutCallback = null;
+
+export const setLogoutCallback = (callback) => {
+    // Es una función para guardar una acción que se ejecutará más tarde
+    logoutCallback = callback;
+}
+
 export const http = axios.create({
     baseURL: APP_BASE_URL,
     headers: {
@@ -14,6 +21,7 @@ http.interceptors.request.use(
     (config) => {
         // Siempre intenta agregar el token si existe
         const token = localStorage.getItem('authToken');
+
         if (token) {
             // config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;

@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../components/common/Icon';
-import { getCurrentUser, isAuthenticated, logout } from '../../utils/auth';
+// import { getCurrentUser, logout } from '../../utils/auth';
+// import { isAuthenticated } from '../../services/userService';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
 export default function Header() {
@@ -11,30 +13,13 @@ export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { getTotalItems } = useCart();
     const totalItems = getTotalItems();
-
-    // Simular estado de autenticación - reemplazar con tu lógica real
-    const [isAuth, setIsAuth] = useState(true);
-    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+    const { user, isAuth, logout } = useAuth();
 
     // Referencias para manejo de clicks fuera
     const userMenuRef = useRef(null);
     const mobileMenuRef = useRef(null);
 
-    useEffect(() => {
-
-        const updateAuthState = () => {
-            setIsAuth(isAuthenticated());
-            setUser(getCurrentUser());
-        };
-
-        window.addEventListener("storage", updateAuthState);
-        updateAuthState();
-
-        return () => {
-            window.addEventListener("storage", updateAuthState);
-        }
-
-    }, [])
 
     // Cerrar menús con Escape y clicks fuera
     useEffect(() => {
@@ -66,6 +51,19 @@ export default function Header() {
 
     }, []);
 
+    // Prevenir scroll del body cuando el menú móvil está abierto
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isMobileMenuOpen]);
+
     const handleLogin = () => {
         setIsUserMenuOpen(false);
         setIsMobileMenuOpen(false);
@@ -78,8 +76,6 @@ export default function Header() {
 
     const handleLogout = () => {
         logout();
-        setIsAuth(false);
-        setUser(null);
         setIsUserMenuOpen(false);
         setIsMobileMenuOpen(false);
         window.location.reload();
@@ -100,7 +96,7 @@ export default function Header() {
     // Generar iniciales del usuario
     const getUserInitials = (userData) => {
 
-        if (!userData || userData.name) return "U";
+        if (!userData) return "U";
 
         const name = userData.displayName || userData.name || userData.email || "Usuario";
 
@@ -115,7 +111,7 @@ export default function Header() {
     const getDisplayName = (userData) => {
         if (!userData) return "Usuario";
         return userData.displayName || userData.name || userData.email || "Usuario";
-    }
+    };
 
     return (
         <header className='header'>

@@ -1,45 +1,22 @@
-import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { getUserProfile, isAuthenticated } from "../services/userService";
 import Loading from "../components/common/Loading/Loading";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({
     children,
     redirectTo = "/login",
     allowedRoles
 }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(false);
     const location = useLocation();
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                setLoading(true);
-                const userData = await getUserProfile();
-                setUser(userData);
-            } catch (error) {
-                console.error("Error al obtener el perfil", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        if (isAuthenticated()) {
-            fetchUserData();
-        } else {
-            setLoading(false);
-        }
-
-    }, [allowedRoles])
+    const { user, isAuth, loading } = useAuth();
 
     if (loading) {
-        return <Loading>Hola</Loading>
+        return <Loading></Loading>
     }
 
 
-    if (!isAuthenticated()) {
-        return <Navigate to={redirectTo} replace state={{ from: location }} />
+    if (!isAuth) {
+        return <Navigate to={redirectTo} replace state={{ from: location }} />;
     }
 
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { checkEmail, register } from "../../services/auth";
+import { useAuth } from "../../context/AuthContext";
+import { checkEmail } from "../../services/auth";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from '../common/Input';
@@ -15,12 +16,12 @@ export default function RegisterForm({ onSuccess }) {
     const [phone, setPhone] = useState("");
 
     // Estados para el UX
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [emailCheck, setEmailCheck] = useState({ status: "idle", message: "" })
 
     // Navegación
     const navigate = useNavigate();
+    const { register, loading } = useAuth();
 
     // Helpers de validación
     const isValidEmail = (value) => {
@@ -145,17 +146,24 @@ export default function RegisterForm({ onSuccess }) {
             return;
         }
 
-        setLoading(true);
+        const userData = {
+            displayName: displayName.trim(),
+            email: email.trim().toLocaleLowerCase(),
+            password,
+            phone: phone.trim()
+        };
 
-        try {
-            const result = await register({ displayName, email, password, phone });
-            console.log(result);
-            onSuccess();
-            window.location.reload();
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
+        const result = await register(userData);
+
+        if (result.success) {
+            navigate("/login", {
+                state: {
+                    message: "Registro exitoso. Por favor inicia sesión.",
+                    email: userData.email
+                }
+            });
+        } else {
+            setError(result.message);
         }
     };
 
@@ -267,6 +275,7 @@ export default function RegisterForm({ onSuccess }) {
                         />
                     </div>
 
+                    {/* Phone Number */}
                     <div className="form-group">
                         <Input
                             id="phone"
