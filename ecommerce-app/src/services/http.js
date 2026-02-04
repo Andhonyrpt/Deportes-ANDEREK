@@ -36,13 +36,28 @@ http.interceptors.request.use(
 
 http.interceptors.response.use(
     (res) => { return res },
-    (err) => {
+    async (err) => {
+        const originalRequest = err.config;
+
         // Manejar errores de autentificación
-        if (err.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            window.location.href = "/login";
-            localStorage.removeItem('userData');
+        if (err.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const { refresh } = await import("./auth");
+                const newToken = await refresh();
+
+                if (newToken) {
+                    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    return http(originalRequest);
+                }
+
+            } catch (error) {
+                console.error("Error en refresh token", error);
+            }
+
+            logoutCallback();
         }
+
         const message = err.response?.data?.message || err.message || 'Error de red';
         return Promise.reject(new Error(message));
     }

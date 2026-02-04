@@ -4,10 +4,10 @@ const FORM = {
     CHANGE: "FORM_CHANGE",
     BLUR: "FORM_BLUR",
     SET_ERRORS: "FORM_SET_ERRORS",
-    MARK_TOUCHED: "FROM_MARK_TOUCHED",
+    MARK_TOUCHED: "FORM_MARK_TOUCHED",
     SUBMIT_START: "FORM_SUBMIT_START",
-    SET_SUBMIT_ERROR: "FORM_SET_SUBMIT_ERROR",
     SUBMIT_END: "FORM_SUBMIT_END",
+    SET_SUBMIT_ERROR: "FORM_SET_SUBMIT_ERROR",
     RESET: "FORM_RESET",
 }
 
@@ -15,8 +15,12 @@ function setIn(obj, path, value) {
     const keys = path.split(".");
     const clone = structuredClone(obj);
     let cur = clone;
-    for (let i = 0; i < keys.length - 1; i++)
+    for (let i = 0; i < keys.length - 1; i++) {
+        if (cur = cur[keys[i]])
+            cur[keys[i]] = {};
         cur = cur[keys[i]];
+    }
+
     cur[keys[keys.length - 1]] = value;
     return clone;
 }
@@ -32,7 +36,7 @@ function formReducer(state, action) {
             return { ...state, values: setIn(state.values, name, value) }
         }
         case FORM.BLUR: {
-            const { name } = action.payload; // name= contact.email;
+            const { name } = action.payload;
             return { ...state, touched: setIn(state.touched, name, true) }
         }
         case FORM.SET_ERRORS: {

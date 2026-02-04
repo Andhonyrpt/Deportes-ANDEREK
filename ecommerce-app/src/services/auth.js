@@ -21,10 +21,12 @@ export const register = async (userData) => {
 export const login = async (email, password) => {
     try {
         const response = await http.post("auth/login", { email, password });
-        const { token } = response.data;
+        const { token, refreshToken } = response.data;
 
         if (token) {
             localStorage.setItem("authToken", token);
+            localStorage.setItem("refreshToken", refreshToken);
+
             return token;
         } else {
             return null;
@@ -35,6 +37,29 @@ export const login = async (email, password) => {
         return null;
     }
 };
+
+export const refresh = async () => {
+    try {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!refreshToken) return null;
+
+        const response = await http.post("auth/refresh", { refreshToken });
+
+        const { token, refreshToken: newRefreshToken } = response.data;
+
+        if (token) {
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("refreshToken", newRefreshToken);
+        }
+
+        return null;
+
+    } catch (error) {
+        console.error("Error al refrescar el token", error);
+        return null;
+    }
+}
 
 export const checkEmail = async (email) => {
     try {

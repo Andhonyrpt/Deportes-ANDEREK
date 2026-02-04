@@ -1,7 +1,12 @@
 import express from "express";
-import { body } from "express-validator";
-import { register, login, checkEmail } from '../controllers/authController.js';
+import {
+    register,
+    login,
+    checkEmail,
+    refreshToken
+} from '../controllers/authController.js';
 import validate from "../middlewares/validations.js";
+import { authLimiter } from "../middlewares/rateLimiter.js";
 import {
     displayNameValidation,
     emailValidation,
@@ -14,6 +19,9 @@ import {
 } from "../middlewares/validators.js";
 
 const router = express.Router();
+
+// Aplicar rate limiting a todas las rutas 
+router.use(authLimiter);
 
 router.post(
     "/register",
@@ -30,6 +38,8 @@ router.post(
 );
 
 router.post("/login", [emailValidation(), passwordLoginValidation()], validate, login);
+
+router.post("/refresh", refreshToken);
 
 router.get("/check-email", [queryEmailValidation()], validate, checkEmail);
 

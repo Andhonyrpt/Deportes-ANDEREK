@@ -1,11 +1,18 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import User from '../models/user.js';
 
 const generateToken = (userId, displayName, role) => {
     return jwt.sign({ userId, displayName, role },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
+    );
+};
+
+const generateRefreshToken = (userId, displayName, role) => {
+    return jwt.sign({ userId, displayName, role },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
     );
 };
 
@@ -65,8 +72,19 @@ async function login(req, res, next) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = generateToken(userExist._id, userExist.displayName, userExist.role);
-        res.status(200).json({ token });
+        const token = generateToken(
+            userExist._id,
+            userExist.displayName,
+            userExist.role
+        );
+
+        const refreshToken = generateRefreshToken(
+            userExist._id,
+            userExist.displayName,
+            userExist.role
+        );
+
+        res.status(200).json({ token, refreshToken });
     } catch (err) {
         next(err);
     }
@@ -84,6 +102,35 @@ async function checkEmail(req, res, next) {
     } catch (err) {
         next(err);
     }
+};
+
+async function refreshToken(req, res, next) {
+    try {
+        const token = req.body.refreshToken;
+
+        if (!token) return res.status(401).json({ message: "No refresh token provider" });
+
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+            if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+            const newAccessToken = generateToken(
+                decoded.userId,
+                decoded.displayName,
+                decode.role
+            );
+
+            // Opcional (recomendable para ecommerce o redes sociales pero no para ambiente laboral)
+            const newRefreshToken = generateRefreshToken(
+                decoded.userId,
+                decoded.displayName,
+                decode.role
+            );
+
+            res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
+        });
+    } catch (error) {
+        next(error);
+    }
 }
 
-export { register, login, checkEmail };
+export { register, login, checkEmail, refreshToken };

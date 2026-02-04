@@ -1,4 +1,4 @@
-import { Children, createContext, use, useContext, useDebugValue, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
     login as loginService,
     register as registerService
@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
 
     const removeToken = () => {
         localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("userData");
     };
 
