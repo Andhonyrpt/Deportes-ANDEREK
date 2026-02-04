@@ -12,9 +12,9 @@ export default function LoginForm({ onSuccess }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const { login, loading } = useAuth();
 
     const navigate = useNavigate();
+    const { login, loading } = useAuth();
 
     const onSubmit = async (e) => {
         e.preventDefault();

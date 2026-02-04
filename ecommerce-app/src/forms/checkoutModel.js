@@ -12,7 +12,7 @@ export const checkoutInitialValues = {
         zip: "",
     },
     payment: {
-        method: "", // "card"||"cash"||"transfer"
+        method: "card", // "card"||"cash"||"transfer"
     },
     notes: ""
 };

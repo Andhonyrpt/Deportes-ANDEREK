@@ -16,8 +16,7 @@ function setIn(obj, path, value) {
     const clone = structuredClone(obj);
     let cur = clone;
     for (let i = 0; i < keys.length - 1; i++) {
-        if (cur = cur[keys[i]])
-            cur[keys[i]] = {};
+        if (cur = cur[keys[i]]) cur[keys[i]] = {};
         cur = cur[keys[i]];
     }
 
@@ -88,8 +87,9 @@ export function useFormReducer({ initialValues, validate }) {
     const [state, dispatch] = useReducer(formReducer, seed);
 
     const onChange = (e) => {
-        const { name, value } = e.target;
-        dispatch({ type: FORM.CHANGE, payload: { name, value } });
+        const { name, value, type, checked } = e.target;
+        const finalValue = type === 'checkbox' ? checked : value;
+        dispatch({ type: FORM.CHANGE, payload: { name, value: finalValue } });
     };
 
     const onBlur = (e) => {
@@ -100,6 +100,7 @@ export function useFormReducer({ initialValues, validate }) {
     const runValidation = () => {
         const errors = validate(state.values);
         dispatch({ type: FORM.SET_ERRORS, payload: errors });
+        return errors;
     };
 
     const getFieldError = (name) => getIn(state.errors, name);
@@ -119,16 +120,37 @@ export function useFormReducer({ initialValues, validate }) {
         })
     };
 
+    const handleSubmit = async (onSubmit) => {
+        markAllTouched();
+        const errors = runValidation();
+
+        if (Object.keys(errors).length === 0) {
+            dispatch({ type: FORM.SUBMIT_START });
+            try {
+                await onSubmit(state.values);
+                dispatch({ type: FORM.SUBMIT_END });
+            } catch (error) {
+                dispatch({ type: FORM.SET_SUBMIT_ERROR, payload: error.message });
+                dispatch({ type: FORM.SUBMIT_END });
+            }
+        }
+    };
+
     return {
-        ...state,
+        values: state.values,
+        errors: state.errors,
+        touched: state.touched,
+        isSubmitting: state.isSubmitting,
+        submitError: state.submitError,
         onChange,
         onBlur,
         runValidation,
         getFieldError,
         isTouched,
         markAllTouched,
+        handleSubmit,
         setSubmitting: (v) => dispatch({ type: v ? FORM.SUBMIT_START : FORM.SUBMIT_END }),
-        setSubmitting: (msg) => dispatch({ type: FORM.SET_SUBMIT_ERROR, payload: msg }),
+        setSubmitError: (msg) => dispatch({ type: FORM.SET_SUBMIT_ERROR, payload: msg }),
         reset: () => dispatch({ type: FORM.RESET, payload: seed })
     }
 };
