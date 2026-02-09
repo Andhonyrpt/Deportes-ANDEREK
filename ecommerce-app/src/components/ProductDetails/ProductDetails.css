@@ -28,7 +28,7 @@
 .product-details-image img {
     max-width: 100%;
     height: auto;
-    border-radius: 12px;
+    border-radius: var(--r3);
     object-fit: contain;
 }
 
@@ -51,7 +51,7 @@
     padding: 8px 12px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(2px);
-    border-radius: 12px;
+    border-radius: var(--r4);
     z-index: 10;
 }
 
@@ -59,7 +59,7 @@
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: var(--r3);
     border: 2px solid transparent;
     cursor: pointer;
     opacity: 0.5;
@@ -76,7 +76,7 @@
 
 .product-details-thumbnail.active {
     opacity: 1;
-    border-color: #28a745;
+    border-color: var(--color-primary-400);
 }
 
 .product-details-info {
