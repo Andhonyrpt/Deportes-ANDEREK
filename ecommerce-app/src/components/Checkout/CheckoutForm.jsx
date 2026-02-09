@@ -1,6 +1,6 @@
 import FormField from "../common/FormField/FormField";
 import { useFormReducer } from "../../hooks/useFormReducer";
-import { checkoutInitialValues,hasErrors } from "../../forms/checkoutModel";
+import { checkoutInitialValues, hasErrors } from "../../forms/checkoutModel";
 import { validateCheckout } from "../../forms/checkoutValidate";
 // import 'CheckoutForm.css';
 
@@ -87,7 +87,7 @@ export default function CheckoutForm({ onSubmitOrder }) {
     return (
         <form className="checkoutForm" onSubmit={handleSubmit} noValidate>
             <h2>Datos del contacto</h2>
-            {fields.slice(0, 3).map((f) => {
+            {fields.slice(0, 3).map((f) => (
                 <FormField
                     key={f.id}{...f}
                     value={getValue(form.values, f.name)}
@@ -95,10 +95,10 @@ export default function CheckoutForm({ onSubmitOrder }) {
                     onBlur={form.onBlur}
                     error={form.getFieldError(f.name)}
                     showError={form.isTouched(f.name)} />
-            })}
+            ))}
 
             <h2>Envío</h2>
-            {fields.slice(3).map((f) => {
+            {fields.slice(3).map((f) => (
                 <FormField
                     key={f.id}{...f}
                     value={getValue(form.values, f.name)}
@@ -106,7 +106,7 @@ export default function CheckoutForm({ onSubmitOrder }) {
                     onBlur={form.onBlur}
                     error={form.getFieldError(f.name)}
                     showError={form.isTouched(f.name)} />
-            })}
+            ))}
 
             {form.submitError ? <p className="submitError">{form.submitError}</p> : null}
 

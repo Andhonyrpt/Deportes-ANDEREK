@@ -18,13 +18,15 @@ export default function ProductDetails({ productId }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedVariant, setSelectedVariant] = useState(null);
+    const [mainImage, setMainImage] = useState(0);
 
     useEffect(() => {
 
         setLoading(true);
         setError(null);
 
-        getProductById(productId).then((foundProduct) => {
+        getProductById(productId).then((res) => {
+            const foundProduct = res.data;
 
             if (!foundProduct) {
                 setError("Producto no encontrado");
@@ -92,20 +94,36 @@ export default function ProductDetails({ productId }) {
     const currentStock = selectedVariant ? selectedVariant.stock : 0;
     const stockBadge = currentStock > 0 ? "success" : "error";
     const stockLabel = currentStock > 0 ? "En stock" : "Agotado";
-    const hasAvailableVariants = variants?.some(v => v.stock > 0);
+    const hasAvailableVariants = variants?.some((v) => v.stock > 0);
 
     return (
         <div className="product-details-container">
 
             <div className="product-details-main">
                 <div className="product-details-image">
-                    <img
-                        src={imagesUrl?.[0] || "/img/products/placeholder.svg"}
-                        alt={name}
-                        onError={(e) => {
-                            e.target.src = "/img/products/placeholder.svg";
-                        }}
-                    />
+                    <div className="product-details-image-wrapper">
+                        <img
+                            src={imagesUrl?.[mainImage] || "/img/products/placeholder.svg"}
+                            alt={name}
+                            onError={(e) => {
+                                e.target.src = "/img/products/placeholder.svg";
+                            }}
+                        />
+
+                        {imagesUrl?.length > 1 && (
+                            <div className="product-details-thumbnail-container">
+                                {imagesUrl.map((url, index) => (
+                                    <img
+                                        key={index}
+                                        src={url}
+                                        alt={`${name} ${index}`}
+                                        className={`product-details-thumbnail ${mainImage === index ? 'active' : ''}`}
+                                        onClick={() => setMainImage(index)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="product-details-info">

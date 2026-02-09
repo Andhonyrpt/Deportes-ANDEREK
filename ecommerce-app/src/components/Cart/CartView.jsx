@@ -8,7 +8,8 @@ export default function CartView() {
         cartItems,
         removeFromCart,
         updateQuantity,
-        changeItemSize
+        changeItemSize,
+        getTotalItems
     } = useCart();
 
     return (
@@ -17,12 +18,14 @@ export default function CartView() {
 
             <div className="cart-view-header">
                 <h2>
-                    {cartItems.length} {cartItems.length === 1 ? "artículo" : "artículos"}
+                    {getTotalItems()} {getTotalItems() === 1 ? "artículo" : "artículos"}
                 </h2>
             </div>
 
             {cartItems && cartItems.map((item) => {
                 const currentItemId = `${item._id}-${item.selectedSize}`;
+                const currentVariant = item.variants?.find((v) => v.size === item.selectedSize);
+                const availableStock = currentVariant ? currentVariant.stock : 0;
 
                 return (
                     <div className="cart-item" key={currentItemId}>
@@ -68,14 +71,19 @@ export default function CartView() {
                         <div className="cart-item-quantity">
                             <Button variant="secondary"
                                 size="sm"
-                                onClick={() => updateQuantity(currentItemId, item.quantity - 1)}
+                                onClick={() => updateQuantity(item._id, item.selectedSize, item.quantity - 1)}
                             >
                                 <Icon name="minus" size={15}></Icon>
                             </Button>
                             <span>{item.quantity}</span>
                             <Button variant="secondary"
                                 size="sm"
-                                onClick={() => updateQuantity(currentItemId, item.quantity + 1)}
+                                onClick={() => {
+                                    if (item.quantity < availableStock) {
+                                        updateQuantity(item._id, item.selectedSize, item.quantity + 1)
+                                    }
+                                }}
+                                disabled={item.quantity >= availableStock}// Se bloquea si llega al límite
                             >
                                 <Icon name="plus" size={15}></Icon>
                             </Button>
@@ -86,7 +94,7 @@ export default function CartView() {
                         </div>
 
                         <Button variant="ghost" className="danger" size="sm"
-                            onClick={() => removeFromCart(currentItemId)}
+                            onClick={() => removeFromCart(item._id, item.selectedSize,)}
                             title="Eliminar articulo"
                         >
                             <Icon name="trash" size={15}></Icon>

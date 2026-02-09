@@ -75,8 +75,8 @@ export function useFormReducer({ initialValues, validate }) {
         Object.fromEntries(
             Object.entries(obj).map(([k, v]) => [
                 k,
-                v && typeof v === 'object' && !Array.isArray(v) ? initTouched(v) : false
-            ])
+                v && typeof v === "object" && !Array.isArray(v) ? initTouched(v) : false
+            ]),
         );
 
     const seed = useMemo(
@@ -88,7 +88,7 @@ export function useFormReducer({ initialValues, validate }) {
 
     const onChange = (e) => {
         const { name, value, type, checked } = e.target;
-        const finalValue = type === 'checkbox' ? checked : value;
+        const finalValue = type === "checkbox" ? checked : value;
         dispatch({ type: FORM.CHANGE, payload: { name, value: finalValue } });
     };
 
@@ -113,7 +113,7 @@ export function useFormReducer({ initialValues, validate }) {
                 Object.entries(obj).map(([k, v]) => [
                     k,
                     v && typeof v === "object" && !Array.isArray(v) ? mark(v) : true
-                ])
+                ]),
             );
         dispatch({
             type: FORM.MARK_TOUCHED, payload: mark(state.touched)
