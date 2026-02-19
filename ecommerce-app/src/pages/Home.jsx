@@ -33,7 +33,6 @@ export default function Home() {
         (async () => {
             try {
                 await loadProducts();
-                console.log(products)
                 setLoading(false);
             } catch (err) {
                 if (!ignore) {

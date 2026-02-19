@@ -9,7 +9,11 @@ import { setLogoutCallback } from '../services/http';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem("userData");
+        return saved ? JSON.parse(saved) : null;
+    });
     const [isAuth, setIsAuth] = useState(false);
     const [loading, setLoading] = useState(true);
 

@@ -1,5 +1,5 @@
 import shippingAddress from '../data/shipping-address.json';
-
+// ya no funcionará
 export function getShippingAddresses() {
     return new Promise((resolve) => {
         setTimeout(() => {

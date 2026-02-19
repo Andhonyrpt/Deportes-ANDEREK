@@ -10,7 +10,6 @@ import Profile from '../../pages/Profile';
 import CategoryPage from '../../pages/CategoryPage';
 import SearchResults from '../../pages/SearchResults';
 import Product from '../../pages/Product';
-import './App.css';
 import Checkout from '../../pages/Checkout';
 import Orders from '../../pages/Orders';
 import OrderConfirmation from '../../pages/OrderConfirmation';

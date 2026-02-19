@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
   getCarts,
   getCartById,
@@ -9,17 +8,26 @@ import {
   updateCart,
   deleteCart,
   addProductToCart,
+  updateCartItem,
+  removeCartItem,
+  clearCartItems
 } from '../controllers/cartController.js';
+import validate from '../middlewares/validations.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import {
+  mongoIdValidation,
+  bodyMongoIdValidation,
+  quantityValidation,
+  sizeValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
 const validateCart = [
   // Validar que user exista y sea un ObjectId válido
   body('user')
-    .notEmpty().withMessage('El campo user es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+    .notEmpty().withMessage('El campo user es obligatorio'),
 
   // Validar que products sea un array
   body('products')
@@ -27,8 +35,7 @@ const validateCart = [
 
   // Validar cada producto individualmente
   body('products.*.product')
-    .notEmpty().withMessage('El campo product es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+    .notEmpty().withMessage('El campo product es obligatorio'),
 
   body('products.*.quantity')
     .notEmpty().withMessage('El campo quantity es obligatorio')
@@ -38,46 +45,73 @@ const validateCart = [
 // Obtener todos los carritos (admin)
 router.get('/cart', authMiddleware, isAdmin, getCarts);
 
-// Obtener carrito por ID (admin)
-router.get('/cart/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId.')
-], validate, authMiddleware, isAdmin, getCartById);
-
 // Obtener carrito por usuario
-router.get('/cart/user/:userId', [
-  param('userId')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getCartByUser);
+router.get('/cart/user/:userId', authMiddleware, [
+  mongoIdValidation("userId", "User ID")
+], validate, getCartByUser);
+
+// Agregar producto al carrito 
+router.post('/cart/add', authMiddleware, [
+  bodyMongoIdValidation("userId", "User ID"),
+  bodyMongoIdValidation("productId", "Product ID"),
+  quantityValidation("quantity", true),
+  sizeValidation("size", true)
+], validate, addProductToCart);
+
+// Obtener carrito por ID (admin)
+router.get('/cart/:id', authMiddleware, isAdmin, [
+  mongoIdValidation("id", "Cart ID")
+], validate, getCartById);
 
 // Crear nuevo carrito
-router.post('/cart', validateCart, validate, authMiddleware, createCart);
-
-// Agregar producto al carrito (función especial)
-router.post('/cart/add-product', [
-  body('userId')
-    .notEmpty().withMessage('El campo "userId" es obligatorio.')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('productId')
-    .notEmpty().withMessage('El campo "productId" es obligatorio.')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('quantity')
-    .optional()
-    .isInt({ min: 1 }).withMessage('La cantidad debe ser un número entero mayor o igual a 1.')
-], validate, authMiddleware, addProductToCart);
+router.post('/cart/create', authMiddleware, [
+  bodyMongoIdValidation("user", "User"),
+  body("products")
+    .notEmpty()
+    .withMessage("Products are required")
+    .isArray({ min: 1 })
+    .withMessage("Products must be a non-empty array"),
+  bodyMongoIdValidation("products.*.product", "Product ID"),
+  quantityValidation("products.*.quantity"),
+  sizeValidation("products.*.size")
+], validate, createCart);
 
 // Actualizar carrito completo
-router.put('/cart/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validateCart, validate, authMiddleware, updateCart);
+router.put('/cart/update/:id', authMiddleware, [
+  mongoIdValidation("id", "Cart ID"),
+  bodyMongoIdValidation("user", "User ID", true),
+  body("products")
+    .optional()
+    .isArray({ min: 1 })
+    .withMessage("Products must be a non-empty array"),
+  bodyMongoIdValidation("products.*.product", "Product ID", true),
+  quantityValidation("products.*.quantity", true),
+  sizeValidation("products.*.size", true)
+], validate, updateCart);
 
 // Eliminar carrito
-router.delete('/cart/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
+router.delete('/cart/clear/:id', [
+  mongoIdValidation("id", "Cart ID")
 ], validate, authMiddleware, deleteCart);
+
+// Rutas nuevas
+router.put("/cart/update-item", authMiddleware,
+  [
+    bodyMongoIdValidation("userId", "User ID"),
+    bodyMongoIdValidation("productId", "Product ID"),
+    quantityValidation("quantity", true),
+    sizeValidation("size", true),
+    sizeValidation("oldSize", true),
+  ], validate, updateCartItem);
+
+router.delete("/cart/remove-item/:productId", authMiddleware, [
+  mongoIdValidation("productId", "Product ID"),
+  bodyMongoIdValidation("userId", "User ID"),
+  sizeValidation("size")
+], validate, removeCartItem);
+
+router.post("/cart/clear", authMiddleware, [
+  bodyMongoIdValidation("userId", "User ID")
+], validate, clearCartItems);
 
 export default router;

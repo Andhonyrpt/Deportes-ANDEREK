@@ -6,19 +6,15 @@ export function isAuthenticated() {
 }
 
 export const getUserProfile = async () => {
-  //requiresAuth: true
-  try {
-    const res = await http.get('users/profile');
-    const { message, user } = res.data;
 
-    if (!user) {
-      throw new Error("No se pudo obtener el perfil");
-    }
+  const res = await http.get('users/profile');
+  const { message, user } = res.data;
 
-    localStorage.setItem('userData', JSON.stringify(user));
-    return user;
-
-  } catch (err) {
-    throw err?.message || String(err);
+  if (!user) {
+    throw new Error("No se pudo obtener el perfil");
   }
+
+  localStorage.setItem('userData', JSON.stringify(user));
+  console.log(message);
+  return user;
 };

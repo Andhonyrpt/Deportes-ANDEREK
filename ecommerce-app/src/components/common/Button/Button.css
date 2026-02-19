@@ -38,7 +38,7 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(var(--accent-rgb), 0.05);
+  background: var(--color-strong-gray)
 }
 
 .btn-third {

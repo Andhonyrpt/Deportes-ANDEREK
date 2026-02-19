@@ -1,13 +1,9 @@
 export const paymentInitialValues = {
-    type: "", // 'credit_card', 'debit_card', 'paypal', 'bank_transfer'
+    bankName: "", 
     cardNumber: "",
     cardHolderName: "",
     expiryDate: "",
-    paypalEmail: "",
-    bankName: "", // Para transferencia bancaria
-    accountNumber: "",
-    isDefault: "",
-    isActive: ""
+    cvv: ""
 };
 
 export function hasErrors(errors) {

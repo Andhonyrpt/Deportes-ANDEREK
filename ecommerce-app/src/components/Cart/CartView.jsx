@@ -23,20 +23,26 @@ export default function CartView() {
             </div>
 
             {cartItems && cartItems.map((item) => {
-                const currentItemId = `${item._id}-${item.selectedSize}`;
-                const currentVariant = item.variants?.find((v) => v.size === item.selectedSize);
+                const p = item.product || item;
+                const currentSize = item.size || item.selectedSize;
+                const currentItemId = `${p._id}-${currentSize}`;
+                const currentVariant = p.variants?.find((v) => v.size === currentSize);
                 const availableStock = currentVariant ? currentVariant.stock : 0;
+
+                const itemPrice = p?.price || 0;
+                const itemQuantity = item?.quantity || 0;
+                const totalItem = itemPrice * itemQuantity;
 
                 return (
                     <div className="cart-item" key={currentItemId}>
 
                         <div className="cart-item-image">
-                            <img src={item.imagesUrl[0]} alt={item.name} loading="lazy" />
+                            <img src={p.imagesUrl[0]} alt={p.name} loading="lazy" />
                         </div>
 
                         <div className="cart-item-info">
-                            <h3>{item.name}</h3>
-                            {item.variants && item.variants.length > 0 && (
+                            <h3>{p.name}</h3>
+                            {p.variants && p.variants.length > 0 && (
                                 <div className="cart-item-size-selector">
                                     <label htmlFor={`size-select-${currentItemId}`}
                                     >
@@ -44,34 +50,34 @@ export default function CartView() {
                                     </label>
                                     <select
                                         id={`size-select-${currentItemId}`}
-                                        value={item.selectedSize}
+                                        value={currentSize}
                                         onChange={(e) => {
                                             const newSize = e.target.value;
-                                            changeItemSize(item._id, item.selectedSize, newSize);
+                                            changeItemSize(p._id, item.quantity, currentSize, newSize);
                                         }}
                                     >
-                                        {item.variants.map(variant => (
+                                        {p.variants.map(variant => (
                                             <option
                                                 key={variant.size}
                                                 value={variant.size}
-                                                disabled={variant.stock === 0 && variant.size !== item.selectedSize}
+                                                disabled={variant.stock === 0 && variant.size !== currentSize}
                                             >
                                                 {variant.size} {variant.stock === 0 ? "(Agotada)" : ""}
                                             </option>
                                         ))}
-                                        {!item.variants.some(v => v.size === item.selectedSize) && item.selectedSize === 'UNICA' && (
+                                        {!p.variants.some(v => v.size === currentSize) && currentSize === 'UNICA' && (
                                             <option value="UNICA">Única</option>
                                         )}
                                     </select>
                                 </div>
                             )}
-                            <p className="cart-item-price">{`$${(item.price).toFixed(2)}`}</p>
+                            <p className="cart-item-price">{`$${(p.price).toFixed(2)}`}</p>
                         </div>
 
                         <div className="cart-item-quantity">
                             <Button variant="secondary"
                                 size="sm"
-                                onClick={() => updateQuantity(item._id, item.selectedSize, item.quantity - 1)}
+                                onClick={() => updateQuantity(p._id, currentSize, item.quantity - 1)}
                             >
                                 <Icon name="minus" size={15}></Icon>
                             </Button>
@@ -80,7 +86,7 @@ export default function CartView() {
                                 size="sm"
                                 onClick={() => {
                                     if (item.quantity < availableStock) {
-                                        updateQuantity(item._id, item.selectedSize, item.quantity + 1)
+                                        updateQuantity(p._id, currentSize, item.quantity + 1)
                                     }
                                 }}
                                 disabled={item.quantity >= availableStock}// Se bloquea si llega al límite
@@ -90,11 +96,11 @@ export default function CartView() {
                         </div>
 
                         <div className="cart-item-total">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ${totalItem.toFixed(2)}
                         </div>
 
                         <Button variant="ghost" className="danger" size="sm"
-                            onClick={() => removeFromCart(item._id, item.selectedSize,)}
+                            onClick={() => removeFromCart(p._id, currentSize,)}
                             title="Eliminar articulo"
                         >
                             <Icon name="trash" size={15}></Icon>

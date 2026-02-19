@@ -1,242 +1,138 @@
+import { useMemo } from "react";
 import Button from "../../common/Button";
 import Input from "../../common/Input";
 import { useFormReducer } from "../../../hooks/useFormReducer";
-import { addressInitialValues, hasErrors } from "../../../forms/addressModel";
+import { addressInitialValues } from "../../../forms/addressModel";
 import { validateAddress } from "../../../forms/addressValidate";
 import "./AddressForm.css";
 
-export default function AddressForm({ onSubmitAddress }) {
+const addressFields = [
+    {
+        id: "name",
+        label: "Nombre completo:",
+        name: "address.name",
+        autoComplete: "name",
+    },
+    {
+        id: "address1",
+        label: "Dirección:",
+        name: "address.address1",
+        autoComplete: "street-address",
+    },
+    {
+        id: "city",
+        label: "Ciudad:",
+        name: "address.city",
+        autoComplete: "address-level2",
+    },
+    {
+        id: "state",
+        label: "Estado:",
+        name: "address.state",
+        autoComplete: "address-level1",
+    },
+    {
+        id: "postalCode",
+        label: "Código postal:",
+        name: "address.postalCode",
+        autoComplete: "postal-code",
+    },
+    {
+        id: "country",
+        label: "País:",
+        name: "address.country",
+        autoComplete: "country-name",
+    },
+    {
+        id: "phone",
+        label: "Teléfono:",
+        name: "address.phone",
+        type: "tel",
+        autoComplete: "tel",
+    },
+    {
+        id: "reference",
+        label: "Referencia:",
+        name: "address.reference"
+    },
+];
+
+export default function AddressForm({
+    onSubmit,
+    onCancel,
+    initialValues = {},
+    isEdit = false,
+}) {
+
+    const mergedInitial = useMemo(() => ({
+        ...addressInitialValues,
+        ...initialValues
+    }),
+        [initialValues]);
+
     const form = useFormReducer({
-        initialValues: addressInitialValues,
+        initialValues: mergedInitial,
         validate: validateAddress,
     });
 
-    const addressFields = [
-        {
-            id: "name",
-            label: "Nombre completo:",
-            name: "name",
-            type: "text",
-            autoComplete: "name",
-        },
-        {
-            id: "address",
-            label: "Dirección:",
-            name: "address",
-            type: "text",
-            autoComplete: "address1",
-        },
-        {
-            id: "city",
-            label: "Ciudad:",
-            name: "city",
-            type: "text",
-            autoComplete: "city",
-        },
-        {
-            id: "state",
-            label: "Estado:",
-            name: "state",
-            type: "text",
-            autoComplete: "state",
-        },
-        {
-            id: "postalCode",
-            label: "Código postal:",
-            name: "postalCode",
-            type: "text",
-            autoComplete: "zipCode",
-        },
-        {
-            id: "country",
-            label: "País:",
-            name: "country",
-            type: "text",
-            autoComplete: "country",
-        },
-        {
-            id: "phone",
-            label: "Teléfono:",
-            name: "phone",
-            type: "text",
-            autoComplete: "tel",
-        },
-    ];
+    const onFormSubmit = (e) => {
+        e.preventDefault();
 
-    const handleSubmit = () => { };
+        form.handleSubmit((values) => {
+            onSubmit(values);
+        });
+    };
 
     return (
         <div>
-            <form noValidate onSubmit={handleSubmit}>
-                <h2>Dirección</h2>
+            <form className="address-form" noValidate onSubmit={onFormSubmit}>
+
+                <h3>{isEdit ? "Editar Dirección" : "Nueva Dirección"}</h3>
+
                 {addressFields.map((field) => (
                     <Input
                         key={field.id}
-                        {...field}
-                        value={getValue(form.values, field.name)}
+                        id={field.id}
+                        label={field.label}
+                        name={field.name}
+                        type={field.type || "text"}
+                        autoComplete={field.autoComplete}
+                        value={form.values[field.name] ?? ""}
                         onChange={form.onChange}
                         onBlur={form.onBlur}
-                        error={form.getFieldError(field)}
-                        showError={form.isTouched(field)}
+                        error={form.getFieldError(field.name)}
+                        showError={form.isTouched(field.name)}
                     />
                 ))}
 
-                {form.submitError ? (
-                    <p className="submitError">{form.submitError}</p>
-                ) : null}
+                <div className="address-form-checkbox">
+                    <input
+                        type="checkbox"
+                        name="default"
+                        checked={form.values.default || false}
+                        onChange={form.onChange}
+                        id="defaultAddress"
+                    />
+                    <label htmlFor="defaultAddress">
+                        Establecer como dirección predeterminada
+                    </label>
+                </div>
 
-                <button
-                    className="submitBtn"
-                    type="submit"
-                    disabled={form.isSubmitting}
-                >
-                    {form.isSubmitting ? "Procesando..." : "Guardar dirección"}
-                </button>
+                {form.submitError && <p className="address-submitError">{form.submitError}</p>}
+
+
+                <div className="address-form-actions">
+                    <Button type="submit" disabled={form.isSubmitting}>
+                        {form.isSubmitting ? "Guardando..." : isEdit ? "Guardar Cambios" : "Agregar Dirección"}
+                    </Button>
+
+                    {onCancel && (
+                        <Button type="button" variant="danger" onClick={onCancel}>
+                            Cancelar
+                        </Button>
+                    )}
+                </div>
             </form>
         </div>
     );
-
-    function getValue(obj, path) {
-        return path.split(".").reduce((acc, k) => (acc ? acc[k] : ""), obj) ?? "";
-    }
-}
-
-//     const [formData, setFormData] = useState(
-//         {
-//             name: "",
-//             address1: "",
-//             address2: "",
-//             postalCode: "",
-//             city: "",
-//             country: "",
-//             reference: "",
-//             default: false,
-//             ...initialValues
-//         }
-//     );
-
-//     // Actualizar formulario cuando initialValues cambia (modo edición)
-//     useEffect(() => {
-//         if (initialValues && Object.keys(initialValues).length > 0) {
-//             setFormData({
-//                 name: "",
-//                 address1: "",
-//                 address2: "",
-//                 postalCode: "",
-//                 city: "",
-//                 country: "",
-//                 reference: "",
-//                 default: false,
-//                 ...initialValues,
-//             });
-//         }
-//     }, [initialValues]);
-
-//     const handleSubmit = (e) => {
-//         e.preventDefault(); //Prevenir muchos clicks
-//         onSubmit(formData);
-
-//         // Resetear formulario solo si es nuevo (no edición)
-//         if (!isEdit) {
-//             setFormData({
-//                 name: "",
-//                 address1: "",
-//                 address2: "",
-//                 postalCode: "",
-//                 city: "",
-//                 country: "",
-//                 reference: "",
-//                 default: false,
-//             });
-//         };
-//     };
-
-//     const handleChange = (e) => {
-//         const { name, value, type, checked } = e.target;
-//         setFormData((prev) => ({
-//             ...prev,
-//             [name]: type === "checkbox" ? checked : value,
-//         }));
-//     };
-
-//     return (
-//         <form className="address-form" onSubmit={handleSubmit}>
-//             <h3>{isEdit ? "Editar dirección" : "Nueva dirección"}</h3>
-//             <Input
-//                 label="Nombre de la dirección"
-//                 name="name"
-//                 value={formData.name}
-//                 onChange={handleChange}
-//                 required
-//             />
-//             <Input
-//                 label="Dirección Línea 1"
-//                 name="address1"
-//                 value={formData.address1}
-//                 onChange={handleChange}
-//                 required
-//             />
-//             <Input
-//                 label="Dirección Línea 2"
-//                 name="address2"
-//                 value={formData.address2}
-//                 onChange={handleChange}
-//             />
-//             <Input
-//                 label="Código Postal"
-//                 name="postalCode"
-//                 value={formData.postalCode}
-//                 onChange={handleChange}
-//                 placeholder="20400"
-//                 required
-//             />
-//             <Input
-//                 label="Ciudad:"
-//                 name="city"
-//                 value={formData.city}
-//                 onChange={handleChange}
-//                 placeholder="Ej.Aguascalientes"
-//                 required
-//             />
-//             <Input
-//                 label="País"
-//                 name="country"
-//                 value={formData.country}
-//                 onChange={handleChange}
-//                 placeholder="Ej.Mexico"
-//                 required
-//             />
-//             <Input
-//                 label="Referencia"
-//                 name="reference"
-//                 value={formData.reference}
-//                 onChange={handleChange}
-//             />
-
-//             <div className="form-checkbox">
-//                 <input type="checkbox"
-//                     name="default"
-//                     checked={formData.default}
-//                     onChange={handleChange}
-//                     id="defaultAddress"
-//                 />
-//                 <label htmlFor="defaultAddress">
-//                     Establecer como dirección predeterminada:
-//                 </label>
-//             </div>
-
-//             <div className="form-actions">
-//                 <Button type="submit">
-//                     {isEdit ? "Guardar Cambios" : "Agregar Dirección"}
-//                 </Button>
-//                 {onCancel && (
-//                     <Button type="button" variant="secondary"
-//                     className="button-delete"
-//                     onClick={onCancel}>
-//                         Cancelar
-//                     </Button>
-//                 )}
-//             </div>
-//         </form>
-//     );
-// };
+};

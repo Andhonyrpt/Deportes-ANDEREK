@@ -51,6 +51,7 @@ export const refresh = async () => {
         if (token) {
             localStorage.setItem("authToken", token);
             localStorage.setItem("refreshToken", newRefreshToken);
+            return token;
         }
 
         return null;

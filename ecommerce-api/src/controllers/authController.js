@@ -119,14 +119,16 @@ async function refreshToken(req, res, next) {
                 decode.role
             );
 
-            // Opcional (recomendable para ecommerce o redes sociales pero no para ambiente laboral)
-            const newRefreshToken = generateRefreshToken(
-                decoded.userId,
-                decoded.displayName,
-                decode.role
-            );
+            // // OPCIONAL.
+            // //Esto sirve como en las redes sociales para nunca pedir el inicio de sesion y sea un refresh infinito 
+            // const newRefreshToken = generateRefreshToken(
+            //   decoded.userId,
+            //   decoded.displayName,
+            //   decoded.role,
+            // );
 
-            res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
+            res.status(200).json({ token: newAccessToken, refreshToken: token });
+            // .json({ token: newAccessToken, refreshToken: newRefreshToken });
         });
     } catch (error) {
         next(error);

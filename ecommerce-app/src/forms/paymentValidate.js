@@ -1,46 +1,53 @@
 export const validatePayment = (values) => {
-    const errors = {
-        type: "", // 'credit_card', 'debit_card', 'paypal', 'bank_transfer'
-        cardNumber: "",
-        cardHolderName: "",
-        expiryDate: "",
-        paypalEmail: "",
-        bankName: "", // Para transferencia bancaria
-        accountNumber: "",
-        isDefault: "",
-        isActive: ""
-    };
-    const validTypes = ['credit_card', 'debit_card', 'paypal', 'bank_transfer'];
+    const errors = {};
+
+    //     bankName: "", 
+    //     cardNumber: "",
+    //     cardHolderName: "",
+    //     expiryDate: "",
+    //     cvv: ""
 
     if (
-        !values.type?.trim() ||
-        !validTypes.includes(values.type.trim())
-    ) errors.type = "Selecciona un método de pago.";
+        !values?.bankName?.trim() ||
+        values?.bankName?.trim().length < 4
+    ) errors.bankName = "Escribe un nombre de banco válido";
 
-    if (values.type?.trim() === "credit_card" || values.type?.trim() === "debit_card") {
-        if (!values.cardNumber.trim()) errors.cardNumber = "Escribe tu número de tarjeta";
-        if (
-            !values.cardHolderName.trim() ||
-            values.cardHolderName.trim().length < 3
-        ) errors.cardHolderName = "Escribe el nombre del titular";
-        if (!values.expiryDate.trim()) errors.expiryDate = "La fecha de vencimiento parece no ser valida (MM/YY)";
-    };
+    if (
+        !values?.cardNumber?.trim() ||
+        values?.cardNumber?.trim().length !== 16
+    ) errors.cardNumber = "Escribe un número de tarjeta válido";
 
-    if (values.type1?.trim() === "paypal") {
-        if (
-            !values.paypalEmail.trim() ||
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.paypalEmail)
-        ) errors.paypalEmail = "Escibe tu correo de paypal";
-    };
+    if (
+        !values?.cardHolderName?.trim() ||
+        values?.cardHolderName?.trim().length < 10
+    ) errors.cardHolderName = "Escribe un nombre de titular válido";
 
+    if (
+        !values?.expiryDate?.trim() ||
+        values?.expiryDate?.trim().length !== 5
+    ) {
+        errors.expiryDate = "La fecha de expiración parece no ser valida (MM/YY)";
+    } else {
+        const date = values.expiryDate.split("/"); // [12,26]
+        const currentYear = new Date().getFullYear().toString().slice(-2);
 
-    if (values.type?.trim() === "bank_transfer") {
-        if (!values.bankName.trim()) errors.bankName = "Escribe el nombre del banco";
-        if (
-            !values.accountNumber.trim() ||
-            values.accountNumber.trim().length < 6
-        ) errors.accountNumber = "Escribe tu número de cuenta";
-    };
+        if (Number(date[0]) > 12 || Number(date[0]) < 1)
+            errors.expiryDate = "El mes en la fecha de expiración no es válido";
+
+        if (Number(date[1]) < Number(currentYear))
+            errors.expiryDate = "El año en la fecha de expiración no es válido"
+    }
+
+    if (
+        !values?.cvv?.trim() ||
+        values?.cvv?.trim().length !== 3
+    ) {
+        errors.cvv = "Escribe un cvv válido";
+    } else {
+        if (isNaN(values.cvv)) {
+            errors.cvv = "El cvv debe contener solo números válidos"
+        }
+    }
 
     return errors;
 

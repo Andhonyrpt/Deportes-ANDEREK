@@ -29,8 +29,7 @@ http.interceptors.request.use(
         return config;
     },
     (err) => {
-        const message = err.response?.data?.message || err.message || 'Error de red';
-        return Promise.reject(new Error(message));
+        return Promise.reject(err);
     }
 );
 
@@ -40,7 +39,7 @@ http.interceptors.response.use(
         const originalRequest = err.config;
 
         // Manejar errores de autentificación
-        if (err.response?.status === 401 && !originalRequest._retry) {
+        if ((err.response?.status === 401||err.response?.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const { refresh } = await import("./auth");
@@ -58,7 +57,6 @@ http.interceptors.response.use(
             logoutCallback();
         }
 
-        const message = err.response?.data?.message || err.message || 'Error de red';
-        return Promise.reject(new Error(message));
+        return Promise.reject(err);
     }
 );

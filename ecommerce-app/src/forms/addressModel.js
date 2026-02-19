@@ -1,13 +1,15 @@
 export const addressInitialValues = {
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
-    phone: "",
-    isDefault: "",
-    addressType: "" // "home", "work", "other"
+    address: {
+        name: "",
+        address: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+        phone: "",
+        isDefault: "",
+        addressType: "" // "home", "work", "other"
+    }
 };
 
 export function hasErrors(errors) {

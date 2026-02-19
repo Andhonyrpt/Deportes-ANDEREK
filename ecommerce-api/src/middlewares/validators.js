@@ -86,6 +86,14 @@ export const quantityValidation = (field = "quantity", optional = false) => {
   return optional ? validator.optional() : validator.notEmpty().withMessage(`${field} is required`);
 };
 
+// Validación de talla (size)
+export const sizeValidation = (field = "size", optional = false) => {
+  const validator = body(field).trim().toUpperCase()
+    .isIn(['S', 'M', 'L', 'XL']).withMessage("Invalid size. Expected: S, M, L, or XL");
+
+  return optional ? validator.optional() : validator.notEmpty().withMessage(`${field} is required`);
+};
+
 // Validación de boolean
 export const booleanValidation = (field) =>
   body(field).optional().isBoolean().withMessage(`${field} must be a boolean`);

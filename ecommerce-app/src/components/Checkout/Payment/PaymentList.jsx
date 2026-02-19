@@ -15,7 +15,7 @@ export default function PaymentList({
         <div className="payment-list">
             <div className="payment-list-header">
                 <h3>Métodos de Pago</h3>
-                <Button onClick={onAdd}>Agregar Nueva Tarjeta</Button>
+                <Button onClick={onAdd}>Agregar nuevo método de pago</Button>
             </div>
 
             <div className="payment-list-content">

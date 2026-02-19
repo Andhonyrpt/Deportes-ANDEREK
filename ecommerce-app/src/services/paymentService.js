@@ -1,5 +1,5 @@
 import paymentMethods from '../data/paymentMethods.json';
-
+// ya no funcionará
 export function getPaymentMethod() {
     return new Promise((resolve) => {
         setTimeout(() => {
