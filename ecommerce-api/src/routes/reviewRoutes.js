@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
     createReview,
     getProductReviews,
@@ -9,53 +8,41 @@ import {
     deleteReview
 } from '../controllers/reviewController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+    mongoIdValidation,
+    bodyMongoIdValidation,
+    ratingValidation,
+    commentValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
 // Crear una nueva review
-router.post('/review', [
-    body('product')
-        .notEmpty().withMessage('Product ID is required')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
-
-    body('rating')
-        .notEmpty().withMessage('Rating is required')
-        .isInt({ min: 1, max: 5 }).withMessage('Rating must be a number between 1 and 5'),
-
-    body('comment')
-        .optional()
-        .isLength({ max: 500 }).withMessage('Comment must not exceed 500 characters')
-        .trim()
-], validate, authMiddleware, createReview);
+router.post('/review', authMiddleware, [
+    bodyMongoIdValidation('product', 'Product ID'),
+    ratingValidation('rating'),
+    commentValidation('comment')
+], validate, createReview);
 
 // Obtener reviews de un producto específico
 router.get('/review-product/:productId', [
-    param('productId')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
+    mongoIdValidation('productId', 'Product ID')
 ], validate, getProductReviews);
 
 // Obtener reviews del usuario autenticado
 router.get('/my-reviews', authMiddleware, getUserReviews);
 
 // Actualizar una review
-router.put('/my-reviews/:reviewId', [
-    param('reviewId')
-        .isMongoId().withMessage('Review ID must be a valid MongoDB ObjectId'),
-
-    body('rating')
-        .notEmpty().withMessage('Rating is required')
-        .isInt({ min: 1, max: 5 }).withMessage('Rating must be a number between 1 and 5'),
-
-    body('comment')
-        .optional()
-        .isLength({ max: 500 }).withMessage('Comment must not exceed 500 characters')
-        .trim()
-], validate, authMiddleware, updateReview);
+router.put('/my-reviews/:reviewId', authMiddleware, [
+    mongoIdValidation('reviewId', 'Review ID'),
+    ratingValidation(true),
+    commentValidation()
+], validate, updateReview);
 
 // Eliminar una review
-router.delete('/my-reviews/:reviewId', [
-    param('reviewId')
-        .isMongoId().withMessage('Review ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, deleteReview);
+router.delete('/my-reviews/:reviewId', authMiddleware, [
+    mongoIdValidation('reviewId', 'Review ID')
+], validate, deleteReview);
 
 export default router;

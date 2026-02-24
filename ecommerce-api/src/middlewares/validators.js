@@ -127,12 +127,12 @@ export const messageValidation = (maxLength = 500) =>
     .escape();
 
 // Validación de stock
-export const stockValidation = () =>
-  body("stock")
+export const stockValidation = (field = "stock") =>
+  body(field)
     .notEmpty()
-    .withMessage("Stock is required")
+    .withMessage(`${field} is required`)
     .isInt({ min: 0 })
-    .withMessage("Stock must be a non-negative integer");
+    .withMessage(`${field} must be a non-negative integer`);
 
 // Validación de order status
 export const orderStatusValidation = (optional = false) => {
@@ -180,7 +180,7 @@ export const paymentTypeValidation = () =>
   body("type")
     .notEmpty()
     .withMessage("Payment type is required")
-    .isIn(["credit_card", "debit_card", "paypal", "bank_transfer", "cash_on_delivery"])
+    .isIn(["credit_card", "debit_card", "paypal", "bank_transfer"])
     .withMessage("Invalid payment method type");
 
 // Validación de role
@@ -308,6 +308,16 @@ export const generalNameValidation = (field = "name", required = true, maxLength
     .withMessage(`${field} must be between 1 and ${maxLength} characters`);
 
   return required ? validator.notEmpty().withMessage(`${field} is required`) : validator.optional();
+};
+
+// Validación de género con opciones cerradas
+export const genreValidation = (field = "genre", optional = false) => {
+  const validator = body(field)
+    .trim()
+    .isIn(['Hombre', 'Mujer', 'Niño'])
+    .withMessage(`${field} inválido. Opciones válidas: Hombre, Mujer, Niño`);
+
+  return optional ? validator.optional() : validator.notEmpty().withMessage("El género es obligatorio");
 };
 
 // Validación de MongoID en query

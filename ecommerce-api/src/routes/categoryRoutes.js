@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param, query } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
     getCategories,
     getCategoryById,
@@ -11,6 +10,19 @@ import {
 } from '../controllers/categoryController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+    mongoIdValidation,
+    paginationValidation,
+    descriptionValidation,
+    urlValidation,
+    searchQueryValidation,
+    sortFieldValidation,
+    orderValidation,
+    generalNameValidation,
+    queryMongoIdValidation,
+    bodyMongoIdValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
@@ -34,51 +46,37 @@ const validateCategory = [
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
 ];
 
-router.get('/categories', authMiddleware, getCategories);
-
 router.get('/categories/search', [
-    query('q')
-        .optional()
-        .isString().withMessage('Search term must be a string'),
-
-    query('parentCategory')
-        .optional()
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-    query('sort')
-        .optional()
-        .isIn(['name', 'description' /*, 'createdAt'*/]) // ajusta según tu modelo real
-        .withMessage('Invalid sort fields'),
-
-    query('order')
-        .optional()
-        .isIn(['asc', 'desc']).withMessage('Order must be "asc" o "desc".'),
-
-    query('page')
-        .optional()
-        .isInt({ min: 1 })
-        .withMessage('Page must be a positive integer'),
-    query('limit')
-        .optional()
-        .isInt({ min: 1 })
-        .withMessage('Limit must be a positive integer')
+    searchQueryValidation(),
+    queryMongoIdValidation('parentCategory', 'parent category ID'),
+    sortFieldValidation(['name', 'description']),
+    orderValidation(),
+    ...paginationValidation()
 ], validate, searchCategories);
 
+router.get('/categories', getCategories);
+
 router.get('/categories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, isAdmin, getCategoryById);
+    mongoIdValidation('id', 'Category ID')
+], validate, getCategoryById);
 
-router.post('/categories', validateCategory, validate, authMiddleware, isAdmin, createCategory);
+router.post('/categories', authMiddleware, isAdmin, [
+    generalNameValidation('name', true, 100),
+    descriptionValidation('description'),
+    urlValidation('imageUrl'),
+    bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
+], validate, createCategory);
 
-router.put('/categories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validateCategory, validate, authMiddleware, isAdmin, updateCategory);
+router.put('/categories/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'Category ID'),
+    generalNameValidation('name', false, 100),
+    descriptionValidation('description'),
+    urlValidation('imageUrl'),
+    bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
+], validate, updateCategory);
 
-router.delete('/categories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, isAdmin, deleteCategory);
+router.delete('/categories/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'Category ID')
+], validate, deleteCategory);
 
 export default router;

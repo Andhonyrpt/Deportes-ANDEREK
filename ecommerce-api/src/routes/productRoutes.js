@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param, query } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
     getProducts,
     getProductById,
@@ -12,109 +11,85 @@ import {
 } from '../controllers/productController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+    bodyMongoIdValidation,
+    generalNameValidation,
+    genreValidation,
+    imagesUrlValidation,
+    mongoIdValidation,
+    orderValidation,
+    paginationValidation,
+    priceOptionalValidation,
+    priceValidation,
+    productDescriptionValidation,
+    productNameValidation,
+    queryBooleanValidation,
+    queryMongoIdValidation,
+    queryPriceValidation,
+    searchQueryValidation,
+    sizeValidation,
+    sortFieldValidation,
+    stockOptionalValidation,
+    stockValidation
+} from '../middlewares/validators.js';
+import { mongo } from 'mongoose';
 
 const router = express.Router();
 
-const validateProduct = [
-    body('name')
-        .notEmpty().withMessage('El nombre es obligatorio.')
-        .isString().withMessage('El nombre debe ser una cadena de texto.')
-        .trim(),
+// Obtener todos los productos con paginación
+router.get('/products', [
+    ...paginationValidation()
+], getProducts);
 
-    body('description')
-        .notEmpty().withMessage('La descripción es obligatoria.')
-        .isString().withMessage('La descripción debe ser una cadena de texto.')
-        .trim(),
-
-    body('modelo')
-        .notEmpty().withMessage('El modelo es obligatorio.')
-        .isIn(['Local', 'Visitante']).withMessage('El modelo debe ser "Local" o "Visitante".'),
-
-    body('genre')
-        .optional()
-        .isIn(['Hombre', 'Mujer', 'Niño']).withMessage('Género no válido.'),
-
-    body('price')
-        .notEmpty().withMessage('El precio es obligatorio.')
-        .isFloat({ min: 1 }).withMessage('El precio debe ser mayor o igual a 1.'),
-
-    body('imagesUrl')
-        .optional()
-        .isArray().withMessage('imagesURL debe ser un arreglo.')
-        .custom((arr) => arr.every(url => typeof url === 'string'))
-        .withMessage('Todas las URLs deben ser cadenas de texto.'),
-
-    body('category')
-        .notEmpty().withMessage('La categoría es obligatoria.')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-];
-
-router.get('/products', getProducts);
-
+// Buscar productos con filtros
 router.get('/products/search', [
-    query('q')
-        .optional()
-        .isString().withMessage('Search term must be a string'),
-
-    query('category')
-        .optional()
-        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
-
-    query('minPrice')
-        .optional()
-        .isFloat({ min: 0 }).withMessage('minPrice must be a number greater than or equal to 0'),
-
-    query('maxPrice')
-        .optional()
-        .isFloat({ min: 0 }).withMessage('maxPrice must be a number greater than or equal to 0'),
-
-    query('inStock')
-        .optional()
-        .isIn(['true', 'false']).withMessage('inStock must be "true" o "false".'),
-
-    query('sort')
-        .optional()
-        .isIn(['name', 'price', 'stock' /*, 'createdAt'*/]).withMessage('Invalid sort field'),
-
-    query('order')
-        .optional()
-        .isIn(['asc', 'desc']).withMessage('order must be "asc" o "desc".'),
-
-    query('page')
-        .optional()
-        .isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-
-    query('limit')
-        .optional()
-        .isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
+    searchQueryValidation(),
+    queryMongoIdValidation('category', 'Category ID'),
+    queryPriceValidation('minPrice'),
+    queryPriceValidation('maxPrice'),
+    queryBooleanValidation('inStock'),
+    sortFieldValidation(['name', 'price', 'stock' /*, 'createdAt'*/]),
+    orderValidation(),
+    ...paginationValidation()
 ], validate, searchProducts);
 
-router.get('/products/:id', [
-    param('id')
-        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
-
-], validate, getProductById);
-
 router.get('/products/category/:idCategory', [
-    param('idCategory')
-        .isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
-
+    mongoIdValidation('idCategory', 'Category ID')
 ], validate, getProductByCategory);
 
+router.get('/products/:id', [
+    mongoIdValidation('id', 'Product ID')
+], validate, getProductById);
 
+router.post('/products', authMiddleware, isAdmin, [
+    productNameValidation(true),
+    productDescriptionValidation(true),
+    generalNameValidation('modelo'),
+    genreValidation('genre'),
+    priceValidation('price'),
+    body('variants').isArray({ min: 1 }).withMessage('At least one variant is required'),
+    sizeValidation('variants.*.size'),
+    stockValidation('variants.*.stock'),
+    ...imagesUrlValidation(true),
+    bodyMongoIdValidation('category', 'Category ID')
+], validate, createProduct);
 
-router.post('/products', validateProduct, validate, authMiddleware, isAdmin, createProduct);
+router.put('/products/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'Product ID'),
+    productNameValidation(false),
+    productDescriptionValidation(false),
+    generalNameValidation('modelo', true),
+    genreValidation('genre', true),
+    priceOptionalValidation('price'),
+    sizeValidation('variants.*.size', true),
+    stockValidation('variants.*.stock'),
+    ...imagesUrlValidation(false),
+    bodyMongoIdValidation('category', 'Category ID', true)
+], validate, updateProduct);
 
-router.put('/products/:id', [
-    param('id')
-        .isMongoId().withMessage(' ID must be a valid MongoDB ObjectId'),
-
-], validateProduct, validate, authMiddleware, isAdmin, updateProduct);
-
-router.delete('/products/:id', [
-    param('id')
-        .isMongoId().withMessage(' ID must be a valid MongoDB ObjectId'),
-
-], validate, authMiddleware, isAdmin, deleteProduct);
+router.delete('/products/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'Product ID')
+], validate, deleteProduct);
 
 export default router;

@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
     getUserWishList,
     addToWishList,
@@ -10,6 +9,12 @@ import {
     moveToCart
 } from '../controllers/wishListController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+    mongoIdValidation,
+    bodyMongoIdValidation,
+    sizeValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
@@ -17,32 +22,27 @@ const router = express.Router();
 router.get('/wishlist', authMiddleware, getUserWishList);
 
 // Agregar producto a la wishlist
-router.post('/add', [
-    body('productId')
-        .notEmpty().withMessage('Product ID is required')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, addToWishList);
+router.post('/wishlist/add', authMiddleware, [
+    bodyMongoIdValidation('productId', 'Product ID')
+], validate, addToWishList);
 
 // Verificar si un producto está en la wishlist
-router.get('/check/:productId', [
-    param('productId')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, checkProductInWishList);
+router.get('/wishlist/check/:productId', authMiddleware, [
+    mongoIdValidation('productId', 'Product ID')
+], validate, checkProductInWishList);
 
 // Remover producto de la wishlist
-router.delete('/remove/:productId', [
-    param('productId')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, removeFromWishList);
+router.delete('/wishlist/remove/:productId', authMiddleware, [
+    mongoIdValidation('productId', 'Product ID')
+], validate, removeFromWishList);
 
 // Mover producto al carrito
-router.post('/move-to-cart', [
-    body('productId')
-        .notEmpty().withMessage('Product ID is required')
-        .isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, moveToCart);
+router.post('/wishlist/move-to-cart', authMiddleware, [
+    bodyMongoIdValidation('productId', 'Product ID'),
+    sizeValidation('size')
+], validate, moveToCart);
 
 // Limpiar toda la wishlist
-router.delete('/clear', authMiddleware, clearWishList);
+router.delete('/wishlist/clear', authMiddleware, clearWishList);
 
 export default router;

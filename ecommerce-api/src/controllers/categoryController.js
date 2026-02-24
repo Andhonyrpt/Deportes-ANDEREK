@@ -2,7 +2,7 @@ import Category from '../models/category.js'
 
 async function getCategories(req, res, next) {
     try {
-        const categories = await Category.find().populate("parentCategory");
+        const categories = await Category.find().populate("parentCategory").sort({ name: 1 });
         res.status(200).json(categories);
     } catch (err) {
         next(err);
@@ -11,12 +11,12 @@ async function getCategories(req, res, next) {
 
 async function getCategoryById(req, res, next) {
     try {
-        const category = await Category.findById(req.params.id).populate(
-            "parentCategory"
-        );
+        const category = await Category.findById(req.params.id).populate("parentCategory");
+
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
+
         res.status(200).json(category);
     } catch (err) {
         next(err);
@@ -26,13 +26,9 @@ async function getCategoryById(req, res, next) {
 async function createCategory(req, res, next) {
 
     try {
-    console.log("Cuerpo recibido:", req.body);
+        console.log("Cuerpo recibido:", req.body);
 
         const { name, description, imageUrl, parentCategory } = req.body;
-
-        if (!name || !description) {
-            return res.status(400).json({ message: 'All files are required' });
-        }
 
         const newCategory = new Category({
             name,
@@ -53,14 +49,30 @@ async function updateCategory(req, res, next) {
 
     try {
         const { name, description, imageUrl, parentCategory } = req.body;
+        const idCategory = req.params.id;
 
-        if (!name || !description || !parentCategory) {
-            return res.status(400).json({ message: 'All files are required' });
+        // Validar que al menos un campo sea proporcionado
+        if (
+            name === undefined &&
+            description === undefined &&
+            parentCategory === undefined &&
+            imageUrl === undefined
+        ) {
+            return res.status(400).json({
+                message: "At least one field must be provided for update",
+            });
         }
 
+        // Construir objeto de actualización con campos proporcionados
+        const updateData = {};
+        if (name !== undefined) updateData.name = name;
+        if (description !== undefined) updateData.description = description;
+        if (parentCategory !== undefined) updateData.parentCategory = parentCategory;
+        if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+
         const updatedCategory = await Category.findByIdAndUpdate(
-            req.params.id,
-            { name, description, imageUrl, parentCategory },
+            idCategory,
+            updateData,
             { new: true }
         );
 
@@ -79,6 +91,7 @@ async function deleteCategory(req, res, next) {
         const idCategory = req.params.id;
 
         const hasChildren = await Category.exists({ parentCategory: idCategory });
+
         if (hasChildren) {
             return res.status(400).json({
                 message: 'Cannot delete category with subcategories'

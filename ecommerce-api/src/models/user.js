@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema({
         default: true,
     }
 
+}, {
+    timestamps: true // <-- agrega createdAt y updatedAt
 });
 
 

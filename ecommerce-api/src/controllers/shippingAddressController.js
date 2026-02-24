@@ -104,6 +104,19 @@ const updateShippingAddress = async (req, res, next) => {
         const { name, address, city, state, postalCode, country, phone, isDefault, addressType } = req.body;
         const userId = req.user.userId;
 
+        // Validar que al menos un campo esté presente
+        if (
+            !name && !address &&
+            !city && !state &&
+            !postalCode && !country &&
+            !phone && isDefault === undefined &&
+            !addressType
+        ) {
+            return res.status(400).json({
+                message: "At least one field must be provided to update",
+            });
+        }
+
         const shippingAddress = await ShippingAddress.findOne({ _id: addressId, user: userId });
 
         if (!shippingAddress) {
@@ -118,16 +131,16 @@ const updateShippingAddress = async (req, res, next) => {
             );
         }
 
-        // Actualizar campos
-        shippingAddress.name = name;
-        shippingAddress.address = address;
-        shippingAddress.city = city;
-        shippingAddress.state = state;
-        shippingAddress.postalCode = postalCode;
-        shippingAddress.country = country || shippingAddress.country;
-        shippingAddress.phone = phone;
-        shippingAddress.isDefault = isDefault !== undefined ? isDefault : shippingAddress.isDefault;
-        shippingAddress.addressType = addressType || shippingAddress.addressType;
+        // Actualizar campos solo si están presentes
+        if (name !== undefined) shippingAddress.name = name;
+        if (address !== undefined) shippingAddress.address = address;
+        if (city !== undefined) shippingAddress.city = city;
+        if (state !== undefined) shippingAddress.state = state;
+        if (postalCode !== undefined) shippingAddress.postalCode = postalCode;
+        if (country !== undefined) shippingAddress.country = country;
+        if (phone !== undefined) shippingAddress.phone = phone;
+        if (isDefault !== undefined) shippingAddress.isDefault = isDefault;
+        if (addressType !== undefined) shippingAddress.addressType = addressType;
 
         await shippingAddress.save();
 

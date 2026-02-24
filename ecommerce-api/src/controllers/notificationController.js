@@ -40,9 +40,7 @@ async function getNotificationByUser(req, res, next) {
 async function createNotification(req, res, next) {
   try {
     const { user, message } = req.body;
-    if (!user || !message) {
-      return res.status(400).json({ error: 'User and message are required' });
-    }
+
     const newNotification = await Notification.create({
       user,
       message,
@@ -61,8 +59,21 @@ async function updateNotification(req, res, next) {
     const { id } = req.params;
     const { message, isRead } = req.body;
 
-    const updatedNotification = await Notification.findByIdAndUpdate(id,
-      { message, isRead },
+    // Validar que al menos un campo sea proporcionado
+    if (message === undefined && isRead === undefined) {
+      return res.status(400).json({
+        message: "At least one field (message or isRead) must be provided for update",
+      });
+    }
+
+    // Construir objeto de actualización con campos proporcionados
+    const updateData = {};
+    if (message !== undefined) updateData.message = message;
+    if (isRead !== undefined) updateData.isRead = isRead;
+
+    const updatedNotification = await Notification.findByIdAndUpdate(
+      id,
+      updateData,
       { new: true }
     ).populate('user');
 

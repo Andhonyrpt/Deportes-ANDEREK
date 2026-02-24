@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
   getOrders,
   getOrderById,
@@ -14,6 +13,17 @@ import {
 } from '../controllers/orderController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+  bodyMongoIdValidation,
+  mongoIdValidation,
+  orderStatusValidation,
+  paymentStatusValidation,
+  priceValidation,
+  quantityValidation,
+  shippingCostValidation,
+  sizeValidation
+} from '../middlewares/validators.js';
 
 const router = express.Router();
 
@@ -21,100 +31,59 @@ const router = express.Router();
 router.get('/orders', authMiddleware, isAdmin, getOrders);
 
 // Obtener órdenes por usuario
-router.get('/orders/user/:userId', [
-  param('userId')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getOrdersByUser);
+router.get('/orders/user/:userId', authMiddleware, [
+  mongoIdValidation('userId', 'User ID')
+], validate, getOrdersByUser);
 
 // Obtener orden por ID
-router.get('/orders/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getOrderById);
+router.get('/orders/:id', authMiddleware, [
+  mongoIdValidation('id', 'Order ID')
+], validate, getOrderById);
 
 // Crear nueva orden
-router.post('/orders', [
-  body('user')
-    .notEmpty().withMessage('"user" es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('products')
-    .isArray({ min: 1 }).withMessage('"products" debe ser un arreglo con al menos un producto'),
-
-  body('products.*.productId')
-    .notEmpty().withMessage('"productId" es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('products.*.quantity')
-    .isInt({ min: 1 }).withMessage('"quantity" debe ser un número entero mayor o igual a 1'),
-
-  body('products.*.price')
-    .isFloat({ min: 0 }).withMessage('"price" debe ser un número positivo'),
-
-  body('shippingAddress')
-    .notEmpty().withMessage('"shippingAddress" es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('paymentMethod')
-    .notEmpty().withMessage('"paymentMethod" es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('shippingCost')
-    .isFloat({ min: 0 }).withMessage('"shippingCost" must be a positive number'),
-], validate, authMiddleware, createOrder);
+router.post('/orders', authMiddleware, [
+  bodyMongoIdValidation('user', 'User ID'),
+  body('products').notEmpty()
+    .withMessage('Products are required')
+    .isArray({ min: 1 })
+    .withMessage("Products must be a non-empty array"),
+  bodyMongoIdValidation('products.*.productId', 'Product ID'),
+  sizeValidation('products.*.size'),
+  quantityValidation('products.*.quantity'),
+  priceValidation('products.*.price'),
+  bodyMongoIdValidation('shippingAddress', 'Shipping Address ID'),
+  bodyMongoIdValidation('paymentMethod', 'Payment Method ID'),
+  shippingCostValidation()
+], validate, createOrder);
 
 // Cancelar orden (función especial)
-router.patch('/orders/:id/cancel', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, isAdmin, cancelOrder);
+router.patch('/orders/:id/cancel', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Order ID')
+], validate, cancelOrder);
 
 // Actualizar solo el estado de la orden (admin)
-router.patch('/orders/:id/status', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('status')
-    .optional()
-    .isIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
-    .withMessage('Status is not valid')
-], validate, authMiddleware, isAdmin, updateOrderStatus);
+router.patch('/orders/:id/status', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Order ID'),
+  orderStatusValidation()
+], validate, updateOrderStatus);
 
 // Actualizar solo el estado de pago (admin)
-router.patch('/orders/:id/payment-status', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('paymentStatus')
-    .optional()
-    .isIn(['pending', 'paid', 'failed', 'refunded'])
-    .withMessage('Payment method is not valid')
-], validate, authMiddleware, isAdmin, updatePaymentStatus);
+router.patch('/orders/:id/payment-status', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Order ID'),
+  paymentStatusValidation()
+], validate, updatePaymentStatus);
 
 // Actualizar orden completa (admin)
-router.put('/orders/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('shippingCost')
-    .isFloat({ min: 0 }).withMessage('"shippingCost" must be a positive number'),
-
-  body('status')
-    .optional()
-    .isIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
-    .withMessage('Status is not valid'),
-
-  body('paymentStatus')
-    .optional()
-    .isIn(['pending', 'paid', 'failed', 'refunded'])
-    .withMessage('Payment method is not valid'),
-], validate, authMiddleware, isAdmin, updateOrder);
+router.put('/orders/:id', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Order ID'),
+  orderStatusValidation(true),
+  paymentStatusValidation(true),
+  shippingCostValidation()
+], validate, updateOrder);
 
 // Eliminar orden (solo si está cancelada) (admin)
-router.delete('/orders/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-], validate, authMiddleware, isAdmin, deleteOrder);
+router.delete('/orders/:id', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Order ID')
+], validate, deleteOrder);
 
 export default router;

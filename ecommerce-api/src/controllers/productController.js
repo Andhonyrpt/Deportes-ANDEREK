@@ -4,8 +4,6 @@ import SubCategory from '../models/subCategory.js';
 async function getProducts(req, res, next) {
 
     try {
-        //req.params
-        //req.query
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -15,7 +13,7 @@ async function getProducts(req, res, next) {
                 path: 'category',
                 populate: { path: 'parentCategory' } // liga
             })
-            .populate(skip)
+            .skip(skip)
             .limit(limit)
             .sort({ name: 1 });
 
@@ -25,6 +23,7 @@ async function getProducts(req, res, next) {
         res.json({
             products,
             pagination: {
+                currentPage: page,
                 totalPages,
                 totalResults,
                 hasNext: page < totalPages,
@@ -82,10 +81,6 @@ async function createProduct(req, res, next) {
 
         const { name, description, modelo, variants, genre, price, imagesUrl, category } = req.body;
 
-        if (!name || !description || !modelo || !variants || !price || !category) {
-            return res.status(400).json({ error: 'All files are required' });
-        }
-
         const subCategoryExists = await SubCategory.findById(category);
 
         if (!subCategoryExists) {
@@ -93,7 +88,9 @@ async function createProduct(req, res, next) {
         }
 
         const newProduct = await Product.create({ name, description, modelo, variants, genre, price, imagesUrl, category });
-        res.status(201).json(newProduct);
+        const populatedProduct = await Product.findById(newProduct._id).populate("category");
+
+        res.status(201).json(populatedProduct);
 
     } catch (err) {
         next(err);
@@ -108,23 +105,45 @@ async function updateProduct(req, res, next) {
         const { name, description, modelo, variants, genre, price, imagesUrl, category } = req.body;
 
 
-        if (!name || !description || !modelo || !price || !variants || !category) {
-            return res.status(400).json({ error: 'All files are required' });
+        // Validar que al menos un campo esté presente
+        if (
+            !name && !description
+            && !modelo && !genre
+            && price === undefined
+            && variants === undefined
+            && !imagesUrl && !category
+        ) {
+            return res.status(400).json({
+                message: "At least one field must be provided to update",
+            });
         }
 
-        const subCategoryExists = await SubCategory.findById(category);
-
-        if (!subCategoryExists) {
-            return res.status(400).json({ error: 'Invalid category' });
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, modelo, variants, genre, price, imagesUrl, category }, { new: true });
-
-        if (updatedProduct) {
-            return res.status(200).json(updatedProduct);
-        } else {
-            return res.status(404).json({ message: 'Product not found' })
+        if (category) {
+            const subCategoryExists = await SubCategory.findById(category);
+            if (!subCategoryExists) {
+                return res.status(400).json({ error: 'Invalid category' });
+            }
+            product.category = category;
         }
+
+        if (name !== undefined) product.name = name;
+        if (description !== undefined) product.description = description;
+        if (modelo !== undefined) product.modelo = modelo;
+        if (genre !== undefined) product.genre = genre;
+        if (price !== undefined) product.price = price;
+        if (variants !== undefined) product.variants = variants; // Aquí manejas tus tallas/stock
+        if (imagesUrl !== undefined) product.imagesUrl = imagesUrl;
+
+        await product.save();
+
+        const updatedProduct = await Product.findById(id).populate("category");
+
+        res.status(200).json(updatedProduct);
 
     } catch (err) {
         next(err);
@@ -144,6 +163,7 @@ async function deleteProduct(req, res, next) {
             return res.status(404).json({ message: 'Product not found' })
         }
 
+        res.status(204).send();
     } catch (err) {
         next(err);
     }
@@ -162,7 +182,6 @@ async function searchProducts(req, res, next) {
             page = 1,
             limit = 10,
         } = req.query;
-        console.log(inStock);
 
         let filters = {};
 
@@ -183,17 +202,18 @@ async function searchProducts(req, res, next) {
             if (minPrice) filters.price.$gte = parseFloat(minPrice);
             if (maxPrice) filters.price.$lte = parseFloat(maxPrice);
         }
-        const bool = Boolean(inStock);
+
         if (inStock === 'true') {
             filters.variants = { $elemMatch: { stock: { $gt: 0 } } };
         }
 
         let sortOptions = {};
+
         if (sort) {
             const sortOrder = order === "desc" ? -1 : 1;
             sortOptions[sort] = sortOrder;
         } else {
-            sortOptions.createdAt = -1;
+            sortOptions.name = 1;
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -215,18 +235,7 @@ async function searchProducts(req, res, next) {
                 totalResults,
                 hasNext: parseInt(page) < totalPages,
                 hasPrev: parseInt(page) > 1,
-            },
-            filters: {
-                searchTerm: q || null,
-                category: category || null,
-                priceRange: {
-                    min: minPrice ? parseFloat(minPrice) : null,
-                    max: maxPrice ? parseFloat(maxPrice) : null,
-                },
-                inStock: inStock === "true",
-                sort: sort || "createdAt",
-                order: order || "desc",
-            },
+            }
         });
     } catch (err) {
         next(err);

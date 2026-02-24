@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    imageUrl: {
+    imageUrl: { //pendiente de revisar uso de imageUrl
         type: String,
         trim: true,
         default: 'https://placehold.co/800x600.png'

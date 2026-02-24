@@ -10,12 +10,14 @@ const createReview = async (req, res, next) => {
 
         // Verificar que el producto existe
         const productExists = await Product.findById(product);
+
         if (!productExists) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
         // Verificar que el usuario no haya review este producto antes
         const existingReview = await Review.findOne({ user, product });
+
         if (existingReview) {
             return res.status(400).json({ message: 'You have already reviewed this product' });
         }
@@ -86,7 +88,15 @@ const updateReview = async (req, res, next) => {
         const { rating, comment } = req.body;
         const userId = req.user.userId;
 
+        // Validar que al menos un campo esté presente
+        if (rating === undefined && comment === undefined) {
+            return res.status(400).json({
+                message: "At least one field (rating or comment) must be provided",
+            });
+        }
+
         const review = await Review.findById(reviewId);
+
         if (!review) {
             return res.status(404).json({ message: 'Review not found' });
         }
@@ -96,8 +106,9 @@ const updateReview = async (req, res, next) => {
             return res.status(403).json({ message: 'You can only update your own reviews' });
         }
 
-        review.rating = rating;
-        review.comment = comment;
+        // Actualizar solo los campos proporcionados
+        if (rating !== undefined) review.rating = rating;
+        if (comment !== undefined) review.comment = comment;
 
         await review.save();
         await review.populate('user', 'displayName');
@@ -118,6 +129,7 @@ const deleteReview = async (req, res, next) => {
         const userId = req.user.userId;
 
         const review = await Review.findById(reviewId);
+        
         if (!review) {
             return res.status(404).json({ message: 'Review not found' });
         }

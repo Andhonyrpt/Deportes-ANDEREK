@@ -11,7 +11,7 @@ const subCategorySchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    imageURL: {
+    imageURL: { //pendiente de revisar uso de imageURL, caso igual para category
         type: String,
         trim: true,
         default: 'https://placehold.co/800x600.png'

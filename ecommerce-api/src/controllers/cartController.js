@@ -13,6 +13,7 @@ async function getCartById(req, res, next) {
   try {
     const id = req.params.id;
     const cart = await Cart.findById(id).populate('user').populate('products.product');
+
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
     }
@@ -28,7 +29,7 @@ async function getCartByUser(req, res, next) {
     const cart = await Cart.findOne({ user: userId }).populate('user').populate('products.product');
 
     if (!cart) {
-      return res.status(404).json({ message: 'No cart found for this user' });
+      return res.status(404).json({ message: 'No cart found for this user', cart: null });
     }
     res.json(cart);
   } catch (err) {
@@ -39,16 +40,6 @@ async function getCartByUser(req, res, next) {
 async function createCart(req, res, next) {
   try {
     const { user, products } = req.body;
-    if (!user || !products || !Array.isArray(products)) {
-      return res.status(400).json({ error: 'User and products array are required' });
-    }
-
-    // Validar que cada producto tenga los campos requeridos
-    for (const item of products) {
-      if (!item.product || !item.size || !item.quantity || item.quantity < 1) {
-        return res.status(400).json({ error: 'Each product must have product ID and quantity >= 1' });
-      }
-    }
 
     const newCart = await Cart.create({
       user,
@@ -114,10 +105,6 @@ async function addProductToCart(req, res, next) {
   try {
     const { userId, productId, quantity = 1, size } = req.body;
 
-    if (!userId || !productId || quantity < 1 || !size) {
-      return res.status(400).json({ error: 'User ID, product ID, and valid quantity are required' });
-    }
-
     // Buscar el carrito del usuario
     let cart = await Cart.findOne({ user: userId });
 
@@ -130,7 +117,7 @@ async function addProductToCart(req, res, next) {
     } else {
       // Si existe carrito, verificar si el producto ya está
       const existingProductIndex = cart.products.findIndex(
-        item => item.product.toString() === productId && item.size === size
+        (item) => item.product.toString() === productId && item.size === size
       );
 
       if (existingProductIndex >= 0) {
@@ -146,7 +133,7 @@ async function addProductToCart(req, res, next) {
     await cart.populate('user');
     await cart.populate('products.product');
 
-    res.status(200).json(cart);
+    res.status(200).json({ message: "Product added to cart successfully", cart });
   } catch (err) {
     next(err);
   }

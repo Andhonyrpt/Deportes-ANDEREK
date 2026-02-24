@@ -13,7 +13,7 @@ async function getOrders(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function getOrderById(req, res, next) {
   try {
@@ -30,7 +30,7 @@ async function getOrderById(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function getOrdersByUser(req, res, next) {
   try {
@@ -42,14 +42,11 @@ async function getOrdersByUser(req, res, next) {
       .populate('paymentMethod')
       .sort({ status: 1 });
 
-    if (orders.length === 0) {
-      return res.status(404).json({ message: 'No orders found for this user' });
-    }
     res.json(orders);
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function createOrder(req, res, next) {
   try {
@@ -61,22 +58,7 @@ async function createOrder(req, res, next) {
       shippingCost = 0
     } = req.body;
 
-    // Validaciones básicas
-    if (!user || !products || !Array.isArray(products) || products.length === 0) {
-      return res.status(400).json({ error: 'User and products array are required' });
-    }
-    if (!shippingAddress || !paymentMethod) {
-      return res.status(400).json({ error: 'Shipping address and payment method are required' });
-    }
-
-    // Validar estructura de productos
-    for (const item of products) {
-      if (!item.productId || !item.size || !item.quantity || !item.price || item.quantity < 1) {
-        return res.status(400).json({
-          error: 'Each product must have productId, quantity >= 1, and price'
-        });
-      }
-
+    const stockChecks = await Promise.all(products.map(async (item) => {
       const product = await Product.findById(item.productId);
 
       if (!product) {
@@ -86,21 +68,85 @@ async function createOrder(req, res, next) {
       const variant = product.variants.find((v) => v.size === item.size);
 
       if (!variant || variant.stock < item.quantity) {
-        return res.status(400).json({ error: `Insufficient stock in size ${item.size}` });
+        return {
+          productId: item.productId,
+          productName: product.name,
+          size: item.size,
+          error: `Insufficient stock for size ${item.size}`,
+          available: variant ? variant.stock : 0,
+          requested: item.quantity,
+        };
       }
+      return { productId: item.productId, product, size: item.size, ok: true };
+    }));
 
-      variant.stock -= item.quantity;
-
-      await product.save();
+    // Verificar si hubo algún error de stock
+    const errors = stockChecks.filter((check) => check.error);
+    if (errors.length > 0) {
+      return res.status(400).json({
+        message: "Cannot create order due to stock issues",
+        errors: errors.map((e) => ({
+          productId: e.productId,
+          productName: e.productName,
+          message: e.error,
+          available: e.available,
+          requested: e.requested,
+          size: e.size
+        })),
+      });
     }
 
-    // Calcular precio total
-    const subtotal = products.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Reducir stock de cada producto de forma atómica
+    const stockUpdates = await Promise.all(
+      stockChecks.map(async (check, index) => {
+        const item = products[index];
+        return Product.findOneAndUpdate(
+          { _id: check.productId, "variants.size": item.size },
+          { $inc: { "variants.$.stock": -item.quantity } },
+          { new: true }
+        );
+      })
+    );
+
+    // Verificar que todas las actualizaciones fueron exitosas
+    if (stockUpdates.some((update) => !update)) {
+      // Si alguna actualización falló, revertir cambios
+      await Promise.all(
+        stockChecks.map(async (check, index) => {
+          if (stockUpdates[index]) {
+            const item = products.find(
+              (p) => p.productId.toString() === check.productId.toString()
+            );
+            return Product.findOneAndUpdate(
+              { _id: check.productId, "variants.size": item.size },
+              { $inc: { "variants.$.stock": item.quantity } }
+            );
+          }
+        })
+      );
+      return res.status(500).json({
+        message: "Failed to update product stock. Order was not created.",
+      });
+    }
+
+    const normalizedProducts = stockChecks.map((check, index) => ({
+      productId: check.product._id,
+      quantity: products[index].quantity,
+      size: products[index].size,
+      price: check.product.price,
+    }));
+
+    // Calcular precio total con precios del servidor
+    const subtotal = normalizedProducts.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
     const totalPrice = subtotal + shippingCost;
+
 
     const newOrder = await Order.create({
       user,
-      products,
+      products: normalizedProducts,
       shippingAddress,
       paymentMethod,
       shippingCost,
@@ -115,10 +161,11 @@ async function createOrder(req, res, next) {
     await newOrder.populate('paymentMethod');
 
     res.status(201).json(newOrder);
-  } catch (err) {
+  }
+  catch (err) {
     next(err);
   }
-}
+};
 
 async function updateOrder(req, res, next) {
   try {
@@ -133,6 +180,13 @@ async function updateOrder(req, res, next) {
       if (updateData[field] !== undefined) {
         filteredUpdate[field] = updateData[field];
       }
+    }
+
+    // Validar que al menos un campo sea proporcionado
+    if (Object.keys(filteredUpdate).length === 0) {
+      return res.status(400).json({
+        message: "At least one field must be provided for update",
+      });
     }
 
     // Si se actualiza shippingCost, recalcular totalPrice
@@ -162,13 +216,14 @@ async function updateOrder(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function cancelOrder(req, res, next) {
   try {
     const { id } = req.params;
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate("products.productId");
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
@@ -179,6 +234,25 @@ async function cancelOrder(req, res, next) {
         message: 'Cannot cancel order with status: ' + order.status
       });
     }
+
+    // Restaurar el stock de los productos
+    const stockRestorations = await Promise.all(
+      order.products.map(async (item) => {
+        return Product.findOneAndUpdate(
+          { _id: item.productId._id, "variants.size": item.size },
+          { $inc: { "variants.$.stock": item.quantity } },
+          { new: true }
+        );
+      })
+    );
+
+    // Verificar que todas las restauraciones fueron exitosas
+    if (stockRestorations.some((update) => !update)) {
+      return res.status(500).json({
+        message: "Failed to restore product stock. Order status not changed.",
+      });
+    }
+
 
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
@@ -193,33 +267,22 @@ async function cancelOrder(req, res, next) {
       .populate('shippingAddress')
       .populate('paymentMethod');
 
-    res.status(200).json(updatedOrder);
+    res.status(200).json({ message: "Order cancelled successfully. Stock has been restored.", updatedOrder });
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function updateOrderStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        error: 'Invalid status. Valid statuses: ' + validStatuses.join(', ')
-      });
-    }
-
-    const updatedOrder = await Order.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    )
-      .populate('user')
-      .populate('products.productId')
-      .populate('shippingAddress')
-      .populate('paymentMethod');
+    const updatedOrder = await Order.findByIdAndUpdate(id, { status }, { new: true })
+      .populate("user")
+      .populate("products.productId")
+      .populate("shippingAddress")
+      .populate("paymentMethod");
 
     if (updatedOrder) {
       return res.status(200).json(updatedOrder);
@@ -229,29 +292,18 @@ async function updateOrderStatus(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function updatePaymentStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { paymentStatus } = req.body;
 
-    const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
-    if (!validPaymentStatuses.includes(paymentStatus)) {
-      return res.status(400).json({
-        error: 'Invalid payment status. Valid statuses: ' + validPaymentStatuses.join(', ')
-      });
-    }
-
-    const updatedOrder = await Order.findByIdAndUpdate(
-      id,
-      { paymentStatus },
-      { new: true }
-    )
-      .populate('user')
-      .populate('products.productId')
-      .populate('shippingAddress')
-      .populate('paymentMethod');
+    const updatedOrder = await Order.findByIdAndUpdate(id, { paymentStatus }, { new: true })
+      .populate("user")
+      .populate("products.productId")
+      .populate("shippingAddress")
+      .populate("paymentMethod");
 
     if (updatedOrder) {
       return res.status(200).json(updatedOrder);
@@ -261,13 +313,14 @@ async function updatePaymentStatus(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 async function deleteOrder(req, res, next) {
   try {
     const { id } = req.params;
 
     const order = await Order.findById(id);
+    
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
@@ -284,7 +337,7 @@ async function deleteOrder(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
 export {
   getOrders,

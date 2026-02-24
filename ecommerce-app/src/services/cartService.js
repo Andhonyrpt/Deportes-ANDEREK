@@ -50,7 +50,7 @@ export const removeFromCart = async (userId, productId, size) => {
 
         return response.data;
     } catch (error) {
-        console.error("Error reomving from cart", error);
+        console.error("Error removing from cart", error);
     }
 };
 

@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param, query } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
     getSubCategories,
     getSubCategoryById,
@@ -10,6 +9,8 @@ import {
 } from '../controllers/subCategoryController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import validate from '../middlewares/validations.js';
+import { bodyMongoIdValidation, generalNameValidation, mongoIdValidation, productDescriptionValidation } from '../middlewares/validators.js';
 
 const router = express.Router();
 
@@ -33,23 +34,27 @@ const validateCategory = [
         .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
 ];
 
-router.get('/subcategories', authMiddleware, getSubCategories);
+router.get('/subcategories', getSubCategories);
 
-router.get('/subcategories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, isAdmin, getSubCategoryById);
+router.get('/subcategories/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'SubCategory ID')
+], validate, getSubCategoryById);
 
-router.post('/subcategories', validateCategory, validate, authMiddleware, isAdmin, createSubCategory);
+router.post('/subcategories', authMiddleware, isAdmin, [
+    generalNameValidation('name'),
+    productDescriptionValidation('description'),
+    bodyMongoIdValidation('parentCategory', 'Parent Category ID')
+], validate, createSubCategory);
 
-router.put('/subcategories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validateCategory, validate, authMiddleware, isAdmin, updateSubCategory);
+router.put('/subcategories/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'SubCategory ID'),
+    generalNameValidation('name', true),
+    productDescriptionValidation('description', true),
+    bodyMongoIdValidation('parentCategory', 'Parent Category ID', true)
+], validate, updateSubCategory);
 
-router.delete('/subcategories/:id', [
-    param('id')
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, isAdmin, deleteSubCategory);
+router.delete('/subcategories/:id', authMiddleware, isAdmin, [
+    mongoIdValidation('id', 'SubCategory ID')
+], validate, deleteSubCategory);
 
 export default router;

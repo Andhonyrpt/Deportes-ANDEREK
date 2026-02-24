@@ -53,6 +53,8 @@ const productSchema = new mongoose.Schema({
         ref: 'SubCategory',
         required: true
     }
+}, {
+    timestamps: true // <-- agrega createdAt y updatedAt
 });
 
 

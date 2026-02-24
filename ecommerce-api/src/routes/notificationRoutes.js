@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import validate from '../middlewares/validations.js';
 import {
   getNotifications,
   getNotificationById,
@@ -14,6 +13,13 @@ import {
 } from '../controllers/notificationController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import isAdmin from '../middlewares/isAdminMiddleware.js';
+import validate from '../middlewares/validations.js';
+import {
+  bodyMongoIdValidation,
+  messageValidation,
+  booleanValidation,
+  mongoIdValidation
+} from '../middlewares/validators.js'
 
 const router = express.Router();
 
@@ -21,67 +27,46 @@ const router = express.Router();
 router.get('/notifications', authMiddleware, isAdmin, getNotifications);
 
 // Obtener notificaciones no leídas por usuario
-router.get('/notifications/unread/:userId', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getUnreadNotificationsByUser);
+router.get('/notifications/unread/:userId', authMiddleware, [
+  mongoIdValidation('userId', 'User ID')
+], validate, getUnreadNotificationsByUser);
 
 // Obtener notificaciones por usuario
-router.get('/notifications/user/:userId', [
-  param('userId')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getNotificationByUser);
+router.get('/notifications/user/:userId', authMiddleware, [
+  mongoIdValidation('userId', 'User ID')
+], validate, getNotificationByUser);
 
 // Obtener notificación por ID
-router.get('/notifications/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, getNotificationById);
+router.get('/notifications/:id', authMiddleware, [
+  mongoIdValidation('id', 'Notification ID')
+], validate, getNotificationById);
 
 // Crear nueva notificación (admin)
-router.post('/notifications', [
-  body('user')
-    .notEmpty().withMessage('El campo "user" es obligatorio')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('message')
-    .notEmpty().withMessage('El mensaje es obligatorio')
-    .isString().withMessage('El mensaje debe ser una cadena de texto')
-    .trim()
-
-], validate, authMiddleware, isAdmin, createNotification);
+router.post('/notifications', authMiddleware, [
+  bodyMongoIdValidation('user', 'User ID'),
+  messageValidation()
+], validate, createNotification);
 
 // Marcar una notificación como leída
-router.patch('/notifications/:id/mark-read', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, markAsRead);
+router.patch('/notifications/:id/mark-read', authMiddleware, [
+  mongoIdValidation('id', 'Notification ID')
+], validate, markAsRead);
 
 // Marcar todas las notificaciones de un usuario como leídas
-router.patch('/notifications/user/:userId/mark-all-read', [
-  param('userId')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-], validate, authMiddleware, markAllAsReadByUser);
+router.patch('/notifications/user/:userId/mark-all-read', authMiddleware, [
+  mongoIdValidation('userId', 'User ID')
+], validate, markAllAsReadByUser);
 
 // Actualizar notificación (admin)
-router.put('/notifications/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
-
-  body('message')
-    .notEmpty().withMessage('El mensaje es obligatorio')
-    .isString().withMessage('El mensaje debe ser una cadena de texto')
-    .trim(),
-
-  body('isRead')
-    .optional()
-    .isBoolean().withMessage('"isRead" must be a boolean value (true/false)'),
-], validate, authMiddleware, isAdmin, updateNotification);
+router.put('/notifications/:id', authMiddleware, isAdmin, [
+  mongoIdValidation('id', 'Notification ID'),
+  messageValidation(500).optional(),
+  booleanValidation('isRead')
+], validate, updateNotification);
 
 // Eliminar notificación
-router.delete('/notifications/:id', [
-  param('id')
-    .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId'),
+router.delete('/notifications/:id', authMiddleware, [
+  mongoIdValidation('id', 'Notification ID')
 ], validate, deleteNotification);
 
 export default router;
