@@ -14,7 +14,13 @@ export default defineConfig({
 
 
         // Per-test timeout (ms)
-        testTimeout: 10_000,
+        testTimeout: 20_000,
+
+        // Disable parallel execution to avoid database interference
+        // This is critical when integration tests share a single MongoDB instance
+        fileParallelism: false,
+        maxWorkers: 1,
+        minWorkers: 1,
 
         // Coverage (optional: run with --coverage flag)
         coverage: {

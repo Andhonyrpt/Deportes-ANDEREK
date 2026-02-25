@@ -137,3 +137,21 @@ router.post('/path',
 > - **DO NOT** modify `server.js` unless explicitly asked to change server-wide config.
 > - **DO NOT** skip `validate` middleware when using validator arrays.
 > - **DO NOT** implement new business logic inside Routes (use Controllers).
+## Testing & QA
+
+The `ecommerce-api` follows a robust testing strategy:
+- **Test Framework**: Vitest.
+- **Single Worker**: Sequential execution is enforced (`maxWorkers: 1`) to ensure database isolation.
+- **Teardown**: Automated DB cleanup after each suite via `tests/setup.js`.
+- **Helpers**: 
+    - `getAuthToken(role)`: Securely generates tokens for tests.
+    - `clearCollections()`: Flexible cleanup of specific collections.
+    - `createMockReqRes()`: Standardized mock for controller unit tests.
+
+### Running Tests
+```bash
+npm run test           # Run all tests
+npm run test:coverage  # Run with coverage report
+```
+
+---
