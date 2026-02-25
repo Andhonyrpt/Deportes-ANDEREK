@@ -105,20 +105,43 @@ Basado en `Checkout.jsx`:
 
 ---
 
-## Patrón de Servicio con `http.js`
+---
 
-Toda comunicación externa debe usar la instancia `http` configurada.
+## Servicios Disponibles (`services/`)
 
-- **URL Base**: Toma el valor de `process.env.REACT_APP_API_BASE_URL`.
-- **Interceptores**:
-  - `request`: Agrega automáticamente el encabezado `Authorization: Bearer <token>`.
-  - `response`: Maneja errores `401/403` llamando a `refresh()` de tokens y reintentando la petición.
-- **Creación de Servicio**: 
-  Importar `http` y realizar peticiones relativas:
-  ```javascript
-  import { http } from "./http";
-  export const getProducts = () => http.get("products");
-  ```
+Toda la comunicación con el backend se centraliza en archivos de servicio:
+
+| Servicio | Funcionalidad Principal |
+| :--- | :--- |
+| `auth.js` | Login, Registro, Refresh Token, Perfil. |
+| `productService.js` | Listado, búsquedas, detalle de producto. |
+| `cartService.js` | Sincronización de carrito con API. |
+| `categoryService.js` | Gestión de categorías y subcategorías. |
+| `orderService.js` | Creación y consulta de órdenes. |
+| `shippingService.js`| Direcciones de envío. |
+| `paymentService.js` | Métodos de pago. |
+| `userService.js` | Gestión de usuarios (Admin). |
+
+---
+
+## Flujos Adicionales
+
+### Wishlist
+- **Toggle**: Agregar/remover productos desde miniaturas o detalle.
+- **Sincronización**: Se persiste en el backend si el usuario está autenticado.
+
+### Reviews
+- **Lectura**: Disponibles públicamente en el detalle del producto.
+- **Escritura**: Solo usuarios autenticados que hayan comprado el producto (recomendado verificar en controlador).
+
+---
+
+## Estado del Checkout
+> [!NOTE]
+> Actualmente, el Checkout (`Checkout.jsx`) utiliza un modelo **híbrido**:
+> 1.  Carga datos iniciales desde la API si están disponibles.
+> 2.  Utiliza `localStorage` mediante `storageHelpers.js` para persistencia temporal y fallback.
+> 3.  **Hito de Mejora**: Se planea una migración completa a persistencia en base de datos para todas las secciones.
 
 ---
 
@@ -128,3 +151,4 @@ Toda comunicación externa debe usar la instancia `http` configurada.
 - **NO** crear estilos inline; usar archivos `.css` existentes o crear nuevos en el mismo directorio del componente.
 - **NO** saltarse la validación de `useFormReducer` en formularios nuevos.
 - **NO** usar `fetch` nativo; preferir siempre la instancia `http` de `services/http.js`.
+- **NO** implementar lógica de formateo de moneda manualmente; usar `formatMoney` de `utils` o `Checkout.jsx`.
