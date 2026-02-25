@@ -70,6 +70,8 @@ app.use((req, res) => {
 // El errorHandler debe ir AL FINAL, después de todas las rutas
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on http:localhost:${process.env.PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(process.env.PORT, () => {
+        console.log(`Server running on http:localhost:${process.env.PORT}`);
+    });
+}

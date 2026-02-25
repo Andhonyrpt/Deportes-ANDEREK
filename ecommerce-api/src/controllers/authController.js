@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt, { decode } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 
 const generateToken = (userId, displayName, role) => {
@@ -116,7 +116,7 @@ async function refreshToken(req, res, next) {
             const newAccessToken = generateToken(
                 decoded.userId,
                 decoded.displayName,
-                decode.role
+                decoded.role
             );
 
             // // OPCIONAL.

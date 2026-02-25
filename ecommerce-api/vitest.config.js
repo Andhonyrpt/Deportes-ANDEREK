@@ -10,6 +10,8 @@ export default defineConfig({
 
         // Test files pattern
         include: ['tests/**/*.test.js'],
+        setupFiles: ['./tests/setup.js'],
+
 
         // Per-test timeout (ms)
         testTimeout: 10_000,
