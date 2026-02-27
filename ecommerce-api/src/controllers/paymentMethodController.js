@@ -262,15 +262,15 @@ async function deletePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
-    const deletedPaymentMethod = await PaymentMethod.findByIdAndDelete(id);
+    const paymentMethod = await PaymentMethod.findById(id);
 
-    if (!deletedPaymentMethod) {
+    if (!paymentMethod) {
       return res.status(404).json({ message: 'Payment method not found' });
     }
 
-    assertCanManagePaymentMethod(deletedPaymentMethod, req.user);
+    assertCanManagePaymentMethod(paymentMethod, req.user);
 
-    await paymentMethod.deleteOne();
+    await PaymentMethod.findByIdAndDelete(id);
 
     res.status(204).send();
   } catch (err) {

@@ -160,10 +160,8 @@ async function deleteProduct(req, res, next) {
         if (deletedProduct) {
             return res.status(204).send();
         } else {
-            return res.status(404).json({ message: 'Product not found' })
+            return res.status(404).json({ message: 'Product not found' });
         }
-
-        res.status(204).send();
     } catch (err) {
         next(err);
     }
