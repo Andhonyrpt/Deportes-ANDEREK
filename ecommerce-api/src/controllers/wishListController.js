@@ -43,28 +43,41 @@ const addToWishList = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Usar $addToSet para evitar duplicados de forma atómica
-        const updated = await WishList.findOneAndUpdate(
-            { user: userId },
-            { $addToSet: { products: { product: productId } } },
-            { new: true, upsert: true }
-        ).populate("products.product", "name price images category variants");
+        // FIX: $addToSet with subdocuments always creates new _id, so compare manually
+        // Only $push if the product is NOT already in the list
+        let wishList = await WishList.findOne({ user: userId });
 
+        if (wishList) {
+            const alreadyInList = wishList.products.some(
+                (p) => p.product.toString() === productId
+            );
 
-        // Detectar si el producto se añadió realmente comparando conteo
-        const exists = updated.products.some(
-            (p) => p.product && p.product._id.toString() === productId
-        );
+            if (alreadyInList) {
+                // Idempotent: product already in wishlist, return current state
+                await wishList.populate('products.product', 'name price images category variants');
+                return res.status(200).json({
+                    message: 'Product already in wishlist',
+                    wishList,
+                    count: wishList.products.length,
+                });
+            }
 
-        if (!exists) {
-            // Esto es improbable con $addToSet + upsert, pero por seguridad
-            return res.status(400).json({ message: "Product already in wishlist" });
+            // Not a duplicate: push safely
+            wishList = await WishList.findOneAndUpdate(
+                { user: userId },
+                { $push: { products: { product: productId } } },
+                { new: true }
+            ).populate('products.product', 'name price images category variants');
+        } else {
+            // Create the wishlist for the first time
+            wishList = await WishList.create({ user: userId, products: [{ product: productId }] });
+            await wishList.populate('products.product', 'name price images category variants');
         }
 
         res.status(200).json({
             message: "Product added to wishlist successfully",
-            wishList: updated,
-            count: updated.products.length,
+            wishList,
+            count: wishList.products.length,
         });
     } catch (err) {
         next(err);
@@ -180,7 +193,7 @@ const moveToCart = async (req, res, next) => {
 
         res.status(200).json({
             message: "Product moved to cart successfully",
-            wishList: updated 
+            wishList: updated
         });
 
     } catch (err) {

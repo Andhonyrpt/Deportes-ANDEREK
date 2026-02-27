@@ -1,4 +1,5 @@
-import Category from '../models/category.js'
+import Category from '../models/category.js';
+import SubCategory from '../models/subCategory.js';
 
 async function getCategories(req, res, next) {
     try {
@@ -90,9 +91,9 @@ async function deleteCategory(req, res, next) {
     try {
         const idCategory = req.params.id;
 
-        const hasChildren = await Category.exists({ parentCategory: idCategory });
+        const hasSubcategories = await SubCategory.exists({ parentCategory: idCategory });
 
-        if (hasChildren) {
+        if (hasSubcategories) {
             return res.status(400).json({
                 message: 'Cannot delete category with subcategories'
             });
