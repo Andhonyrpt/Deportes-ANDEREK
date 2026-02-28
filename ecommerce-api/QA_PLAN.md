@@ -39,6 +39,7 @@
 
 ### Fase 2: Cobertura Core
 - [ ] Pruebas unitarias para todos los validadores en `src/middlewares/validators.js`.
+- [ ] Pruebas unitarias aislando dependencias (mocks) para los 10 controladores sin cobertura actual (Users, Cart, Categories, Reviews, etc.).
 - [ ] Pruebas de integración para el flujo de Checkout y actualización de stock.
 
 ### Fase 3: CI/CD

@@ -68,6 +68,16 @@ async function updateCart(req, res, next) {
       });
     }
 
+    // Validar que el usuario es dueño del carrito o es admin
+    const cart = await Cart.findById(id);
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    if (cart.user.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'You are not allowed to modify this cart' });
+    }
+
     // Construir objeto de actualización con campos proporcionados
     const updateData = {};
     if (user !== undefined) updateData.user = user;

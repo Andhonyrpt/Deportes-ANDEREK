@@ -248,6 +248,19 @@ async function cancelOrder(req, res, next) {
 
     // Verificar que todas las restauraciones fueron exitosas
     if (stockRestorations.some((update) => !update)) {
+      // Rollback for items that WERE successfully restored
+      await Promise.all(
+        stockRestorations.map(async (restoredItem, index) => {
+          if (restoredItem) {
+            const originalItem = order.products[index];
+            return Product.findOneAndUpdate(
+              { _id: originalItem.productId._id, "variants.size": originalItem.size },
+              { $inc: { "variants.$.stock": -originalItem.quantity } }
+            );
+          }
+        })
+      );
+
       return res.status(500).json({
         message: "Failed to restore product stock. Order status not changed.",
       });
@@ -320,7 +333,7 @@ async function deleteOrder(req, res, next) {
     const { id } = req.params;
 
     const order = await Order.findById(id);
-    
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }

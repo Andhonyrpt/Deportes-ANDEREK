@@ -138,6 +138,26 @@ describe('Order Integration Tests', () => {
             expect(response.body.totalPrice).toBe(350);
         });
 
+        it('should NOT allow negative shippingCost to reduce the total price', async () => {
+            const clientPayload = buildOrderPayload({
+                shippingCost: -100 // Malicious negative shipping
+            });
+
+            const response = await request(app)
+                .post('/api/orders')
+                .set('Authorization', `Bearer ${customerToken}`)
+                .send(clientPayload);
+
+            // If it accepts it, we check if it actually reduced the price or if it was ignored/normalized
+            // Ideally, it should be rejected (400) or normalized to 0.
+            // Based on current controllers, it might just add it: 300 - 100 = 200.
+            if (response.status === 201) {
+                expect(response.body.totalPrice).toBeGreaterThanOrEqual(300); // Subtotal (150*2)
+            } else {
+                expect(response.status).toBe(422); // Validation error code
+            }
+        });
+
         it('should return 400 when stock is insufficient', async () => {
             const response = await request(app)
                 .post('/api/orders')

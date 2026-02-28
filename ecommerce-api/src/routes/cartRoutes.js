@@ -82,8 +82,8 @@ router.put('/cart/update/:id', authMiddleware, [
   bodyMongoIdValidation("user", "User ID", true),
   body("products")
     .optional()
-    .isArray({ min: 1 })
-    .withMessage("Products must be a non-empty array"),
+    .isArray()
+    .withMessage("Products must be an array"),
   bodyMongoIdValidation("products.*.product", "Product ID", true),
   quantityValidation("products.*.quantity", true),
   sizeValidation("products.*.size", true)

@@ -112,6 +112,8 @@
 | `POST /cart/add` | Unitario | Lógica: producto nuevo → crear carrito | 200 + nuevo carrito | 🔴 Alta |
 | `POST /cart/add` | Unitario | Lógica: producto existente (same size) → sumar quantiy | 200 + cantidad incrementada | 🔴 Alta |
 | `PUT /cart/update-item` | Unitario | Lógica: oldSize para encontrar item → actualizar size | 200 + size correcto | 🔴 Alta |
+| `PUT /cart/update/:id` | Integración | Vulnerabilidad IDOR: Intentar actualizar el carrito de otro usuario conociendo su ID | 403 Forbidden | 🔴 Crítica |
+| `PUT /cart/update/:id` | Integración | Seguridad: Enviar `products: []` para verificar si vacía el carrito en lugar de fallar | 200 + carrito vacío | 🟡 Media |
 
 ---
 
@@ -145,6 +147,9 @@
 | `POST /orders` | Unitario | totalPrice calculado en servidor (ignora precio del cliente) | 201 + totalPrice = suma server-side | 🔴 Alta |
 | `PATCH /orders/:id/cancel` | Unitario | Rollback: si restauración de stock falla, no cancelar | 500 + "Failed to restore product stock" | 🔴 Alta |
 | `PATCH /orders/:id` | Integración | Actualizar shippingCost → recalcula totalPrice | 200 + totalPrice recalculado | 🟡 Media |
+| `PATCH /orders/:id` | Integración | Seguridad: Enviar `shippingCost` negativo intencionalmente | 400 + ValidationError | 🔴 Crítica |
+| `PATCH /orders/:id/cancel` | Unitario | Lógica Incompleta (Bug Real): Fallo parcial en `stockRestorations` → debe revertir el stock restaurado antes de fallar | 500 + estado original | 🔴 Crítica |
+| `POST /orders` | Unitario | Evaluar mezcla de productos con stock suficiente y sin stock simultáneamente | 400 + array detallado de errores | 🔴 Alta |
 
 ---
 
@@ -177,6 +182,8 @@
 | `POST /users` | Integración | Customer intenta crear usuario (RBAC) | 403 | 🔴 Alta |
 | `PATCH /users/:userId/toggle-status` | Integración | Admin activa/desactiva usuario (toggle) | 200 + isActive invertido | 🟡 Media |
 | `GET /users` | Integración | Customer intenta listar usuarios (RBAC) | 403 | 🔴 Alta |
+| `DELETE /users/:userId` | Unitario | Mock: Fallo en BD al buscar usuario (`User.findByIdAndUpdate` arroja error) | 500 + next(error) | 🔴 Alta |
+| `PUT /users/change-password/:userId` | Unitario | Mock: `User.findById` retorna null | 404 + "User not found" | 🔴 Alta |
 
 ---
 
@@ -204,6 +211,8 @@
 | `POST /review` | Unitario | Producto no encontrado (mock) | 404 | 🔴 Alta |
 | `POST /review` | Unitario | Review duplicada (mock) | 400 | 🔴 Alta |
 | `PUT /review/:reviewId` | Unitario | Autorización: user !== review.user | 403 | 🔴 Alta |
+| `POST /review` | Integración | Seguridad/Integridad: Rating fuera de límites (ej. `rating: 9999` o `rating: -5`) | 400 + ValidationError | 🔴 Crítica |
+| `POST /review` | Integración | SQL/NoSQL Injection: Enviar objeto en lugar de string en `productId` o `rating` | 400 + ValidationError | 🟡 Media |
 
 ---
 
@@ -228,6 +237,9 @@
 | `GET /wishlist/check/:productId` | Integración | Producto NO en wishlist → inWishList: false | 200 + `{inWishList: false}` | 🟡 Media |
 | `POST /wishlist/move-to-cart` | Integración | Mover producto a carrito → eliminado de wishlist y en carrito | 200 + producto en carrito | 🔴 Alta |
 | `POST /wishlist/move-to-cart` | Integración | Mover de wishlist inexistente | 404 | 🟡 Media |
+| `POST /wishlist/add` | Unitario | Mock: Error al consultar BD (ej. `Product.findById` falla) | 500 + next(error) | 🔴 Alta |
+| `POST /wishlist/move-to-cart` | Unitario | Lógica: Si falla validación de carrito, producto NO se elimina de wishlist | Error manejado | 🔴 Alta |
+| `POST /wishlist/add` | Integración | Integridad: `productId` con formato ObjectId inválido (ej. "123") | 400 + ValidationError | 🟡 Media |
 
 ---
 
@@ -250,6 +262,8 @@
 | `DELETE /categories/:id` | Integración | Eliminar categoría sin hijos | 204 | 🟡 Media |
 | `DELETE /categories/:id` | Integración | Eliminar categoría con subcategorías (tiene hijos) | 400 + "Cannot delete category with subcategories" | 🔴 Alta |
 | `GET /categories/search` | Integración | Búsqueda por query `?q=` | 200 + categorías filtradas | 🟡 Media |
+| `DELETE /categories/:id` | Unitario | Mock: `SubCategory.exists` arroja error de BD | 500 + propagación a error handler | 🔴 Alta |
+| `POST /categories` | Unitario | Mock: `Category.create` falla por error de validación (Mongoose) | 500/400 | 🔴 Alta |
 
 ---
 
@@ -268,6 +282,8 @@
 | `PATCH /notifications/user/:userId/mark-all-read` | Integración | Marcar todas las del usuario como leídas | 200 + count de modificadas | 🟡 Media |
 | `GET /notifications/user/:userId/unread` | Integración | Obtener notificaciones no leídas | 200 + solo `isRead: false` | 🟡 Media |
 | `DELETE /notifications/:id` | Integración | Eliminar notificación | 204 | 🟡 Media |
+| `GET /notifications/user/:userId` | Unitario | Mock: `Notification.find` retorna error | 500 + next(error) | 🔴 Alta |
+| `POST /notifications` (interno) | Unitario | Helper: Creación de notificación vía sockets/bd funciona aisladamente | Éxito | 🔴 Alta |
 
 ---
 
@@ -291,6 +307,8 @@
 | `DELETE /user-addresses/:addressId` | Integración | Eliminar dirección de otro usuario | 404 | 🔴 Alta |
 | `GET /user-addresses/default` | Integración | Obtener dirección default | 200 + dirección default | 🟡 Media |
 | `GET /user-addresses/default` | Integración | Sin dirección default | 404 + "No default address found" | 🟡 Media |
+| `POST /new-address` | Unitario | Lógica: Validar que `updateMany` (isDefault: false) se llame si se envía `isDefault: true` | `updateMany` ejecutado | 🔴 Alta |
+| `DELETE /user-addresses/:addressId` | Unitario | Mock: Dirección no existe en BD (`findByIdAndDelete` retorna null) | 404 + "Address not found" | 🔴 Alta |
 
 ---
 
@@ -315,6 +333,8 @@
 | `PATCH /payment-methods/:id/deactivate` | Integración | Desactivar método de pago | 200 + `{isActive: false}` | 🟡 Media |
 | `DELETE /payment-methods/:id` | Integración | Eliminar propio método de pago | 204 | 🟡 Media |
 | `DELETE /payment-methods/:id` | Integración | Eliminar método de pago de otro usuario | 403 | 🔴 Alta |
+| `POST /payment-methods` | Unitario | Lógica: Validar exclusividad de `isDefault` mediante mocks de `updateMany` | Ejecución verificada | 🔴 Alta |
+| `PUT /payment-methods/:id` | Unitario | Mock: Comprobar validación de `ownerId !== userId` sin tocar la BD | 403 Access Denied | 🔴 Alta |
 
 ---
 
@@ -332,6 +352,8 @@
 | `POST /subcategories` | Integración | Sin autenticación de admin | 403/401 | 🔴 Alta |
 | `PUT /subcategories/:id` | Integración | Actualizar subcategoría | 200 + actualizada | 🟡 Media |
 | `DELETE /subcategories/:id` | Integración | Eliminar subcategoría sin productos | 204 | 🟡 Media |
+| `DELETE /subcategories/:id` | Unitario | Lógica: `Product.exists` retorna true → lanza 400 | 400 + "Cannot delete subcategory with products" | 🔴 Alta |
+| `POST /subcategories` | Unitario | Mock: `Category.exists` retorna false → lanza 400 | 400 + "Parent category does not exist" | 🔴 Alta |
 
 ---
 

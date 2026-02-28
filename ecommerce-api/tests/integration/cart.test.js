@@ -248,4 +248,50 @@ describe('Cart Integration Tests', () => {
             expect(response.body.cart.products).toHaveLength(0);
         });
     });
+    describe('PUT /api/cart/update/:id (Security & IDOR)', () => {
+        let otherUser;
+        let otherUserToken;
+        let otherUserCart;
+
+        beforeEach(async () => {
+            otherUserToken = await getAuthToken('customer', 'other');
+            otherUser = await User.findOne({ email: 'customerother@test.com' });
+
+            otherUserCart = await Cart.create({
+                user: otherUser._id,
+                products: [{ product: testProduct._id, quantity: 1, size: 'M' }]
+            });
+        });
+
+        it('should return 403 Forbidden if a user tries to update another users cart (IDOR)', async () => {
+            const response = await request(app)
+                .put(`/api/cart/update/${otherUserCart._id}`)
+                .set('Authorization', `Bearer ${customerToken}`) // Customer intenta editar el de Other
+                .send({
+                    user: otherUser._id.toString(),
+                    products: [{ product: testProduct._id.toString(), quantity: 10, size: 'M' }]
+                });
+
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('message'); // Asumiendo que se implementó la seguridad
+        });
+
+        it('should allow the owner to update their own cart with an empty array to clear it', async () => {
+            const customerCart = await Cart.create({
+                user: customerUser._id,
+                products: [{ product: testProduct._id, quantity: 1, size: 'M' }]
+            });
+
+            const response = await request(app)
+                .put(`/api/cart/update/${customerCart._id}`)
+                .set('Authorization', `Bearer ${customerToken}`)
+                .send({
+                    user: customerUser._id.toString(),
+                    products: [] // Array vacío
+                });
+
+            expect(response.status).toBe(200);
+            expect(response.body.products).toHaveLength(0);
+        });
+    });
 });
