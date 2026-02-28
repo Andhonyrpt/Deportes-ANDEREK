@@ -1,0 +1,45 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/Usuario/Documents/Deportes-ANDEREK/ecommerce-api[39m
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  enable debug logging with { debug: true })
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m2026-02-28T01:53:50.368Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m2026-02-28T01:53:50.382Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m[DEBUG] Attempting update with filter: {"_id":"69a24aae4757521b5ac462c7","variants":{"$elemMatch":{"size":"M","stock":{"$gte":1}}}}
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m[DEBUG] Attempting update with filter: {"_id":"69a24aae4757521b5ac462c7","variants":{"$elemMatch":{"size":"M","stock":{"$gte":1}}}}
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m[DEBUG] Update result for M: SUCCESS (stock left: 0)
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m[DEBUG] Update result for M: FAILED
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39mStatuses: 201,500
+Successes: 1, Failures: 1
+Final stock: 0
+
+ [32mÔ£ô[39m tests/integration/order_concurrency.test.js[2m > [22mOrder Concurrency & Race Conditions[2m > [22mshould NOT allow over-selling when multiple users buy the last item simultaneously[33m 433[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 19:53:47
+[2m   Duration [22m 2.89s[2m (transform 474ms, setup 857ms, import 1.24s, tests 446ms, environment 0ms)[22m
+

@@ -92,16 +92,12 @@ return (
 
 Basado en `Checkout.jsx`:
 1.  **Validación Inicial**: Si el carrito está vacío, redirige a `/cart`.
-2.  **Carga de Datos**: Inicializa direcciones y métodos de pago desde `localStorage` (o servicios).
-3.  **Sección 1: Dirección**: El usuario selecciona o crea una dirección. Se persiste en `localStorage` y estado local.
+2.  **Carga de Datos**: Inicializa direcciones y métodos de pago. **Nota**: Prioriza datos de la API si el usuario está autenticado.
+3.  **Sección 1: Dirección**: El usuario selecciona o crea una dirección. Se persiste en la BD (vía API) y opcionalmente en `localStorage` como fallback.
 4.  **Sección 2: Pago**: El usuario selecciona o crea un método de pago.
 5.  **Sección 3: Revisión**: Se muestra `CartView` para confirmación final.
-6.  **Cálculo**: Se aplica `TAX_RATE` (16%) y `SHIPPING_RATE` (si total < 1000).
-7.  **Confirmación**: Al hacer clic en "Confirmar y Pagar":
-    - Se crea objeto `order`.
-    - Se guarda en el historial (`localStorage` de órdenes).
-    - Se limpia el carrito (`clearCart`).
-    - Redirige a `/order-confirmation` con el estado de la orden.
+6.  **Cálculo**: El motor del servidor calcula el `totalPrice` final, incluyendo `shippingCost`.
+7.  **Confirmación**: Al confirmar, se genera la orden en la API, se limpia el carrito y se redirige a confirmación.
 
 ---
 
@@ -137,18 +133,19 @@ Toda la comunicación con el backend se centraliza en archivos de servicio:
 ---
 
 ## Estado del Checkout
-> [!NOTE]
-> Actualmente, el Checkout (`Checkout.jsx`) utiliza un modelo **híbrido**:
-> 1.  Carga datos iniciales desde la API si están disponibles.
-> 2.  Utiliza `localStorage` mediante `storageHelpers.js` para persistencia temporal y fallback.
-> 3.  **Hito de Mejora**: Se planea una migración completa a persistencia en base de datos para todas las secciones.
+> [!IMPORTANT]
+> El Checkout está en proceso de migración de un modelo **híbrido** (`localStorage`) a uno **100% basado en API**. 
+> - Las direcciones y métodos de pago ahora deben gestionarse preferentemente a través de `shippingService` y `paymentService`.
+> - Consultar `IMPROVEMENTS.md` en la raíz para ver el progreso de esta migración.
 
 ---
 
 ## Restricciones del Agente
 
 - **NO** modificar `localStorage` directamente para Auth o Cart; usar los métodos de los Contextos.
-- **NO** crear estilos inline; usar archivos `.css` existentes o crear nuevos en el mismo directorio del componente.
-- **NO** saltarse la validación de `useFormReducer` en formularios nuevos.
+- **NO** crear estilos inline; usar archivos `.css` existentes o crear nuevos.
 - **NO** usar `fetch` nativo; preferir siempre la instancia `http` de `services/http.js`.
-- **NO** implementar lógica de formateo de moneda manualmente; usar `formatMoney` de `utils` o `Checkout.jsx`.
+- **NO** implementar lógica de cálculo de precios en el cliente; el servidor es la fuente de verdad.
+
+---
+*Senior QA & Documentation Report - Actualizado por Antigravity AI*

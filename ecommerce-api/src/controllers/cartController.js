@@ -26,6 +26,12 @@ async function getCartById(req, res, next) {
 async function getCartByUser(req, res, next) {
   try {
     const userId = req.params.userId;
+
+    // Verificar si el usuario es el dueño del carrito o es admin
+    if (userId !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'You are not allowed to access this cart' });
+    }
+
     const cart = await Cart.findOne({ user: userId }).populate('user').populate('products.product');
 
     if (!cart) {
@@ -113,7 +119,8 @@ async function deleteCart(req, res, next) {
 
 async function addProductToCart(req, res, next) {
   try {
-    const { userId, productId, quantity = 1, size } = req.body;
+    const { productId, quantity = 1, size } = req.body;
+    const userId = req.user.userId; // Seguridad: Usar ID del token, no del body
 
     // Buscar el carrito del usuario
     let cart = await Cart.findOne({ user: userId });
@@ -151,7 +158,9 @@ async function addProductToCart(req, res, next) {
 
 async function updateCartItem(req, res, next) {
   try {
-    const { userId, productId, quantity, size, oldSize } = req.body;
+    const { productId, quantity, size, oldSize } = req.body;
+    const userId = req.user.userId; // Seguridad: Usar ID del token
+
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
@@ -184,7 +193,8 @@ async function updateCartItem(req, res, next) {
 async function removeCartItem(req, res, next) {
   try {
     const { productId } = req.params;
-    const { userId, size } = req.body;
+    const { size } = req.body;
+    const userId = req.user.userId; // Seguridad: Usar ID del token
 
     const cart = await Cart.findOne({ user: userId });
 
@@ -208,7 +218,7 @@ async function removeCartItem(req, res, next) {
 
 async function clearCartItems(req, res, next) {
   try {
-    const { userId } = req.body;
+    const userId = req.user.userId; // Seguridad: Usar ID del token
 
     const cart = await Cart.findOne({ user: userId });
 

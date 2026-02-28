@@ -25,10 +25,6 @@ import {
 const router = express.Router();
 
 const validateCart = [
-  // Validar que user exista y sea un ObjectId válido
-  body('user')
-    .notEmpty().withMessage('El campo user es obligatorio'),
-
   // Validar que products sea un array
   body('products')
     .isArray({ min: 1 }).withMessage('Debe haber al menos un producto en el carrito'),
@@ -52,7 +48,6 @@ router.get('/cart/user/:userId', authMiddleware, [
 
 // Agregar producto al carrito 
 router.post('/cart/add', authMiddleware, [
-  bodyMongoIdValidation("userId", "User ID"),
   bodyMongoIdValidation("productId", "Product ID"),
   quantityValidation("quantity", true),
   sizeValidation("size", true)
@@ -65,7 +60,6 @@ router.get('/cart/:id', authMiddleware, isAdmin, [
 
 // Crear nuevo carrito
 router.post('/cart/create', authMiddleware, [
-  bodyMongoIdValidation("user", "User"),
   body("products")
     .notEmpty()
     .withMessage("Products are required")
@@ -79,7 +73,6 @@ router.post('/cart/create', authMiddleware, [
 // Actualizar carrito completo
 router.put('/cart/update/:id', authMiddleware, [
   mongoIdValidation("id", "Cart ID"),
-  bodyMongoIdValidation("user", "User ID", true),
   body("products")
     .optional()
     .isArray()
@@ -97,7 +90,6 @@ router.delete('/cart/clear/:id', [
 // Rutas nuevas
 router.put("/cart/update-item", authMiddleware,
   [
-    bodyMongoIdValidation("userId", "User ID"),
     bodyMongoIdValidation("productId", "Product ID"),
     quantityValidation("quantity", true),
     sizeValidation("size", true),
@@ -106,12 +98,9 @@ router.put("/cart/update-item", authMiddleware,
 
 router.delete("/cart/remove-item/:productId", authMiddleware, [
   mongoIdValidation("productId", "Product ID"),
-  bodyMongoIdValidation("userId", "User ID"),
   sizeValidation("size")
 ], validate, removeCartItem);
 
-router.post("/cart/clear", authMiddleware, [
-  bodyMongoIdValidation("userId", "User ID")
-], validate, clearCartItems);
+router.post("/cart/clear", authMiddleware, [], validate, clearCartItems);
 
 export default router;

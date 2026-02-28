@@ -57,6 +57,7 @@ src/
 | **POST** | `/orders` | Yes | No | Create a new order |
 | **PATCH** | `/orders/:id/status` | Yes | Yes | Update order status |
 | **PATCH** | `/orders/:id/cancel` | Yes | Yes | Cancel order |
+| **DELETE** | `/orders/:id` | Yes | Yes | Delete cancelled order |
 
 ### Shipping & Payments
 | Method | Path | Auth | Admin | Description |
@@ -79,6 +80,8 @@ src/
 | :--- | :--- | :---: | :---: | :--- |
 | **GET** | `/notifications/user/:userId` | Yes | No | Get user notifications |
 | **PATCH** | `/notifications/:id/mark-read` | Yes | No | Mark notification as read |
+| **PATCH** | `/notifications/mark-all-read/:userId` | Yes | No | Mark all as read |
+| **GET** | `/notifications/unread/:userId` | Yes | No | Get unread count |
 
 ## Mongoose Models
 
@@ -87,14 +90,14 @@ src/
 | **User** | `displayName`, `email`, `hashPassword`, `phone`, `role` (admin/customer/guest), `isActive`, `avatar` |
 | **Product** | `name`, `description`, `modelo`, `price`, `imagesUrl` (Array), `category` (Ref), `variants` ([{size, stock}]) |
 | **Cart** | `user` (Ref), `products` ([{product (Ref), quantity, size}]) |
-| **Order** | `user` (Ref), `products` ([{productId, size, quantity, price}]), `totalPrice`, `status`, `shippingAddress` (Ref), `paymentMethod` (Ref) |
+| **Order** | `user` (Ref), `products` ([{productId (Ref), size, quantity, price}]), `totalPrice`, `shippingCost`, `status`, `paymentStatus`, `shippingAddress` (Ref), `paymentMethod` (Ref) |
 | **Category**| `name`, `description`, `imageUrl`, `parentCategory` (Ref) |
-| **SubCategory**| `name`, `description`, `category` (Ref) |
-| **ShippingAddress**| `user` (Ref), `name`, `addressLine`, `city`, `state`, `postalCode`, `country`, `isDefault` |
-| **PaymentMethod**| `user` (Ref), `alias`, `cardNumber`, `cardHolder`, `expiryDate`, `isDefault` |
+| **SubCategory**| `name`, `description`, `imageURL`, `parentCategory` (Ref) |
+| **ShippingAddress**| `user` (Ref), `name`, `address`, `city`, `state`, `postalCode`, `country`, `phone`, `isDefault`, `addressType` |
+| **PaymentMethod**| `user` (Ref), `type`, `cardNumber`, `cardHolderName`, `expiryDate`, `paypalEmail`, `bankName`, `accountNumber`, `isDefault`, `isActive` |
 | **Review** | `user` (Ref), `product` (Ref), `rating`, `comment` |
 | **WishList** | `user` (Ref), `products` ([{product (Ref), addedAt}]) |
-| **Notification**| `user` (Ref), `message`, `isRead`, `type` |
+| **Notification**| `user` (Ref), `message`, `isRead` |
 
 ## Available Validators (`validators.js`)
 Use these functions in routes to validate input:

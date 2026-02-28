@@ -96,12 +96,20 @@ async function createOrder(req, res, next) {
       });
     }
 
-    // Reducir stock de cada producto de forma atómica
+    // Reducir stock de cada producto de forma atómica y verificar suficiencia EN LA MISMA OPERACIÓN (Fix Race Condition)
     const stockUpdates = await Promise.all(
       stockChecks.map(async (check, index) => {
         const item = products[index];
         return Product.findOneAndUpdate(
-          { _id: check.productId, "variants.size": item.size },
+          {
+            _id: check.productId,
+            variants: {
+              $elemMatch: {
+                size: item.size,
+                stock: { $gte: item.quantity }
+              }
+            }
+          },
           { $inc: { "variants.$.stock": -item.quantity } },
           { new: true }
         );

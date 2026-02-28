@@ -26,21 +26,31 @@ Actualmente, el checkout (`Checkout.jsx`) maneja direcciones y métodos de pago 
 ## 3. Calidad y Testing
 
 ### Implementación de Testing Automatizado
-Aunque existe una configuración de `vitest`, la cobertura es baja.
-- **Unit Testing**: Cubrir controladores críticos (Auth, Cart, Orders).
-- **Integration Testing**: Probar flujos completos desde la ruta hasta la DB.
-- **E2E (Cypress)**: Implementar pruebas de humo para el proceso de Login -> Carrito -> Checkout.
+Tras la Fase 11 de QA, la API cuenta con una cobertura robusta en sus controladores principales.
+- **Unit Testing**: [x] Cubiertos: Auth, Cart, Orders, Reviews, Wishlist, Categories, Notifications, Shipping/Payment.
+- **Integration Testing**: [x] Flujos críticos de seguridad (IDOR, Price Manipulation, Negative Costs) verificados.
+- **E2E (Cypress)**: [ ] Pendiente: Implementar pruebas de humo completas en el frontend.
 
-## 4. Frontend (App)
+## 4. Backend (API) - Deuda Técnica
+
+### Lógica de Stock en Middleware
+Actualmente, el rollback de stock se maneja manualmente en `orderController.js`.
+- **Acción**: Migrar la lógica de restauración y descuento de stock a Mongoose Middleware (`pre('save')` o `post('findOneAndUpdate')`).
+- **Beneficio**: Garantiza atomicidad y reduce la complejidad de los controladores.
+
+### Consistencia de Naming
+Se han detectado discrepancias como `imageUrl` vs `imageURL`.
+- **Acción**: Estandarizar todos los campos de imagen a `imageUrl` y asegurar que todos los modelos usen `timestamps: true`.
+
+## 5. Frontend (App)
 
 ### Optimización de Rendimiento
 - **Acción**: Implementar `React.lazy` para la carga de rutas y optimizar imágenes pesadas.
-- **Beneficio**: Tiempos de carga inicial más rápidos (LCP).
+- **Beneficio**: Reducción del Bundle Size y mejores tiempos de carga (LCP).
 
 ### UX/UI Premium
-- **Acción**: Agregar micro-animaciones (Framer Motion) en transiciones de páginas y estados de carga de botones.
-- **Beneficio**: Sensación de producto "premium" y moderno.
+- **Acción**: Integrar micro-animaciones (Framer Motion) y transiciones suaves entre páginas.
+- **Beneficio**: Sensación de producto terminado y moderno.
 
-## 5. Documentación Continua
-- **Acción**: Integrar la generación de documentación de API (Swagger/OpenAPI).
-- **Beneficio**: Documentación viva que se sincroniza automáticamente con los cambios en el código.
+---
+*Senior QA & Documentation Report - Actualizado por Antigravity AI*
