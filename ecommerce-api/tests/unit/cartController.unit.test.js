@@ -14,6 +14,7 @@ describe('cartController Unit Tests', () => {
     describe('addProductToCart', () => {
         it('should create a new cart if the user does not have one', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 body: { userId: 'user123', productId: 'prod123', quantity: 2, size: 'M' }
             });
 
@@ -39,6 +40,7 @@ describe('cartController Unit Tests', () => {
 
         it('should add a new product to an existing cart (same product diff size)', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 body: { userId: 'user123', productId: 'prod123', quantity: 1, size: 'L' }
             });
 
@@ -59,6 +61,7 @@ describe('cartController Unit Tests', () => {
 
         it('should increment quantity if the exact product and size already exists', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 body: { userId: 'user123', productId: 'prod123', quantity: 3, size: 'M' }
             });
 
@@ -84,7 +87,9 @@ describe('cartController Unit Tests', () => {
     describe('updateCartItem', () => {
         it('should return 404 if the user does not have a cart', async () => {
             const { req, res, next } = createMockReqRes({
-                body: { userId: 'user123', productId: 'prod123', size: 'M' }
+                user: { userId: 'user123', role: 'customer' },
+                body: { userId: 'user123', productId: 'prod123', size: 'M' },
+                params: { userId: 'user123' } // Controllers now often use params over body for userId
             });
 
             Cart.findOne.mockResolvedValue(null);
@@ -97,6 +102,7 @@ describe('cartController Unit Tests', () => {
 
         it('should return 404 if the product/size is not in the cart', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 body: { userId: 'user123', productId: 'prod123', size: 'L' }
             });
 
@@ -115,6 +121,7 @@ describe('cartController Unit Tests', () => {
 
         it('should update size and quantity using oldSize to find the item', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 body: { userId: 'user123', productId: 'prod123', quantity: 5, size: 'L', oldSize: 'M' }
             });
 

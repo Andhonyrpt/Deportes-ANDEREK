@@ -17,6 +17,12 @@ async function getNotificationById(req, res, next) {
     if (!notification) {
       return res.status(404).json({ message: 'Notification not found' });
     }
+
+    // IDOR Check: Only owner or admin can view
+    if (notification.user._id.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden: You do not own this notification' });
+    }
+
     res.json(notification);
   } catch (err) {
     next(err);
@@ -26,6 +32,12 @@ async function getNotificationById(req, res, next) {
 async function getNotificationByUser(req, res, next) {
   try {
     const userId = req.params.userId;
+
+    // IDOR Check: User can only see their own notifications, unless admin
+    if (userId !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden: Access denied' });
+    }
+
     const notifications = await Notification.find({ user: userId }).populate('user').sort({ message: 1 });
 
     if (notifications.length === 0) {
@@ -40,6 +52,11 @@ async function getNotificationByUser(req, res, next) {
 async function createNotification(req, res, next) {
   try {
     const { user, message } = req.body;
+
+    // Security: Only admins can create notifications for others
+    if (user !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
 
     const newNotification = await Notification.create({
       user,
@@ -59,6 +76,16 @@ async function updateNotification(req, res, next) {
     const { id } = req.params;
     const { message, isRead } = req.body;
 
+    const notification = await Notification.findById(id);
+    if (!notification) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    // IDOR Check: Only owner can update (admins can update anything)
+    if (notification.user.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     // Validar que al menos un campo sea proporcionado
     if (message === undefined && isRead === undefined) {
       return res.status(400).json({
@@ -66,7 +93,6 @@ async function updateNotification(req, res, next) {
       });
     }
 
-    // Construir objeto de actualización con campos proporcionados
     const updateData = {};
     if (message !== undefined) updateData.message = message;
     if (isRead !== undefined) updateData.isRead = isRead;
@@ -77,11 +103,7 @@ async function updateNotification(req, res, next) {
       { new: true }
     ).populate('user');
 
-    if (updatedNotification) {
-      return res.status(200).json(updatedNotification);
-    } else {
-      return res.status(404).json({ message: 'Notification not found' });
-    }
+    res.status(200).json(updatedNotification);
   } catch (err) {
     next(err);
   }
@@ -90,13 +112,19 @@ async function updateNotification(req, res, next) {
 async function deleteNotification(req, res, next) {
   try {
     const { id } = req.params;
-    const deletedNotification = await Notification.findByIdAndDelete(id);
 
-    if (deletedNotification) {
-      return res.status(204).send();
-    } else {
+    const notification = await Notification.findById(id);
+    if (!notification) {
       return res.status(404).json({ message: 'Notification not found' });
     }
+
+    // IDOR Check
+    if (notification.user.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    await Notification.findByIdAndDelete(id);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }
@@ -105,17 +133,22 @@ async function deleteNotification(req, res, next) {
 async function markAsRead(req, res, next) {
   try {
     const { id } = req.params;
-    const notification = await Notification.findByIdAndUpdate(
-      id,
-      { isRead: true },
-      { new: true }
-    ).populate('user');
 
-    if (notification) {
-      return res.status(200).json(notification);
-    } else {
+    const notification = await Notification.findById(id);
+    if (!notification) {
       return res.status(404).json({ message: 'Notification not found' });
     }
+
+    // IDOR Check
+    if (notification.user.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    notification.isRead = true;
+    await notification.save();
+    await notification.populate('user');
+
+    res.status(200).json(notification);
   } catch (err) {
     next(err);
   }
@@ -124,6 +157,12 @@ async function markAsRead(req, res, next) {
 async function markAllAsReadByUser(req, res, next) {
   try {
     const { userId } = req.params;
+
+    // IDOR Check
+    if (userId !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const result = await Notification.updateMany(
       { user: userId, isRead: false },
       { isRead: true }
@@ -141,6 +180,12 @@ async function markAllAsReadByUser(req, res, next) {
 async function getUnreadNotificationsByUser(req, res, next) {
   try {
     const userId = req.params.userId;
+
+    // IDOR Check
+    if (userId !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const notifications = await Notification.find({
       user: userId,
       isRead: false

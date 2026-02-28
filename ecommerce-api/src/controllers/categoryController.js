@@ -64,7 +64,26 @@ async function updateCategory(req, res, next) {
             });
         }
 
-        // Construir objeto de actualización con campos proporcionados
+        // 1. Prevenir que sea su propio padre
+        if (parentCategory === idCategory) {
+            return res.status(400).json({ message: "A category cannot be its own parent" });
+        }
+
+        // 2. Prevenir ciclos
+        if (parentCategory) {
+            let currentParent = await Category.findById(parentCategory);
+            while (currentParent) {
+                if (currentParent._id.toString() === idCategory) {
+                    return res.status(400).json({ message: "Circular reference detected: this would create a loop in the category hierarchy" });
+                }
+                if (currentParent.parentCategory) {
+                    currentParent = await Category.findById(currentParent.parentCategory);
+                } else {
+                    break;
+                }
+            }
+        }
+
         const updateData = {};
         if (name !== undefined) updateData.name = name;
         if (description !== undefined) updateData.description = description;

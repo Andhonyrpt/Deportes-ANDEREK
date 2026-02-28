@@ -110,7 +110,7 @@ async function updateUserProfile(req, res, next) {
             }
         }
 
-        // Actualizar campos solo si están presentes
+        // Actualizar campos solo si están presentes (Excluyendo rol y estado por seguridad)
         if (displayName) user.displayName = displayName;
         if (email) user.email = email;
         if (phone) user.phone = phone;

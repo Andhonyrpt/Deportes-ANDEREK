@@ -19,33 +19,36 @@ describe('notificationController Unit Tests', () => {
     describe('markAsRead', () => {
         it('should mark a notification as read and return 200', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 params: { id: 'notif123' }
             });
 
-            const mockNotif = { _id: 'notif123', isRead: true };
-            Notification.findByIdAndUpdate.mockReturnValue({
-                populate: vi.fn().mockResolvedValue(mockNotif)
-            });
+            const mockNotif = {
+                _id: 'notif123',
+                isRead: false,
+                user: 'user123', // Still needs to match req.user.userId for the IDOR check
+                save: vi.fn().mockResolvedValue(true),
+                populate: vi.fn().mockReturnThis()
+            };
+            Notification.findById.mockResolvedValue(mockNotif);
 
             await markAsRead(req, res, next);
 
-            expect(Notification.findByIdAndUpdate).toHaveBeenCalledWith(
-                'notif123',
-                { isRead: true },
-                { new: true }
-            );
+            expect(Notification.findById).toHaveBeenCalledWith('notif123');
+            expect(mockNotif.isRead).toBe(true);
+            expect(mockNotif.save).toHaveBeenCalled();
+            expect(mockNotif.populate).toHaveBeenCalledWith('user');
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(mockNotif);
         });
 
         it('should return 404 if notification not found', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 params: { id: 'invalid_id' }
             });
 
-            Notification.findByIdAndUpdate.mockReturnValue({
-                populate: vi.fn().mockResolvedValue(null)
-            });
+            Notification.findById.mockResolvedValue(null);
 
             await markAsRead(req, res, next);
 
@@ -56,6 +59,7 @@ describe('notificationController Unit Tests', () => {
     describe('markAllAsReadByUser', () => {
         it('should mark all notifications as read for a user', async () => {
             const { req, res, next } = createMockReqRes({
+                user: { userId: 'user123', role: 'customer' },
                 params: { userId: 'user123' }
             });
 

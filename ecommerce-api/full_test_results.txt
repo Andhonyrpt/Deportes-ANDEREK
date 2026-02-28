@@ -1,0 +1,1115 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/Usuario/Documents/Deportes-ANDEREK/ecommerce-api[39m
+
+[90mstdout[2m | tests/unit/cartController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+ [31mÔØ»[39m tests/unit/cartController.unit.test.js [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 86[2mms[22m[39m
+[31m       [31m├ù[31m should create a new cart if the user does not have one[39m[32m 8[2mms[22m[39m
+[31m       [31m├ù[31m should add a new product to an existing cart (same product diff size)[39m[32m 8[2mms[22m[39m
+[31m       [31m├ù[31m should increment quantity if the exact product and size already exists[39m[32m 2[2mms[22m[39m
+[31m       [31m├ù[31m should return 404 if the user does not have a cart[39m[32m 2[2mms[22m[39m
+[31m       [31m├ù[31m should return 404 if the product/size is not in the cart[39m[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should update size and quantity using oldSize to find the item[39m[32m 1[2mms[22m[39m
+[90mstdout[2m | tests/unit/notificationController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  enable debug logging with { debug: true })
+
+ [31mÔØ»[39m tests/unit/notificationController.unit.test.js [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 83[2mms[22m[39m
+[31m       [31m├ù[31m should mark a notification as read and return 200[39m[32m 9[2mms[22m[39m
+       [32mÔ£ô[39m should return 404 if notification not found[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should mark all notifications as read for a user[39m[32m 2[2mms[22m[39m
+       [32mÔ£ô[39m should call next(err) if getNotifications fails[32m 1[2mms[22m[39m
+[90mstdout[2m | tests/unit/resilience.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+ [31mÔØ»[39m tests/unit/resilience.test.js [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 66[2mms[22m[39m
+[31m     [31m├ù[31m should call next(err) when Cart.findOne fails (DB failure simulation)[39m[32m 10[2mms[22m[39m
+     [32mÔ£ô[39m should call next(err) when Cart.create fails[32m 1[2mms[22m[39m
+[90mstdout[2m | tests/integration/orders.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+[90mstdout[2m | tests/integration/orders.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/orders.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+[90mstdout[2m | tests/integration/orders.test.js
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mHappy Path: should create an order and deduct stock
+[22m[39m2026-02-28T02:50:45.575Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mshould calculate totalPrice server-side (ignore client price)
+[22m[39m2026-02-28T02:50:45.828Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mshould NOT allow negative shippingCost to reduce the total price
+[22m[39m2026-02-28T02:50:46.069Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mshould return 400 when stock is insufficient
+[22m[39m2026-02-28T02:50:46.291Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mshould return 400 when size is out-of-stock
+[22m[39m2026-02-28T02:50:46.477Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPOST /api/orders[2m > [22m[2mshould return 401 without authentication
+[22m[39m2026-02-28T02:50:46.660Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mGET /api/orders[2m > [22m[2madmin should list all orders
+[22m[39m2026-02-28T02:50:46.840Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mGET /api/orders[2m > [22m[2madmin should list all orders
+[22m[39m2026-02-28T02:50:46.862Z | GET | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mGET /api/orders[2m > [22m[2mcustomer should be denied access to all orders (RBAC)
+[22m[39m2026-02-28T02:50:47.046Z | GET | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/status[2m > [22m[2madmin should update order status
+[22m[39m2026-02-28T02:50:47.231Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/status[2m > [22m[2madmin should update order status
+[22m[39m2026-02-28T02:50:47.253Z | PATCH | /api/orders/69a25807b87d002c9305f9ae/status
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/status[2m > [22m[2mcustomer should be denied status update (RBAC)
+[22m[39m2026-02-28T02:50:47.437Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/status[2m > [22m[2mcustomer should be denied status update (RBAC)
+[22m[39m2026-02-28T02:50:47.457Z | PATCH | /api/orders/69a25807b87d002c9305f9d6/status
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould cancel a pending order and restore stock
+[22m[39m2026-02-28T02:50:47.676Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould cancel a pending order and restore stock
+[22m[39m2026-02-28T02:50:47.696Z | PATCH | /api/orders/69a25807b87d002c9305f9f8/cancel
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould set paymentStatus to "refunded" when cancelling a paid order
+[22m[39m2026-02-28T02:50:47.887Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould set paymentStatus to "refunded" when cancelling a paid order
+[22m[39m2026-02-28T02:50:47.910Z | PATCH | /api/orders/69a25807b87d002c9305fa25/cancel
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould return 400 when cancelling a delivered order
+[22m[39m2026-02-28T02:50:48.103Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould return 400 when cancelling a delivered order
+[22m[39m2026-02-28T02:50:48.125Z | PATCH | /api/orders/69a25808b87d002c9305fa53/cancel
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould return 400 when cancelling an already-cancelled order
+[22m[39m2026-02-28T02:50:48.301Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mPATCH /api/orders/:id/cancel[2m > [22m[2mshould return 400 when cancelling an already-cancelled order
+[22m[39m2026-02-28T02:50:48.320Z | PATCH | /api/orders/69a25808b87d002c9305fa7a/cancel
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mDELETE /api/orders/:id[2m > [22m[2mshould delete a cancelled order
+[22m[39m2026-02-28T02:50:48.498Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mDELETE /api/orders/:id[2m > [22m[2mshould delete a cancelled order
+[22m[39m2026-02-28T02:50:48.516Z | PATCH | /api/orders/69a25808b87d002c9305faa1/cancel
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mDELETE /api/orders/:id[2m > [22m[2mshould delete a cancelled order
+[22m[39m2026-02-28T02:50:48.533Z | DELETE | /api/orders/69a25808b87d002c9305faa1
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mDELETE /api/orders/:id[2m > [22m[2mshould return 400 when deleting an active (non-cancelled) order
+[22m[39m2026-02-28T02:50:48.709Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/orders.test.js[2m > [22m[2mOrder Integration Tests[2m > [22m[2mDELETE /api/orders/:id[2m > [22m[2mshould return 400 when deleting an active (non-cancelled) order
+[22m[39m2026-02-28T02:50:48.727Z | DELETE | /api/orders/69a25808b87d002c9305fad1
+
+ [32mÔ£ô[39m tests/integration/orders.test.js [2m([22m[2m16 tests[22m[2m)[22m[33m 3522[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m Happy Path: should create an order and deduct stock [33m 414[2mms[22m[39m
+[90mstdout[2m | tests/integration/users.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/users.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+[90mstdout[2m | tests/integration/users.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mGET /api/users/profile[2m > [22m[2mshould return the logged-in user profile
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mGET /api/users/profile[2m > [22m[2mshould return the logged-in user profile
+[22m[39m2026-02-28T02:50:50.956Z | GET | /api/users/profile
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mGET /api/users/profile[2m > [22m[2mshould return 401 if not authenticated
+[22m[39m2026-02-28T02:50:51.151Z | GET | /api/users/profile
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/users/profile[2m > [22m[2mshould update profile successfully
+[22m[39m2026-02-28T02:50:51.329Z | PUT | /api/users/profile
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/users/profile[2m > [22m[2mshould return 400 when updating to an email already in use
+[22m[39m2026-02-28T02:50:51.500Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/users/profile[2m > [22m[2mshould return 400 when updating to an email already in use
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/users/profile[2m > [22m[2mshould return 400 when updating to an email already in use
+[22m[39m2026-02-28T02:50:51.587Z | PUT | /api/users/profile
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/users/profile[2m > [22m[2mshould return 400 when no fields are provided
+[22m[39m2026-02-28T02:50:51.750Z | PUT | /api/users/profile
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/change-password/:userId[2m > [22m[2mshould change password with correct current password
+[22m[39m2026-02-28T02:50:51.916Z | PUT | /api/change-password/69a2580b89e8450bafbf1896
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPUT /api/change-password/:userId[2m > [22m[2mshould return 400 when current password is incorrect
+[22m[39m2026-02-28T02:50:52.224Z | PUT | /api/change-password/69a2580c89e8450bafbf18a0
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mPATCH /api/deactivate[2m > [22m[2mshould deactivate own account
+[22m[39m2026-02-28T02:50:52.457Z | PATCH | /api/deactivate
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mAdmin Operations[2m > [22m[2mshould allow admin to list all users
+[22m[39m2026-02-28T02:50:52.626Z | GET | /api/users
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mAdmin Operations[2m > [22m[2mshould deny customer access to list all users (RBAC)
+[22m[39m2026-02-28T02:50:52.795Z | GET | /api/users
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mAdmin Operations[2m > [22m[2mshould allow admin to delete a user (soft delete)
+[22m[39m2026-02-28T02:50:52.968Z | DELETE | /api/users/69a2580c89e8450bafbf18c6
+
+[90mstdout[2m | tests/integration/users.test.js[2m > [22m[2mUser Integration Tests[2m > [22m[2mAdmin Operations[2m > [22m[2mshould deny customer from deleting users (RBAC)
+[22m[39m2026-02-28T02:50:53.144Z | DELETE | /api/users/69a2580d89e8450bafbf18d1
+
+ [32mÔ£ô[39m tests/integration/users.test.js [2m([22m[2m12 tests[22m[2m)[22m[33m 2489[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should return the logged-in user profile [33m 312[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should change password with correct current password [33m 314[2mms[22m[39m
+[90mstdout[2m | tests/integration/reviews.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/reviews.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject })
+
+[90mstdout[2m | tests/integration/reviews.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould create a review successfully
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould create a review successfully
+[22m[39m2026-02-28T02:50:55.536Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould return 404 when reviewing a non-existent product
+[22m[39m2026-02-28T02:50:55.764Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould return 400 when user already reviewed the product
+[22m[39m2026-02-28T02:50:55.938Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould return 400 when user already reviewed the product
+[22m[39m2026-02-28T02:50:55.955Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPOST /api/review[2m > [22m[2mshould return 401 when not authenticated
+[22m[39m2026-02-28T02:50:56.132Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mGET /api/review-product/:productId[2m > [22m[2mshould return all reviews for a product
+[22m[39m2026-02-28T02:50:56.305Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mGET /api/review-product/:productId[2m > [22m[2mshould return all reviews for a product
+[22m[39m2026-02-28T02:50:56.318Z | GET | /api/review-product/69a25810350e15c2a6b3c372
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mGET /api/review-product/:productId[2m > [22m[2mshould return empty array for a product with no reviews
+[22m[39m2026-02-28T02:50:56.494Z | GET | /api/review-product/69a25810350e15c2a6b3c38b
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPUT /api/my-reviews/:reviewId[2m > [22m[2mshould update own review
+[22m[39m2026-02-28T02:50:56.671Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPUT /api/my-reviews/:reviewId[2m > [22m[2mshould update own review
+[22m[39m2026-02-28T02:50:56.686Z | PUT | /api/my-reviews/69a25810350e15c2a6b3c3a2
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPUT /api/my-reviews/:reviewId[2m > [22m[2mshould return 403 when updating another user's review
+[22m[39m2026-02-28T02:50:56.861Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mPUT /api/my-reviews/:reviewId[2m > [22m[2mshould return 403 when updating another user's review
+[22m[39m2026-02-28T02:50:56.876Z | PUT | /api/my-reviews/69a25810350e15c2a6b3c3bc
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mDELETE /api/my-reviews/:reviewId[2m > [22m[2mshould return 403 when deleting another user's review
+[22m[39m2026-02-28T02:50:57.049Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mDELETE /api/my-reviews/:reviewId[2m > [22m[2mshould return 403 when deleting another user's review
+[22m[39m2026-02-28T02:50:57.064Z | DELETE | /api/my-reviews/69a25811350e15c2a6b3c3d4
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mDELETE /api/my-reviews/:reviewId[2m > [22m[2mshould delete own review
+[22m[39m2026-02-28T02:50:57.238Z | POST | /api/review
+
+[90mstdout[2m | tests/integration/reviews.test.js[2m > [22m[2mReview Integration Tests[2m > [22m[2mDELETE /api/my-reviews/:reviewId[2m > [22m[2mshould delete own review
+[22m[39m2026-02-28T02:50:57.251Z | DELETE | /api/my-reviews/69a25811350e15c2a6b3c3ec
+
+ [32mÔ£ô[39m tests/integration/reviews.test.js [2m([22m[2m10 tests[22m[2m)[22m[33m 2096[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should create a review successfully [33m 412[2mms[22m[39m
+[90mstdout[2m | tests/integration/categories.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+[90mstdout[2m | tests/integration/categories.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/categories.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mGET /api/categories[2m > [22m[2mshould list all categories
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mGET /api/categories[2m > [22m[2mshould list all categories
+[22m[39m2026-02-28T02:50:59.508Z | GET | /api/categories
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mGET /api/categories/:id[2m > [22m[2mshould return an existing category
+[22m[39m2026-02-28T02:50:59.694Z | GET | /api/categories/69a25813b92a92aed0902a27
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mGET /api/categories/:id[2m > [22m[2mshould return 404 for non-existent category
+[22m[39m2026-02-28T02:50:59.863Z | GET | /api/categories/654321654321654321654321
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mPOST /api/categories[2m > [22m[2madmin should create a root category
+[22m[39m2026-02-28T02:51:00.053Z | POST | /api/categories
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mPOST /api/categories[2m > [22m[2madmin should create a root category
+[22m[39mCuerpo recibido: { name: [32m'New Root Category'[39m, description: [32m'A new root category'[39m }
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mPOST /api/categories[2m > [22m[2mshould return 403 without admin role
+[22m[39m2026-02-28T02:51:00.223Z | POST | /api/categories
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mDELETE /api/categories/:id[2m > [22m[2mshould return 400 when deleting a category with subcategories
+[22m[39m2026-02-28T02:51:00.387Z | DELETE | /api/categories/69a25814b92a92aed0902a57
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mDELETE /api/categories/:id[2m > [22m[2mshould delete a leaf category (no children)
+[22m[39m2026-02-28T02:51:00.552Z | DELETE | /api/categories/69a25814b92a92aed0902a67
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mGET /api/categories/search[2m > [22m[2mshould search categories by query
+[22m[39m2026-02-28T02:51:00.719Z | GET | /api/categories/search?q=Parent
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mSubCategory Operations[2m > [22m[2madmin should create a subcategory
+[22m[39m2026-02-28T02:51:00.890Z | POST | /api/subcategories
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mSubCategory Operations[2m > [22m[2mcustomer should be denied creating a subcategory
+[22m[39m2026-02-28T02:51:01.057Z | POST | /api/subcategories
+
+[90mstdout[2m | tests/integration/categories.test.js[2m > [22m[2mCategory & SubCategory Integration Tests[2m > [22m[2mSubCategory Operations[2m > [22m[2mshould list all subcategories
+[22m[39m2026-02-28T02:51:01.222Z | GET | /api/subcategories
+
+ [32mÔ£ô[39m tests/integration/categories.test.js [2m([22m[2m11 tests[22m[2m)[22m[33m 2065[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should list all categories [33m 350[2mms[22m[39m
+[90mstdout[2m | tests/integration/paymentMethods.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`)
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  enable debug logging with { debug: true })
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould create a credit card payment method
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould create a credit card payment method
+[22m[39m2026-02-28T02:51:03.562Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould create a credit card payment method
+[22m[39mPAYMENT METHOD CREATE RESPONSE: {
+  user: {
+    _id: [32m'69a25817ce36bbe19abee16b'[39m,
+    displayName: [32m'customer User'[39m,
+    email: [32m'customer@test.com'[39m,
+    hashPassword: [32m'$2b$10$9MIFmGoVNKiautfsEi.qW.RimSLmMFJcWbpW9ssOjNfkgwPozDTz.'[39m,
+    role: [32m'customer'[39m,
+    avatar: [32m'https://placehold.co/100x100.png'[39m,
+    phone: [32m'1234567890'[39m,
+    isActive: [33mtrue[39m,
+    createdAt: [32m'2026-02-28T02:51:03.446Z'[39m,
+    updatedAt: [32m'2026-02-28T02:51:03.446Z'[39m,
+    __v: [33m0[39m
+  },
+  type: [32m'credit_card'[39m,
+  cardNumber: [32m'1111222233334444'[39m,
+  cardHolderName: [32m'Test User'[39m,
+  expiryDate: [32m'12/28'[39m,
+  isDefault: [33mfalse[39m,
+  isActive: [33mtrue[39m,
+  _id: [32m'69a25817ce36bbe19abee171'[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould return 422 for invalid payment type
+[22m[39m2026-02-28T02:51:03.834Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould return 422 for invalid expiry date format
+[22m[39m2026-02-28T02:51:04.075Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould ensure only one default when setting isDefault: true
+[22m[39m2026-02-28T02:51:04.312Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPOST /api/payment-methods[2m > [22m[2mshould ensure only one default when setting isDefault: true
+[22m[39m2026-02-28T02:51:04.328Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPUT /api/payment-methods/:id (ownership)[2m > [22m[2mshould return 403 when updating another user's payment method
+[22m[39m2026-02-28T02:51:04.574Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mPUT /api/payment-methods/:id (ownership)[2m > [22m[2mshould return 403 when updating another user's payment method
+[22m[39m2026-02-28T02:51:04.587Z | PUT | /api/payment-methods/69a25818ce36bbe19abee1ad
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mDELETE /api/payment-methods/:id (ownership)[2m > [22m[2mshould return 403 when deleting another user's payment method
+[22m[39m2026-02-28T02:51:04.832Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mDELETE /api/payment-methods/:id (ownership)[2m > [22m[2mshould return 403 when deleting another user's payment method
+[22m[39m2026-02-28T02:51:04.843Z | DELETE | /api/payment-methods/69a25818ce36bbe19abee1bd
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mDELETE /api/payment-methods/:id (ownership)[2m > [22m[2mshould delete own payment method
+[22m[39m2026-02-28T02:51:05.084Z | POST | /api/payment-methods
+
+[90mstdout[2m | tests/integration/paymentMethods.test.js[2m > [22m[2mPayment Method Integration Tests[2m > [22m[2mDELETE /api/payment-methods/:id (ownership)[2m > [22m[2mshould delete own payment method
+[22m[39m2026-02-28T02:51:05.095Z | DELETE | /api/payment-methods/69a25819ce36bbe19abee1cd
+
+ [32mÔ£ô[39m tests/integration/paymentMethods.test.js [2m([22m[2m7 tests[22m[2m)[22m[33m 1914[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should create a credit card payment method [33m 395[2mms[22m[39m
+[90mstdout[2m | tests/integration/cart.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/cart.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/cart.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould add a product to the cart
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould add a product to the cart
+[22m[39m2026-02-28T02:51:07.308Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould accumulate quantity when adding the same product + size twice
+[22m[39m2026-02-28T02:51:07.441Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould accumulate quantity when adding the same product + size twice
+[22m[39m2026-02-28T02:51:07.457Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould create a separate item when adding same product with different size
+[22m[39m2026-02-28T02:51:07.566Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould create a separate item when adding same product with different size
+[22m[39m2026-02-28T02:51:07.582Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/add[2m > [22m[2mshould return 401 when adding without authentication
+[22m[39m2026-02-28T02:51:07.692Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mGET /api/cart/user/:userId[2m > [22m[2mshould return 404 if user has no cart
+[22m[39m2026-02-28T02:51:07.786Z | GET | /api/cart/user/69a2581bff82b1262fca5efc
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mGET /api/cart/user/:userId[2m > [22m[2mshould return cart when user has one
+[22m[39m2026-02-28T02:51:07.883Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mGET /api/cart/user/:userId[2m > [22m[2mshould return cart when user has one
+[22m[39m2026-02-28T02:51:07.897Z | GET | /api/cart/user/69a2581bff82b1262fca5f0c
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould update the quantity of a cart item
+[22m[39m2026-02-28T02:51:08.001Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould update the quantity of a cart item
+[22m[39m2026-02-28T02:51:08.017Z | PUT | /api/cart/update-item
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould change the size of a cart item using oldSize
+[22m[39m2026-02-28T02:51:08.125Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould change the size of a cart item using oldSize
+[22m[39m2026-02-28T02:51:08.139Z | PUT | /api/cart/update-item
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould return 404 if product is not in cart
+[22m[39m2026-02-28T02:51:08.243Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update-item[2m > [22m[2mshould return 404 if product is not in cart
+[22m[39m2026-02-28T02:51:08.258Z | PUT | /api/cart/update-item
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mDELETE /api/cart/remove-item/:productId[2m > [22m[2mshould remove a specific product+size from the cart
+[22m[39m2026-02-28T02:51:08.356Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mDELETE /api/cart/remove-item/:productId[2m > [22m[2mshould remove a specific product+size from the cart
+[22m[39m2026-02-28T02:51:08.370Z | DELETE | /api/cart/remove-item/69a2581cff82b1262fca5f77
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/clear[2m > [22m[2mshould clear all items from the cart
+[22m[39m2026-02-28T02:51:08.476Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPOST /api/cart/clear[2m > [22m[2mshould clear all items from the cart
+[22m[39m2026-02-28T02:51:08.490Z | POST | /api/cart/clear
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update/:id (Security & IDOR)[2m > [22m[2mshould return 403 Forbidden if a user tries to update another users cart (IDOR)
+[22m[39m2026-02-28T02:51:08.670Z | PUT | /api/cart/update/69a2581cff82b1262fca5faf
+
+[90mstdout[2m | tests/integration/cart.test.js[2m > [22m[2mCart Integration Tests[2m > [22m[2mPUT /api/cart/update/:id (Security & IDOR)[2m > [22m[2mshould allow the owner to update their own cart with an empty array to clear it
+[22m[39m2026-02-28T02:51:08.847Z | PUT | /api/cart/update/69a2581cff82b1262fca5fca
+
+ [32mÔ£ô[39m tests/integration/cart.test.js [2m([22m[2m13 tests[22m[2m)[22m[33m 1838[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should add a product to the cart [33m 310[2mms[22m[39m
+[90mstdout[2m | tests/integration/auth.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/auth.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/auth.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould register a new user successfully
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould register a new user successfully
+[22m[39m2026-02-28T02:51:10.875Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould register a new user successfully
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 400 if user already exists
+[22m[39m2026-02-28T02:51:11.035Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 400 if user already exists
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 400 if user already exists
+[22m[39m2026-02-28T02:51:11.122Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 400 if user already exists
+[22m[39m{
+  _id: new ObjectId([32m'69a2581f9315db4a9d15af11'[39m),
+  displayName: [32m'Integration Test User'[39m,
+  email: [32m'duplicate@example.com'[39m,
+  hashPassword: [32m'$2b$10$DwVkJ2W4X4OYPwmlLoVRYevw/NuNn1oEB0rFXrQugTxmdjwB9E5q6'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:11.112Z[39m,
+  updatedAt: [35m2026-02-28T02:51:11.112Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 422 for invalid email format
+[22m[39m2026-02-28T02:51:11.136Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 422 for password without numbers
+[22m[39m2026-02-28T02:51:11.145Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/register[2m > [22m[2mshould return 422 for invalid phone number (not 10 digits)
+[22m[39m2026-02-28T02:51:11.154Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould login successfully with valid credentials
+[22m[39m2026-02-28T02:51:11.163Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould login successfully with valid credentials
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould login successfully with valid credentials
+[22m[39m2026-02-28T02:51:11.246Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould login successfully with valid credentials
+[22m[39m{
+  _id: new ObjectId([32m'69a2581f9315db4a9d15af19'[39m),
+  displayName: [32m'Login User'[39m,
+  email: [32m'login@example.com'[39m,
+  hashPassword: [32m'$2b$10$0fWq28qbRtNee2QxVELc4OUJIAgyzt4Eq65EHqLuJTfLXk1eAfj22'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:11.239Z[39m,
+  updatedAt: [35m2026-02-28T02:51:11.239Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for incorrect password
+[22m[39m2026-02-28T02:51:11.335Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for incorrect password
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for incorrect password
+[22m[39m2026-02-28T02:51:11.418Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for incorrect password
+[22m[39m{
+  _id: new ObjectId([32m'69a2581f9315db4a9d15af1e'[39m),
+  displayName: [32m'Login User'[39m,
+  email: [32m'login@example.com'[39m,
+  hashPassword: [32m'$2b$10$io3P5Gmhpckf2hzcstwuquim6hMUJm0N49a9LrPi.UnaIhStYPD.e'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:11.409Z[39m,
+  updatedAt: [35m2026-02-28T02:51:11.409Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for non-existent user
+[22m[39m2026-02-28T02:51:11.500Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for non-existent user
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for non-existent user
+[22m[39m2026-02-28T02:51:11.595Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 400 for non-existent user
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 422 for empty body
+[22m[39m2026-02-28T02:51:11.608Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 422 for empty body
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/login[2m > [22m[2mshould return 422 for empty body
+[22m[39m2026-02-28T02:51:11.693Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mGET /api/auth/check-email[2m > [22m[2mshould return taken: true for a registered email
+[22m[39m2026-02-28T02:51:11.701Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mGET /api/auth/check-email[2m > [22m[2mshould return taken: true for a registered email
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mGET /api/auth/check-email[2m > [22m[2mshould return taken: true for a registered email
+[22m[39m2026-02-28T02:51:11.783Z | GET | /api/auth/check-email?email=check%40example.com
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mGET /api/auth/check-email[2m > [22m[2mshould return taken: false for an unregistered email
+[22m[39m2026-02-28T02:51:11.791Z | GET | /api/auth/check-email?email=free%40example.com
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mGET /api/auth/check-email[2m > [22m[2mshould return 422 for missing email query param
+[22m[39m2026-02-28T02:51:11.800Z | GET | /api/auth/check-email
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return a new access token with a valid refresh token
+[22m[39m2026-02-28T02:51:11.808Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return a new access token with a valid refresh token
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return a new access token with a valid refresh token
+[22m[39m2026-02-28T02:51:11.890Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return a new access token with a valid refresh token
+[22m[39m{
+  _id: new ObjectId([32m'69a2581f9315db4a9d15af34'[39m),
+  displayName: [32m'Refresh User'[39m,
+  email: [32m'refresh@example.com'[39m,
+  hashPassword: [32m'$2b$10$jlp6zQahdWiXQ4AeTKGRmO1YGN4Y/F5QA1d9HNbxLKi/.a.rbm3mi'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:11.884Z[39m,
+  updatedAt: [35m2026-02-28T02:51:11.884Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return a new access token with a valid refresh token
+[22m[39m2026-02-28T02:51:11.970Z | POST | /api/auth/refresh
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 401 if no refresh token is provided
+[22m[39m2026-02-28T02:51:11.980Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 401 if no refresh token is provided
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 401 if no refresh token is provided
+[22m[39m2026-02-28T02:51:12.066Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 401 if no refresh token is provided
+[22m[39m{
+  _id: new ObjectId([32m'69a258209315db4a9d15af39'[39m),
+  displayName: [32m'Refresh User'[39m,
+  email: [32m'refresh@example.com'[39m,
+  hashPassword: [32m'$2b$10$YlOfVB/M9RTTK1QDbY4ZJOJgvC59iAod0LHoWjcNOh6RlKgRDjSOq'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:12.058Z[39m,
+  updatedAt: [35m2026-02-28T02:51:12.058Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 401 if no refresh token is provided
+[22m[39m2026-02-28T02:51:12.148Z | POST | /api/auth/refresh
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for a malformed (invalid) refresh token
+[22m[39m2026-02-28T02:51:12.155Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for a malformed (invalid) refresh token
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for a malformed (invalid) refresh token
+[22m[39m2026-02-28T02:51:12.237Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for a malformed (invalid) refresh token
+[22m[39m{
+  _id: new ObjectId([32m'69a258209315db4a9d15af3e'[39m),
+  displayName: [32m'Refresh User'[39m,
+  email: [32m'refresh@example.com'[39m,
+  hashPassword: [32m'$2b$10$61UzseQlZ/zLiBjlUaPe9eq94Sq4Evkt.5D1oCppd60gE4F.z7xmq'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:12.231Z[39m,
+  updatedAt: [35m2026-02-28T02:51:12.231Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for a malformed (invalid) refresh token
+[22m[39m2026-02-28T02:51:12.318Z | POST | /api/auth/refresh
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for an expired refresh token
+[22m[39m2026-02-28T02:51:12.327Z | POST | /api/auth/register
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for an expired refresh token
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for an expired refresh token
+[22m[39m2026-02-28T02:51:12.410Z | POST | /api/auth/login
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for an expired refresh token
+[22m[39m{
+  _id: new ObjectId([32m'69a258209315db4a9d15af43'[39m),
+  displayName: [32m'Refresh User'[39m,
+  email: [32m'refresh@example.com'[39m,
+  hashPassword: [32m'$2b$10$PcS2BUi4WzoSf1GexFSo8.XqsxTMle7ZYS.H2BkqF44B2avOnZct2'[39m,
+  role: [32m'guest'[39m,
+  avatar: [32m'https://placehold.co/100x100.png'[39m,
+  phone: [32m'1234567890'[39m,
+  isActive: [33mtrue[39m,
+  createdAt: [35m2026-02-28T02:51:12.405Z[39m,
+  updatedAt: [35m2026-02-28T02:51:12.405Z[39m,
+  __v: [33m0[39m
+}
+
+[90mstdout[2m | tests/integration/auth.test.js[2m > [22m[2mAuth Integration Tests[2m > [22m[2mPOST /api/auth/refresh[2m > [22m[2mshould return 403 for an expired refresh token
+[22m[39m2026-02-28T02:51:12.490Z | POST | /api/auth/refresh
+
+ [32mÔ£ô[39m tests/integration/auth.test.js [2m([22m[2m16 tests[22m[2m)[22m[33m 1697[2mms[22m[39m
+[90mstdout[2m | tests/integration/shippingAddress.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPOST /api/new-address[2m > [22m[2mshould create a shipping address successfully
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPOST /api/new-address[2m > [22m[2mshould create a shipping address successfully
+[22m[39m2026-02-28T02:51:14.705Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPOST /api/new-address[2m > [22m[2mshould ensure only one default address exists when setting isDefault: true
+[22m[39m2026-02-28T02:51:14.889Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPOST /api/new-address[2m > [22m[2mshould ensure only one default address exists when setting isDefault: true
+[22m[39m2026-02-28T02:51:14.905Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPOST /api/new-address[2m > [22m[2mshould return 401 without authentication
+[22m[39m2026-02-28T02:51:15.079Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mGET /api/user-addresses[2m > [22m[2mshould list user addresses sorted by default first
+[22m[39m2026-02-28T02:51:15.254Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mGET /api/user-addresses[2m > [22m[2mshould list user addresses sorted by default first
+[22m[39m2026-02-28T02:51:15.264Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mGET /api/user-addresses[2m > [22m[2mshould list user addresses sorted by default first
+[22m[39m2026-02-28T02:51:15.274Z | GET | /api/user-addresses
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mGET /api/user-address/:addressId (data isolation)[2m > [22m[2mshould return 404 when accessing another user's address
+[22m[39m2026-02-28T02:51:15.439Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mGET /api/user-address/:addressId (data isolation)[2m > [22m[2mshould return 404 when accessing another user's address
+[22m[39m2026-02-28T02:51:15.448Z | GET | /api/user-address/69a2582377ddac6a599aafd3
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPATCH /api/default/:addressId[2m > [22m[2mshould change default address and unmark previous default
+[22m[39m2026-02-28T02:51:15.615Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPATCH /api/default/:addressId[2m > [22m[2mshould change default address and unmark previous default
+[22m[39m2026-02-28T02:51:15.627Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mPATCH /api/default/:addressId[2m > [22m[2mshould change default address and unmark previous default
+[22m[39m2026-02-28T02:51:15.637Z | PATCH | /api/default/69a2582377ddac6a599aafe2
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mDELETE /api/delete-address/:addressId (data isolation)[2m > [22m[2mshould return 404 when deleting another user's address
+[22m[39m2026-02-28T02:51:15.807Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mDELETE /api/delete-address/:addressId (data isolation)[2m > [22m[2mshould return 404 when deleting another user's address
+[22m[39m2026-02-28T02:51:15.815Z | DELETE | /api/delete-address/69a2582377ddac6a599aaff1
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mDELETE /api/delete-address/:addressId (data isolation)[2m > [22m[2mshould delete own address successfully
+[22m[39m2026-02-28T02:51:15.976Z | POST | /api/new-address
+
+[90mstdout[2m | tests/integration/shippingAddress.test.js[2m > [22m[2mShipping Address Integration Tests[2m > [22m[2mDELETE /api/delete-address/:addressId (data isolation)[2m > [22m[2mshould delete own address successfully
+[22m[39m2026-02-28T02:51:15.985Z | DELETE | /api/delete-address/69a2582377ddac6a599aaffd
+
+ [32mÔ£ô[39m tests/integration/shippingAddress.test.js [2m([22m[2m8 tests[22m[2m)[22m[33m 1583[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should create a shipping address successfully [33m 304[2mms[22m[39m
+[90mstdout[2m | tests/integration/wishlist.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/wishlist.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/wishlist.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist[2m > [22m[2mshould return empty wishlist for user with no items
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist[2m > [22m[2mshould return empty wishlist for user with no items
+[22m[39m2026-02-28T02:51:18.183Z | GET | /api/wishlist
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist[2m > [22m[2mshould return wishlist with products
+[22m[39m2026-02-28T02:51:18.327Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist[2m > [22m[2mshould return wishlist with products
+[22m[39m2026-02-28T02:51:18.362Z | GET | /api/wishlist
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist[2m > [22m[2mshould return 401 without authentication
+[22m[39m2026-02-28T02:51:18.465Z | GET | /api/wishlist
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mPOST /api/wishlist/add[2m > [22m[2mshould add a product to the wishlist
+[22m[39m2026-02-28T02:51:18.562Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mPOST /api/wishlist/add[2m > [22m[2mshould return 404 for non-existent product
+[22m[39m2026-02-28T02:51:18.672Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mPOST /api/wishlist/add[2m > [22m[2mshould be idempotent: adding same product twice does not create duplicates
+[22m[39m2026-02-28T02:51:18.771Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mPOST /api/wishlist/add[2m > [22m[2mshould be idempotent: adding same product twice does not create duplicates
+[22m[39m2026-02-28T02:51:18.785Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mDELETE /api/wishlist/remove/:productId[2m > [22m[2mshould remove a product from the wishlist
+[22m[39m2026-02-28T02:51:18.889Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mDELETE /api/wishlist/remove/:productId[2m > [22m[2mshould remove a product from the wishlist
+[22m[39m2026-02-28T02:51:18.903Z | DELETE | /api/wishlist/remove/69a25826995a025f7b39b567
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist/check/:productId[2m > [22m[2mshould return inWishList: true when product is in wishlist
+[22m[39m2026-02-28T02:51:19.006Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist/check/:productId[2m > [22m[2mshould return inWishList: true when product is in wishlist
+[22m[39m2026-02-28T02:51:19.019Z | GET | /api/wishlist/check/69a25826995a025f7b39b57e
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mGET /api/wishlist/check/:productId[2m > [22m[2mshould return inWishList: false when product is not in wishlist
+[22m[39m2026-02-28T02:51:19.118Z | GET | /api/wishlist/check/69a25827995a025f7b39b595
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mDELETE /api/wishlist/clear[2m > [22m[2mshould clear all products from the wishlist
+[22m[39m2026-02-28T02:51:19.228Z | POST | /api/wishlist/add
+
+[90mstdout[2m | tests/integration/wishlist.test.js[2m > [22m[2mWishlist Integration Tests[2m > [22m[2mDELETE /api/wishlist/clear[2m > [22m[2mshould clear all products from the wishlist
+[22m[39m2026-02-28T02:51:19.241Z | DELETE | /api/wishlist/clear
+
+ [32mÔ£ô[39m tests/integration/wishlist.test.js [2m([22m[2m10 tests[22m[2m)[22m[33m 1338[2mms[22m[39m
+[90mstdout[2m | tests/integration/cart_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/cart_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/cart_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould NOT allow User A to view User B's cart (GET /api/cart/user/:userId)
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould NOT allow User A to view User B's cart (GET /api/cart/user/:userId)
+[22m[39m2026-02-28T02:51:21.571Z | GET | /api/cart/user/69a258297d5e82b7a583f8bb
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould ignore userId in body and update User A's own cart (POST /api/cart/add)
+[22m[39m2026-02-28T02:51:21.776Z | POST | /api/cart/add
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould NOT allow User A to update items in User B's cart (PUT /api/cart/update-item)
+[22m[39m2026-02-28T02:51:21.987Z | PUT | /api/cart/update-item
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould NOT allow User A to clear User B's cart (POST /api/cart/clear)
+[22m[39m2026-02-28T02:51:22.170Z | POST | /api/cart/clear
+
+[90mstdout[2m | tests/integration/cart_security.test.js[2m > [22m[2mCart IDOR Security Tests[2m > [22m[2mshould allow admin to view any user's cart
+[22m[39m2026-02-28T02:51:22.424Z | GET | /api/cart/user/69a2582a7d5e82b7a583f91a
+
+ [32mÔ£ô[39m tests/integration/cart_security.test.js [2m([22m[2m5 tests[22m[2m)[22m[33m 1210[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should NOT allow User A to view User B's cart (GET /api/cart/user/:userId) [33m 351[2mms[22m[39m
+[90mstdout[2m | tests/integration/products.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`)
+
+[90mstdout[2m | tests/integration/products.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/products.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject })
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products[2m > [22m[2mshould return paginated products
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products[2m > [22m[2mshould return paginated products
+[22m[39m2026-02-28T02:51:24.724Z | GET | /api/products
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPOST /api/products[2m > [22m[2mshould create a product as admin
+[22m[39m2026-02-28T02:51:24.794Z | POST | /api/products
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPOST /api/products[2m > [22m[2mshould return 403 when creating as customer
+[22m[39m2026-02-28T02:51:24.832Z | POST | /api/products
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products/:id[2m > [22m[2mshould return 404 for non-existent product
+[22m[39m2026-02-28T02:51:24.849Z | GET | /api/products/654321654321654321654321
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products/:id[2m > [22m[2mshould return an existing product by id
+[22m[39m2026-02-28T02:51:24.871Z | GET | /api/products/69a2582c9bb389a20bd085cb
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products/search[2m > [22m[2mshould find products by name query
+[22m[39m2026-02-28T02:51:24.895Z | GET | /api/products/search?q=Unique
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products/search[2m > [22m[2mshould filter products by price range
+[22m[39m2026-02-28T02:51:24.924Z | GET | /api/products/search?minPrice=100&maxPrice=600
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mGET /api/products/search[2m > [22m[2mshould filter only in-stock products
+[22m[39m2026-02-28T02:51:24.953Z | GET | /api/products/search?inStock=true
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPUT /api/products/:id[2m > [22m[2mshould update a product as admin
+[22m[39m2026-02-28T02:51:24.979Z | PUT | /api/products/69a2582c9bb389a20bd08607
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPUT /api/products/:id[2m > [22m[2mshould return 400 or 422 when updating without any updatable field
+[22m[39m2026-02-28T02:51:25.012Z | PUT | /api/products/69a2582d9bb389a20bd08616
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPUT /api/products/:id[2m > [22m[2mshould return 404 for non-existent product (valid ID format)
+[22m[39m2026-02-28T02:51:25.035Z | PUT | /api/products/654321654321654321654321
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPUT /api/products/:id[2m > [22m[2mshould return 403 when updating as customer
+[22m[39m2026-02-28T02:51:25.056Z | PUT | /api/products/69a2582d9bb389a20bd0862d
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mDELETE /api/products/:id[2m > [22m[2mshould delete a product as admin
+[22m[39m2026-02-28T02:51:25.076Z | DELETE | /api/products/69a2582d9bb389a20bd08638
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mDELETE /api/products/:id[2m > [22m[2mshould return 404 for deleting non-existent product
+[22m[39m2026-02-28T02:51:25.097Z | DELETE | /api/products/654321654321654321654321
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mDELETE /api/products/:id[2m > [22m[2mshould return 403 when deleting as customer
+[22m[39m2026-02-28T02:51:25.117Z | DELETE | /api/products/69a2582d9bb389a20bd0864f
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPOST /api/products (edge cases)[2m > [22m[2mshould return 400 or 422 when category (SubCategory) does not exist
+[22m[39m2026-02-28T02:51:25.134Z | POST | /api/products
+
+[90mstdout[2m | tests/integration/products.test.js[2m > [22m[2mProduct Integration Tests[2m > [22m[2mPOST /api/products (edge cases)[2m > [22m[2mshould return 401 when creating a product without authentication
+[22m[39m2026-02-28T02:51:25.152Z | POST | /api/products
+
+ [32mÔ£ô[39m tests/integration/products.test.js [2m([22m[2m17 tests[22m[2m)[22m[33m 771[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should return paginated products [33m 364[2mms[22m[39m
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] })
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m2026-02-28T02:51:27.458Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39m2026-02-28T02:51:27.473Z | POST | /api/orders
+
+[90mstdout[2m | tests/integration/order_concurrency.test.js[2m > [22m[2mOrder Concurrency & Race Conditions[2m > [22m[2mshould NOT allow over-selling when multiple users buy the last item simultaneously
+[22m[39mStatuses: 201,500
+Successes: 1, Failures: 1
+Final stock: 0
+
+ [32mÔ£ô[39m tests/integration/order_concurrency.test.js [2m([22m[2m1 test[22m[2m)[22m[33m 490[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should NOT allow over-selling when multiple users buy the last item simultaneously [33m 477[2mms[22m[39m
+[90mstdout[2m | tests/integration/notification_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/notification_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/notification_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould NOT allow user 2 to view user 1 notification by ID
+[22m[39m2026-02-28T02:51:29.685Z | GET | /api/notifications/69a25831c8800c960e575e5b
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould NOT allow user 2 to list notifications for user 1
+[22m[39m2026-02-28T02:51:29.722Z | GET | /api/notifications/user/69a25831c8800c960e575e55
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould NOT allow user 2 to mark as read user 1 notification
+[22m[39m2026-02-28T02:51:29.729Z | PATCH | /api/notifications/69a25831c8800c960e575e5b/mark-read
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould NOT allow user 2 to delete user 1 notification
+[22m[39m2026-02-28T02:51:29.739Z | DELETE | /api/notifications/69a25831c8800c960e575e5b
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould ALLOW user 1 to view their own notification
+[22m[39m2026-02-28T02:51:29.748Z | GET | /api/notifications/69a25831c8800c960e575e5b
+
+[90mstdout[2m | tests/integration/notification_security.test.js[2m > [22m[2mNotification Security (IDOR)[2m > [22m[2mshould ALLOW admin to view any notification
+[22m[39m2026-02-28T02:51:29.767Z | GET | /api/notifications/69a25831c8800c960e575e5b
+
+ [32mÔ£ô[39m tests/integration/notification_security.test.js [2m([22m[2m6 tests[22m[2m)[22m[33m 310[2mms[22m[39m
+[90mstdout[2m | tests/integration/category_integrity.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject })
+
+[90mstdout[2m | tests/integration/category_integrity.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/category_integrity.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/category_integrity.test.js[2m > [22m[2mCategory Integrity & Cycles
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/category_integrity.test.js[2m > [22m[2mCategory Integrity & Cycles[2m > [22m[2mshould NOT allow a category to be its own parent
+[22m[39m2026-02-28T02:51:31.940Z | PUT | /api/categories/69a25833ddb297a194c9f784
+
+[90mstdout[2m | tests/integration/category_integrity.test.js[2m > [22m[2mCategory Integrity & Cycles[2m > [22m[2mshould NOT allow creating a circular reference (A -> B -> A)
+[22m[39m2026-02-28T02:51:31.969Z | PUT | /api/categories/69a25833ddb297a194c9f784
+
+[90mstdout[2m | tests/integration/category_integrity.test.js[2m > [22m[2mCategory Integrity & Cycles[2m > [22m[2mshould ALLOW a valid parent update
+[22m[39m2026-02-28T02:51:31.989Z | PUT | /api/categories/69a25833ddb297a194c9f786
+
+ [32mÔ£ô[39m tests/integration/category_integrity.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 238[2mms[22m[39m
+[90mstdout[2m | tests/integration/product_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+[90mstdout[2m | tests/integration/product_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/product_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/product_security.test.js[2m > [22m[2mProduct Search Security (NoSQLi & ReDoS)[2m > [22m[2mshould NOT allow NoSQL Injection in filters (?minPrice[$gt]=0)
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/product_security.test.js[2m > [22m[2mProduct Search Security (NoSQLi & ReDoS)[2m > [22m[2mshould NOT allow NoSQL Injection in filters (?minPrice[$gt]=0)
+[22m[39m2026-02-28T02:51:34.166Z | GET | /api/products/search?minPrice%5B%24gt%5D=0
+
+[90mstdout[2m | tests/integration/product_security.test.js[2m > [22m[2mProduct Search Security (NoSQLi & ReDoS)[2m > [22m[2mshould handle ReDoS patterns safely in "q" parameter
+[22m[39m2026-02-28T02:51:34.218Z | GET | /api/products/search?q=%28a%2B%29%2B%24
+
+[90mstdout[2m | tests/integration/product_security.test.js[2m > [22m[2mProduct Search Security (NoSQLi & ReDoS)[2m > [22m[2mshould treat "q" as a literal string or sanitize regex special characters
+[22m[39m2026-02-28T02:51:34.243Z | GET | /api/products/search?q=Shield
+
+ [32mÔ£ô[39m tests/integration/product_security.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 298[2mms[22m[39m
+[90mstdout[2m | tests/integration/user_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  enable debug logging with { debug: true })
+
+[90mstdout[2m | tests/integration/user_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject })
+
+[90mstdout[2m | tests/integration/user_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/user_security.test.js[2m > [22m[2mUser Security & Hardening
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/user_security.test.js[2m > [22m[2mUser Security & Hardening[2m > [22m[2mshould NOT allow a user to escalate their role via profile update
+[22m[39m2026-02-28T02:51:36.450Z | PUT | /api/users/profile
+
+[90mstdout[2m | tests/integration/user_security.test.js[2m > [22m[2mUser Security & Hardening[2m > [22m[2mshould NOT allow a user to change isActive status via profile update
+[22m[39m2026-02-28T02:51:36.477Z | PUT | /api/users/profile
+
+ [32mÔ£ô[39m tests/integration/user_security.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 265[2mms[22m[39m
+[90mstdout[2m | tests/integration/auth_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+[90mstdout[2m | tests/integration/auth_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ÔÜÖ´©Å  override existing env vars with { override: true })
+
+[90mstdout[2m | tests/integration/auth_security.test.js
+[22m[39m[dotenv@17.2.0] injecting env (0) from .env (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+[90mstdout[2m | tests/integration/auth_security.test.js[2m > [22m[2mAuthentication Security Tests[2m > [22m[2mshould REJECT a JWT with "alg: none" (Algorithm Confusion)
+[22m[39m2026-02-28T02:51:38.403Z | GET | /api/users/profile
+
+[90mstdout[2m | tests/integration/auth_security.test.js[2m > [22m[2mAuthentication Security Tests[2m > [22m[2mshould REJECT a JWT with "alg: none" (Algorithm Confusion)
+[22m[39mMongoDB is connected
+
+[90mstdout[2m | tests/integration/auth_security.test.js[2m > [22m[2mAuthentication Security Tests[2m > [22m[2mshould REJECT an expired token
+[22m[39m2026-02-28T02:51:38.439Z | GET | /api/users/profile
+
+[90mstdout[2m | tests/integration/auth_security.test.js[2m > [22m[2mAuthentication Security Tests[2m > [22m[2mshould REJECT a token signed with a different secret
+[22m[39m2026-02-28T02:51:38.454Z | GET | /api/users/profile
+
+ [32mÔ£ô[39m tests/integration/auth_security.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 196[2mms[22m[39m
+[90mstdout[2m | tests/unit/wishlistController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] })
+
+ [32mÔ£ô[39m tests/unit/wishlistController.unit.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+[90mstdout[2m | tests/unit/reviewController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  suppress all logs with { quiet: true })
+
+ [32mÔ£ô[39m tests/unit/reviewController.unit.test.js [2m([22m[2m9 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+[90mstdout[2m | tests/unit/productController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+ [32mÔ£ô[39m tests/unit/productController.unit.test.js [2m([22m[2m6 tests[22m[2m)[22m[32m 132[2mms[22m[39m
+[90mstdout[2m | tests/unit/authController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject })
+
+[90mstdout[2m | tests/unit/authController.unit.test.js[2m > [22m[2mauthController Unit Tests[2m > [22m[2mregister[2m > [22m[2mshould register a new user and return 201
+[22m[39m[1mnull[22m
+
+[90mstdout[2m | tests/unit/authController.unit.test.js[2m > [22m[2mauthController Unit Tests[2m > [22m[2mregister[2m > [22m[2mshould return 400 if user already exists
+[22m[39m{ email: [32m'test@example.com'[39m }
+
+[90mstdout[2m | tests/unit/authController.unit.test.js[2m > [22m[2mauthController Unit Tests[2m > [22m[2mlogin[2m > [22m[2mshould login successfully and return tokens
+[22m[39m{
+  _id: [32m'mockId'[39m,
+  email: [32m'test@example.com'[39m,
+  hashPassword: [32m'hashedPassword'[39m,
+  displayName: [32m'Test User'[39m,
+  role: [32m'customer'[39m
+}
+
+[90mstdout[2m | tests/unit/authController.unit.test.js[2m > [22m[2mauthController Unit Tests[2m > [22m[2mlogin[2m > [22m[2mshould return 400 for invalid credentials
+[22m[39m{ email: [32m'test@example.com'[39m, hashPassword: [32m'hashedPassword'[39m }
+
+ [32mÔ£ô[39m tests/unit/authController.unit.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+[90mstdout[2m | tests/unit/middlewares/validators.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] })
+
+ [32mÔ£ô[39m tests/unit/middlewares/validators.test.js [2m([22m[2m12 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+[90mstdout[2m | tests/unit/shippingPayment.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+ [32mÔ£ô[39m tests/unit/shippingPayment.unit.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 83[2mms[22m[39m
+[90mstdout[2m | tests/unit/categories.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`)
+
+[90mstdout[2m | tests/unit/categories.unit.test.js[2m > [22m[2mCategories & SubCategories Unit Tests[2m > [22m[2mCategory Controller[2m > [22m[2mshould call next(err) if createCategory fails in Mongoose
+[22m[39mCuerpo recibido: { name: [32m'New Cat'[39m }
+
+ [32mÔ£ô[39m tests/unit/categories.unit.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+[90mstdout[2m | tests/unit/orderController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  enable debug logging with { debug: true })
+
+ [32mÔ£ô[39m tests/unit/orderController.unit.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 75[2mms[22m[39m
+[90mstdout[2m | tests/unit/middlewares/rateLimit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+ [32mÔ£ô[39m tests/unit/middlewares/rateLimit.test.js [2m([22m[2m1 test[22m[2m)[22m[32m 60[2mms[22m[39m
+[90mstdout[2m | tests/unit/userController.unit.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit)
+
+ [32mÔ£ô[39m tests/unit/userController.unit.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+[90mstdout[2m | tests/unit/orderResilience.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild)
+
+ [32mÔ£ô[39m tests/unit/orderResilience.test.js [2m([22m[2m1 test[22m[2m)[22m[32m 58[2mms[22m[39m
+[90mstdout[2m | tests/unit/middlewares/auth.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' })
+
+ [32mÔ£ô[39m tests/unit/middlewares/auth.test.js [2m([22m[2m4 tests[22m[2m)[22m[32m 60[2mms[22m[39m
+[90mstdout[2m | tests/unit/middlewares/isAdmin.test.js
+[22m[39m[dotenv@17.2.0] injecting env (6) from .env.test (tip: ­ƒöÉ encrypt with dotenvx: https://dotenvx.com)
+
+ [32mÔ£ô[39m tests/unit/middlewares/isAdmin.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m30 passed[39m[22m[90m (33)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[2m | [22m[1m[32m203 passed[39m[22m[90m (212)[39m
+[2m   Start at [22m 20:50:38
+[2m   Duration [22m 79.09s[2m (transform 1.02s, setup 27.00s, import 17.83s, tests 23.62s, environment 6ms)[22m
+
