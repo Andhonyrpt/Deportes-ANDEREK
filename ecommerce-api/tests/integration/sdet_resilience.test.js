@@ -92,8 +92,8 @@ describe('SDET Advanced Resilience & Fault Tolerance Tests', () => {
 
             // Note: In a real test we might want to lower the limit for testing.
             // But let's see if we can trigger it or just verify the header exists.
-            const res = await request(app).get('/api/product');
-            expect(res.headers).toHaveProperty('x-ratelimit-limit');
+            const res = await request(app).get('/api/products');
+            expect(res.headers).toHaveProperty('ratelimit-limit');
 
             // We won't fire 100 requests here as it makes the test slow, 
             // but an SDET would typically test this in a performance/stress environment.

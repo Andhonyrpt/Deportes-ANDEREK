@@ -146,11 +146,14 @@ describe('SDET Advanced Logic & Business Integrity Tests', () => {
                 .set('Authorization', `Bearer ${adminToken}`)
                 .send({ totalPrice: 1 });
 
+            console.log(`Update Order Hack Attempt: Status=${hackRes.status}, Body=${JSON.stringify(hackRes.body)}`);
+
             // If price changed, it's a security/logic bug
             const checkRes = await request(app)
                 .get(`/api/orders/${orderId}`)
                 .set('Authorization', `Bearer ${customerToken}`);
 
+            console.log(`Final Order Data for Price Integrity: ${JSON.stringify(checkRes.body)}`);
             expect(checkRes.body.totalPrice).toBe(50);
         });
     });

@@ -4,7 +4,8 @@ const cartSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        unique: true
     },
     products: [
         {
@@ -13,10 +14,10 @@ const cartSchema = new mongoose.Schema({
                 ref: 'Product',
                 required: true
             },
-            size: { 
-                type: String, 
-                enum: ['S', 'M', 'L', 'XL'], 
-                required: true 
+            size: {
+                type: String,
+                enum: ['S', 'M', 'L', 'XL'],
+                required: true
             },
             quantity: {
                 type: Number,
@@ -25,8 +26,7 @@ const cartSchema = new mongoose.Schema({
             }
         }
     ],
-
-});
+}, { timestamps: true });
 
 
 const Cart = mongoose.model('Cart', cartSchema);

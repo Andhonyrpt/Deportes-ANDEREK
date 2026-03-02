@@ -21,8 +21,9 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         max: 500
     }
+}, { timestamps: true });
 
-});
+reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
 
 const Review = mongoose.model('Review', reviewSchema);

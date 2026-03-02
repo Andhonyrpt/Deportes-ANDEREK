@@ -31,7 +31,7 @@ describe('Auth Middleware Unit Tests', () => {
         req.headers = { authorization: 'Bearer invalid_token' };
 
         // Mock jwt.verify to call callback with error
-        jwt.verify.mockImplementation((token, secret, callback) => {
+        jwt.verify.mockImplementation((token, secret, options, callback) => {
             callback(new Error('Invalid token'), null);
         });
 
@@ -47,7 +47,7 @@ describe('Auth Middleware Unit Tests', () => {
         req.headers = { authorization: 'Bearer valid_token' };
         const decoded = { userId: '123', email: 'test@test.com', role: 'customer' };
 
-        jwt.verify.mockImplementation((token, secret, callback) => {
+        jwt.verify.mockImplementation((token, secret, options, callback) => {
             callback(null, decoded);
         });
 
@@ -63,7 +63,7 @@ describe('Auth Middleware Unit Tests', () => {
         req.headers = { authorization: 'Bearer admin_token' };
         const decoded = { userId: '456', email: 'admin@test.com', role: 'admin' };
 
-        jwt.verify.mockImplementation((token, secret, callback) => {
+        jwt.verify.mockImplementation((token, secret, options, callback) => {
             callback(null, decoded);
         });
 

@@ -151,24 +151,39 @@ async function createOrder(req, res, next) {
     );
     const totalPrice = subtotal + shippingCost;
 
+    let newOrder;
+    try {
+      newOrder = await Order.create({
+        user,
+        products: normalizedProducts,
+        shippingAddress,
+        paymentMethod,
+        shippingCost,
+        totalPrice,
+        status: 'pending',
+        paymentStatus: 'pending'
+      });
 
-    const newOrder = await Order.create({
-      user,
-      products: normalizedProducts,
-      shippingAddress,
-      paymentMethod,
-      shippingCost,
-      totalPrice,
-      status: 'pending',
-      paymentStatus: 'pending'
-    });
+      await newOrder.populate('user');
+      await newOrder.populate('products.productId');
+      await newOrder.populate('shippingAddress');
+      await newOrder.populate('paymentMethod');
 
-    await newOrder.populate('user');
-    await newOrder.populate('products.productId');
-    await newOrder.populate('shippingAddress');
-    await newOrder.populate('paymentMethod');
-
-    res.status(201).json(newOrder);
+      res.status(201).json(newOrder);
+    } catch (createErr) {
+      // ROLLBACK: Si falla la creación de la orden o la población, restaurar stock
+      console.error("Order creation failed, rolling back stock:", createErr.message);
+      await Promise.all(
+        stockChecks.map(async (check, index) => {
+          const item = products[index];
+          return Product.findOneAndUpdate(
+            { _id: check.productId, "variants.size": item.size },
+            { $inc: { "variants.$.stock": item.quantity } }
+          );
+        })
+      );
+      throw createErr; // Relanzar para que el catch externo lo maneje
+    }
   }
   catch (err) {
     next(err);
@@ -298,6 +313,19 @@ async function updateOrderStatus(req, res, next) {
   try {
     const { id } = req.params;
     const { status } = req.body;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Guard: Máquina de estados. No permitir cambios desde estados terminales
+    if (order.status === 'delivered' || order.status === 'cancelled') {
+      return res.status(400).json({
+        message: `Cannot change status of an order that is already ${order.status}`
+      });
+    }
 
     const updatedOrder = await Order.findByIdAndUpdate(id, { status }, { new: true })
       .populate("user")

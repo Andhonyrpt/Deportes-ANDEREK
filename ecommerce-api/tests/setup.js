@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { afterAll, beforeAll } from 'vitest';
 
-dotenv.config({ path: '.env.test' });
+dotenv.config({ path: '.env.test', override: true });
 
 beforeAll(async () => {
     // Ensuring we are connected to the test database

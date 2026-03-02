@@ -15,13 +15,6 @@ const createReview = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Verificar que el usuario no haya review este producto antes
-        const existingReview = await Review.findOne({ user, product });
-
-        if (existingReview) {
-            return res.status(400).json({ message: 'You have already reviewed this product' });
-        }
-
         const newReview = new Review({
             user,
             product,
@@ -39,6 +32,9 @@ const createReview = async (req, res, next) => {
             review: newReview
         });
     } catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({ message: 'You have already reviewed this product' });
+        }
         next(err);
     }
 };
@@ -129,7 +125,7 @@ const deleteReview = async (req, res, next) => {
         const userId = req.user.userId;
 
         const review = await Review.findById(reviewId);
-        
+
         if (!review) {
             return res.status(404).json({ message: 'Review not found' });
         }

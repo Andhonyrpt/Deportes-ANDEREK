@@ -1,5 +1,6 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 
 // Obtener perfil del usuario autenticado
 const getUserProfile = async (req, res, next) => {
@@ -279,14 +280,24 @@ const toggleUserStatus = async (req, res, next) => {
 
 // Eliminar cuenta (soft delete)
 async function deleteUser(req, res, next) {
-
     try {
-
         const { userId } = req.params;
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verificar si el usuario tiene órdenes activas
+        const activeOrders = await mongoose.model('Order').findOne({
+            user: userId,
+            status: { $in: ['pending', 'processing', 'shipped'] }
+        });
+
+        if (activeOrders) {
+            return res.status(400).json({
+                message: 'Cannot delete user with active orders. Please cancel or complete orders first.'
+            });
         }
 
         // Soft delete - solo desactivar

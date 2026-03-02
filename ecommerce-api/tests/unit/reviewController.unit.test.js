@@ -32,7 +32,6 @@ describe('reviewController Unit Tests', () => {
             await createReview(req, res, next);
 
             expect(Product.findById).toHaveBeenCalledWith('prod123');
-            expect(Review.findOne).toHaveBeenCalledWith({ user: 'user123', product: 'prod123' });
             expect(saveMock).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -54,14 +53,17 @@ describe('reviewController Unit Tests', () => {
             expect(res.json).toHaveBeenCalledWith({ message: 'Product not found' });
         });
 
-        it('should return 400 if user has already reviewed the product', async () => {
+        it('should return 400 if user has already reviewed the product (Unique Index Violation)', async () => {
             const { req, res, next } = createMockReqRes({
                 body: { product: 'prod123', rating: 5 },
                 user: { userId: 'user123' }
             });
 
             Product.findById.mockResolvedValue({ _id: 'prod123' });
-            Review.findOne.mockResolvedValue({ _id: 'existing_review' });
+
+            const error = new Error('Duplicate Key');
+            error.code = 11000;
+            Review.prototype.save = vi.fn().mockRejectedValue(error);
 
             await createReview(req, res, next);
 

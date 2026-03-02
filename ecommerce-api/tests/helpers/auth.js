@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
  *   e.g. getAuthToken('customer', '2') → email: customer2@test.com, role: customer
  */
 export async function getAuthToken(role = 'customer', emailSuffix = '') {
+    console.log('DEBUG: getAuthToken secret:', process.env.JWT_SECRET);
     const email = `${role}${emailSuffix}@test.com`;
     let user = await User.findOne({ email });
 
@@ -34,7 +35,7 @@ export async function getAuthToken(role = 'customer', emailSuffix = '') {
     }
 
     return jwt.sign(
-        { userId: user._id, displayName: user.displayName, role: user.role },
+        { userId: user._id.toString(), displayName: user.displayName, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
     );

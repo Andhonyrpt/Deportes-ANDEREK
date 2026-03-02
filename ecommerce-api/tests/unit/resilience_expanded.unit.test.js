@@ -86,10 +86,9 @@ describe('Expanded Controller Resilience Unit Tests', () => {
         it('should call next(err) when Review.save fails', async () => {
             const error = new Error('Review Save Failure');
             vi.spyOn(Product, 'findById').mockResolvedValue({ _id: 'prod123' });
-            vi.spyOn(Review, 'findOne').mockResolvedValue(null);
 
             // Mocking the prototype save
-            const saveSpy = vi.spyOn(Review.prototype, 'save').mockRejectedValue(error);
+            vi.spyOn(Review.prototype, 'save').mockRejectedValue(error);
 
             const { req, res, next } = createMockReqRes({
                 user: { userId: 'user123' },
@@ -108,7 +107,7 @@ describe('Expanded Controller Resilience Unit Tests', () => {
 
             const { req, res, next } = createMockReqRes({
                 user: { userId: 'user123' },
-                body: { isDefault: true, name: 'Home' }
+                body: { isDefault: true, name: 'Home', address: '123 St', city: 'City', state: 'ST', postalCode: '12345', phone: '1234567890' }
             });
 
             await shippingAddressController.createShippingAddress(req, res, next);

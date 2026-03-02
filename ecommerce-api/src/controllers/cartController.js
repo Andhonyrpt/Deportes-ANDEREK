@@ -120,38 +120,45 @@ async function deleteCart(req, res, next) {
 async function addProductToCart(req, res, next) {
   try {
     const { productId, quantity = 1, size } = req.body;
-    const userId = req.user.userId; // Seguridad: Usar ID del token, no del body
+    const userId = req.user.userId;
 
-    // Buscar el carrito del usuario
-    let cart = await Cart.findOne({ user: userId });
-
-    if (!cart) {
-      // Si no existe carrito, crear uno nuevo
-      cart = new Cart({
+    // 1. Intentar actualizar la cantidad si el producto y talla ya existen en el carrito
+    let cart = await Cart.findOneAndUpdate(
+      {
         user: userId,
-        products: [{ product: productId, quantity, size }]
-      });
-    } else {
-      // Si existe carrito, verificar si el producto ya está
-      const existingProductIndex = cart.products.findIndex(
-        (item) => item.product.toString() === productId && item.size === size
-      );
+        "products.product": productId,
+        "products.size": size
+      },
+      { $inc: { "products.$.quantity": quantity } },
+      { new: true }
+    );
 
-      if (existingProductIndex >= 0) {
-        // Si el producto ya existe, actualizar cantidad
-        cart.products[existingProductIndex].quantity += quantity;
-      } else {
-        // Si el producto no existe, agregarlo
-        cart.products.push({ product: productId, quantity, size });
-      }
+    // 2. Si no se encontró el producto/talla, agregarlo al array (o crear el carrito si no existe)
+    if (!cart) {
+      cart = await Cart.findOneAndUpdate(
+        { user: userId },
+        {
+          $push: {
+            products: { product: productId, quantity, size }
+          }
+        },
+        {
+          new: true,
+          upsert: true,
+          setDefaultsOnInsert: true
+        }
+      );
     }
 
-    await cart.save();
     await cart.populate('user');
     await cart.populate('products.product');
 
     res.status(200).json({ message: "Product added to cart successfully", cart });
   } catch (err) {
+    if (err.code === 11000) {
+      // Si hubo una colisión en el upsert del carrito, reintentar una vez
+      return addProductToCart(req, res, next);
+    }
     next(err);
   }
 };

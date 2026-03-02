@@ -15,72 +15,48 @@ describe('cartController Unit Tests', () => {
         it('should create a new cart if the user does not have one', async () => {
             const { req, res, next } = createMockReqRes({
                 user: { userId: 'user123', role: 'customer' },
-                body: { userId: 'user123', productId: 'prod123', quantity: 2, size: 'M' }
+                body: { productId: 'prod123', quantity: 2, size: 'M' }
             });
 
-            // Mock: No existe carrito
-            Cart.findOne.mockResolvedValue(null);
-
-            // Mock Cart constructor instance methods using prototype
-            const saveMock = vi.fn().mockResolvedValue(true);
-            const populateMock = vi.fn().mockResolvedValue(true);
-
-            Cart.prototype.save = saveMock;
-            Cart.prototype.populate = populateMock;
+            // Mock: Primera llamada (intentar update existente) devuelve null
+            Cart.findOneAndUpdate.mockResolvedValueOnce(null);
+            // Mock: Segunda llamada (upsert) devuelve el nuevo carrito
+            const mockCart = {
+                user: 'user123',
+                products: [{ product: 'prod123', quantity: 2, size: 'M' }],
+                populate: vi.fn().mockReturnThis()
+            };
+            Cart.findOneAndUpdate.mockResolvedValueOnce(mockCart);
 
             await addProductToCart(req, res, next);
 
-            expect(Cart.findOne).toHaveBeenCalledWith({ user: 'user123' });
-            expect(saveMock).toHaveBeenCalled();
+            expect(Cart.findOneAndUpdate).toHaveBeenCalledTimes(2);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
                 message: "Product added to cart successfully"
             }));
         });
 
-        it('should add a new product to an existing cart (same product diff size)', async () => {
-            const { req, res, next } = createMockReqRes({
-                user: { userId: 'user123', role: 'customer' },
-                body: { userId: 'user123', productId: 'prod123', quantity: 1, size: 'L' }
-            });
-
-            const mockCart = {
-                user: 'user123',
-                products: [{ product: 'prod123', quantity: 2, size: 'M' }],
-                save: vi.fn(),
-                populate: vi.fn()
-            };
-            Cart.findOne.mockResolvedValue(mockCart);
-
-            await addProductToCart(req, res, next);
-
-            expect(mockCart.products).toHaveLength(2); // Se agregó una nueva talla
-            expect(mockCart.products[1].size).toBe('L');
-            expect(mockCart.save).toHaveBeenCalled();
-        });
-
         it('should increment quantity if the exact product and size already exists', async () => {
             const { req, res, next } = createMockReqRes({
                 user: { userId: 'user123', role: 'customer' },
-                body: { userId: 'user123', productId: 'prod123', quantity: 3, size: 'M' }
+                body: { productId: 'prod123', quantity: 3, size: 'M' }
             });
-
-            // Simulamos toString() del ObjectId
-            const mockProductId = { toString: () => 'prod123' };
 
             const mockCart = {
                 user: 'user123',
-                products: [{ product: mockProductId, quantity: 2, size: 'M' }],
-                save: vi.fn(),
-                populate: vi.fn()
+                products: [{ product: 'prod123', quantity: 5, size: 'M' }],
+                populate: vi.fn().mockReturnThis()
             };
-            Cart.findOne.mockResolvedValue(mockCart);
+            // Primera llamada tiene éxito ($inc)
+            Cart.findOneAndUpdate.mockResolvedValueOnce(mockCart);
 
             await addProductToCart(req, res, next);
 
-            expect(mockCart.products).toHaveLength(1);
-            expect(mockCart.products[0].quantity).toBe(5); // 2 + 3
-            expect(mockCart.save).toHaveBeenCalled();
+            expect(Cart.findOneAndUpdate).toHaveBeenCalledTimes(1);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+                cart: expect.objectContaining({ user: 'user123' })
+            }));
         });
     });
 

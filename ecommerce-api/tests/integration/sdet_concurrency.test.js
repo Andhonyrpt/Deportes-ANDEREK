@@ -15,6 +15,13 @@ describe('SDET Advanced Concurrency Tests', () => {
     let productId;
 
     beforeAll(async () => {
+        await Promise.all([
+            User.init(),
+            Product.init(),
+            Cart.init(),
+            Review.init(),
+            ShippingAddress.init()
+        ]);
         console.log('Supertest App Object:', app);
         // Setup a customer
         const customer = await User.create({
@@ -25,7 +32,12 @@ describe('SDET Advanced Concurrency Tests', () => {
             role: 'customer'
         });
         customerId = customer._id.toString();
-        customerToken = await getAuthToken('customer', customerId);
+        const jwt = (await import('jsonwebtoken')).default;
+        customerToken = jwt.sign(
+            { userId: customerId, displayName: customer.displayName, role: customer.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
         // Setup a product
         const product = await Product.create({
@@ -70,11 +82,10 @@ describe('SDET Advanced Concurrency Tests', () => {
             const successes = results.filter(r => r.status === 201);
             const failures = results.filter(r => r.status !== 201);
 
-            if (successes.length === 0 && failures.length > 0) {
-                console.log('First failure body:', JSON.stringify(failures[0].body));
-            }
-
             console.log(`Review Concurrency Results: Successes=${successes.length}, Failures=${failures.length}`);
+            if (failures.length > 0) {
+                console.log('First Review Failure:', failures[0].status, JSON.stringify(failures[0].body));
+            }
 
             // If the code is buggy (which we suspect), successes might be > 1
             // But as an SDET, we want to prove it and then suggest a fix.
@@ -98,10 +109,15 @@ describe('SDET Advanced Concurrency Tests', () => {
                 phone: '1122334455',
                 role: 'customer'
             });
-            const newUserToken = await getAuthToken('customer', newUser._id.toString());
+            const jwt = (await import('jsonwebtoken')).default;
+            const newUserToken = jwt.sign(
+                { userId: newUser._id.toString(), displayName: newUser.displayName, role: newUser.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
 
             // FIRE 8 concurrent requests to add product
-            await Promise.all(
+            const results = await Promise.all(
                 Array.from({ length: 8 }).map(() =>
                     request(app)
                         .post('/api/cart/add')
@@ -113,6 +129,8 @@ describe('SDET Advanced Concurrency Tests', () => {
                         })
                 )
             );
+
+            const successes = results.filter(r => r.status === 200 || r.status === 201);
 
             const cartCount = await Cart.countDocuments({ user: newUser._id });
             console.log(`Cart Concurrency Results: Total Carts=${cartCount}`);
@@ -150,6 +168,10 @@ describe('SDET Advanced Concurrency Tests', () => {
 
             const defaultAddresses = await ShippingAddress.find({ user: customerId, isDefault: true });
             console.log(`Address Concurrency Results: Default Addresses=${defaultAddresses.length}`);
+            if (defaultAddresses.length === 0) {
+                const allAddrs = await ShippingAddress.find({ user: customerId });
+                console.log('DEBUG: Total addresses found for user:', allAddrs.length);
+            }
 
             // Should have exactly 1 default address
             expect(defaultAddresses.length).toBe(1);

@@ -1,6 +1,8 @@
 import rateLimit from "express-rate-limit";
 
-const skipTest = () => process.env.NODE_ENV === 'test';
+const skipTest = (req) => {
+    return process.env.NODE_ENV === 'test' && !process.env.TEST_LIMITER;
+};
 
 // Rate limiter para autenticación (login/register)
 export const authLimiter = rateLimit({

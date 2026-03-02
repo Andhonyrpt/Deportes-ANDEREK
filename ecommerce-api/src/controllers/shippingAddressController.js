@@ -6,14 +6,6 @@ const createShippingAddress = async (req, res, next) => {
         const { name, address, city, state, postalCode, country, phone, isDefault, addressType } = req.body;
         const user = req.user.userId; // Asumiendo que tienes middleware de autenticación
 
-        // Si esta dirección se marca como default, desmarcar las demás
-        if (isDefault) {
-            await ShippingAddress.updateMany(
-                { user },
-                { isDefault: false }
-            );
-        }
-
         const newAddress = new ShippingAddress({
             user,
             name,
@@ -28,6 +20,14 @@ const createShippingAddress = async (req, res, next) => {
         });
 
         await newAddress.save();
+
+        // Si esta dirección se marca como default, asegurar que sea la ÚNICA de forma atómica
+        if (newAddress.isDefault) {
+            await ShippingAddress.updateMany(
+                { user },
+                [{ $set: { isDefault: { $eq: ["$_id", newAddress._id] } } }]
+            );
+        }
 
         res.status(201).json({
             message: 'Shipping address created successfully',
@@ -123,14 +123,6 @@ const updateShippingAddress = async (req, res, next) => {
             return res.status(404).json({ message: 'Address not found' });
         }
 
-        // Si esta dirección se marca como default, desmarcar las demás
-        if (isDefault && !shippingAddress.isDefault) {
-            await ShippingAddress.updateMany(
-                { user: userId, _id: { $ne: addressId } },
-                { isDefault: false }
-            );
-        }
-
         // Actualizar campos solo si están presentes
         if (name !== undefined) shippingAddress.name = name;
         if (address !== undefined) shippingAddress.address = address;
@@ -143,6 +135,14 @@ const updateShippingAddress = async (req, res, next) => {
         if (addressType !== undefined) shippingAddress.addressType = addressType;
 
         await shippingAddress.save();
+
+        // Si se marcó como default, asegurar atomicidad
+        if (shippingAddress.isDefault) {
+            await ShippingAddress.updateMany(
+                { user: userId },
+                [{ $set: { isDefault: { $eq: ["$_id", shippingAddress._id] } } }]
+            );
+        }
 
         res.status(200).json({
             message: 'Address updated successfully',
@@ -165,15 +165,14 @@ const setDefaultAddress = async (req, res, next) => {
             return res.status(404).json({ message: 'Address not found' });
         }
 
-        // Desmarcar todas las direcciones como default
+        // Asegurar que esta sea la ÚNICA dirección default de forma atómica
         await ShippingAddress.updateMany(
             { user: userId },
-            { isDefault: false }
+            [{ $set: { isDefault: { $eq: ["$_id", address._id] } } }]
         );
 
-        // Marcar la dirección actual como default
+        // Actualizar el objeto local para la respuesta
         address.isDefault = true;
-        await address.save();
 
         res.status(200).json({
             message: 'Default address updated successfully',

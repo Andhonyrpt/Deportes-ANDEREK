@@ -1,5 +1,9 @@
-import cors from 'cors';
 import dotenv from "dotenv";
+if (process.env.NODE_ENV !== 'test') {
+    dotenv.config();
+}
+
+import cors from 'cors';
 import express from "express";
 import mongoose from 'mongoose';
 import dbConnection from './src/config/database.js';
@@ -15,7 +19,9 @@ dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependencia c
 setupGlobalErrorHandlers();
 
 export const app = express();
-dbConnection();
+if (process.env.NODE_ENV !== 'test') {
+    dbConnection();
+}
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN?.split(','),

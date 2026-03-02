@@ -50,6 +50,7 @@ describe('Mass Resilience Unit Tests (DB Failure Simulations)', () => {
                     // Mock findById or findOne or whatever comes first
                     vi.spyOn(ctrl.model, 'findById').mockRejectedValue(error);
                     vi.spyOn(ctrl.model, 'findOne').mockRejectedValue(error);
+                    vi.spyOn(ctrl.model, 'findOneAndUpdate').mockRejectedValue(error);
                     vi.spyOn(ctrl.model, 'findByIdAndUpdate').mockRejectedValue(error);
                     vi.spyOn(ctrl.model, 'findByIdAndDelete').mockRejectedValue(error);
 
