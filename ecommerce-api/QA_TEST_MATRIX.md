@@ -37,10 +37,21 @@ Estos tests verifican la robustez de la API contra ataques comunes y errores de 
 | **Escalamiento de Roles** | `userController` | Integración | ✅ Fixed |
 | **IDOR en Notificaciones** | `notificationController`| Integración | ✅ Fixed |
 | **Category Circular Ref** | `categoryController`| Integración | ✅ Fixed |
+| **Race: Multi-Review** | `reviewController` | Integración | ❌ VULNERABLE |
+| **Race: Multi-Cart** | `cartController` | Integración | ❌ VULNERABLE |
+| **Race: Multi-Default Addr**| `shippingAddressController`| Integración | ❌ VULNERABLE |
+| **Race: Lost Cart Update** | `cartController` | Integración | ❌ VULNERABLE |
+| **Resilience: Order Rollback**| `orderController` | Integración | ❌ VULNERABLE |
+| **Resilience: RateLimit Skip**| `rateLimiter` | Integración | ❌ MIS-CONFIG |
+| **Logic: State Machine** | `orderController` | Integración | ❌ VULNERABLE |
+| **Security: JWT Resilience** | `authMiddleware` | Integración | ✅ PASS |
+| **Security: Regex Injection** | `productController` | Integración | ✅ PASS |
 
 ---
 
 ## 2. LISTADO DETALLADO POR COMPONENTE
+
+**Total de Escenarios Verificados: 301**
 
 ### 2.1 AUTENTICACIÓN (`authController`)
 - **Existentes (14)**: Registro exitoso, duplicados, validaciones de formato, login, tokens expirados, algorithm confusion (none), refresh tokens.
