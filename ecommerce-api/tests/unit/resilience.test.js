@@ -10,9 +10,9 @@ describe('Cart Controller Resilience Unit Tests', () => {
         vi.restoreAllMocks();
     });
 
-    it('should call next(err) when Cart.findOne fails (DB failure simulation)', async () => {
+    it('should call next(err) when Cart.findOneAndUpdate fails (DB failure simulation)', async () => {
         const error = new Error('Database connection lost');
-        const findOneSpy = vi.spyOn(Cart, 'findOne').mockRejectedValue(error);
+        vi.spyOn(Cart, 'findOneAndUpdate').mockRejectedValue(error);
 
         const { req, res, next } = createMockReqRes({
             user: { userId: '507f1f72bcf86cd799439011', role: 'customer' },
@@ -25,12 +25,12 @@ describe('Cart Controller Resilience Unit Tests', () => {
         expect(res.status).not.toHaveBeenCalled();
     });
 
-    it('should call next(err) when the Cart instance save fails', async () => {
-        const error = new Error('Schema validation failed during creation');
-        vi.spyOn(Cart, 'findOne').mockResolvedValue(null);
-
-        // Spy on the prototype of Cart to catch the .save() call inside the controller
-        const saveSpy = vi.spyOn(Cart.prototype, 'save').mockRejectedValue(error);
+    it('should call next(err) when Cart.populate fails', async () => {
+        const error = new Error('Populate Failure');
+        const mockCart = {
+            populate: vi.fn().mockRejectedValue(error)
+        };
+        vi.spyOn(Cart, 'findOneAndUpdate').mockResolvedValue(mockCart);
 
         const { req, res, next } = createMockReqRes({
             user: { userId: '507f1f72bcf86cd799439011', role: 'customer' },
@@ -40,6 +40,5 @@ describe('Cart Controller Resilience Unit Tests', () => {
         await cartController.addProductToCart(req, res, next);
 
         expect(next).toHaveBeenCalledWith(error);
-        expect(saveSpy).toHaveBeenCalled();
     });
 });

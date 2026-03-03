@@ -87,16 +87,16 @@ describe('SDET Advanced Resilience & Fault Tolerance Tests', () => {
 
     describe('2. Rate Limiting Resilience', () => {
         it('should return 429 Too Many Requests when exceeding the limit', async () => {
-            // The apiLimiter is set to 100 requests per 15 minutes in server.js (probably, let's verify)
-            // But we can fire 101 requests very fast if the limit is lower for testing or if we just want to prove it works.
+            // We use x-test-limit-strict header to trigger max: 2 for authLimiter in tests
+            // First 2 requests pass
+            await request(app).post('/api/auth/login').set('x-test-limit-strict', 'true').send({ email: 'nonexistent@test.com', password: '123' });
+            await request(app).post('/api/auth/login').set('x-test-limit-strict', 'true').send({ email: 'nonexistent@test.com', password: '123' });
 
-            // Note: In a real test we might want to lower the limit for testing.
-            // But let's see if we can trigger it or just verify the header exists.
-            const res = await request(app).get('/api/products');
-            expect(res.headers).toHaveProperty('ratelimit-limit');
+            // 3rd request should fail with 429
+            const res = await request(app).post('/api/auth/login').set('x-test-limit-strict', 'true').send({ email: 'nonexistent@test.com', password: '123' });
 
-            // We won't fire 100 requests here as it makes the test slow, 
-            // but an SDET would typically test this in a performance/stress environment.
+            expect(res.status).toBe(429);
+            expect(res.body.message).toMatch(/Too many authentication attempts/);
         });
     });
 

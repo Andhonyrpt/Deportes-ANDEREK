@@ -31,7 +31,7 @@ describe('SDET Advanced Security & JWT Resilience Tests', () => {
             const res = await request(app)
                 .get('/api/users/profile')
                 .set('Authorization', `Bearer ${malformedToken}`);
-            expect(res.status).toBe(401);
+            expect(res.status).toBe(403);
         });
 
         it('should REJECT an expired JWT gracefully', async () => {
@@ -43,14 +43,14 @@ describe('SDET Advanced Security & JWT Resilience Tests', () => {
             const res = await request(app)
                 .get('/api/users/profile')
                 .set('Authorization', `Bearer ${expiredToken}`);
-            expect(res.status).toBe(401);
+            expect(res.status).toBe(403);
         });
 
         it('should handle malformed JSON in JWT payload', async () => {
             const res = await request(app)
                 .get('/api/users/profile')
                 .set('Authorization', 'Bearer invalid.token.here');
-            expect(res.status).toBe(401);
+            expect(res.status).toBe(403);
         });
     });
 

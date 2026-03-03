@@ -128,6 +128,9 @@ describe('SDET Advanced Logic & Business Integrity Tests', () => {
 
     describe('4. Order Amount Mutation', () => {
         it('should NOT allow manual mutation of totalPrice via updateOrder', async () => {
+            // Reset price to 50 to ensure test independence
+            await Product.findByIdAndUpdate(productId, { price: 50 });
+
             // 1. Create order
             const orderRes = await request(app)
                 .post('/api/orders')

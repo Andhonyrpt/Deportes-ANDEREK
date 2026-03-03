@@ -26,6 +26,11 @@ import { createMockReqRes } from '../helpers/createMockReqRes.js';
 describe('Mass Resilience Unit Tests (DB Failure Simulations)', () => {
     beforeEach(() => {
         vi.restoreAllMocks();
+        // Global mocks for dependencies to ensure we reach the target model calls
+        vi.spyOn(Category, 'exists').mockResolvedValue(true);
+        vi.spyOn(Category, 'findById').mockResolvedValue({ _id: '507f1f72bcf86cd799439012', parentCategory: null });
+        vi.spyOn(SubCategory, 'findById').mockResolvedValue({ _id: '507f1f72bcf86cd799439011' });
+        vi.spyOn(Product, 'findById').mockResolvedValue({ _id: '507f1f72bcf86cd799439011', price: 10, name: 'Prod' });
     });
 
     const controllers = [
@@ -44,23 +49,63 @@ describe('Mass Resilience Unit Tests (DB Failure Simulations)', () => {
 
     controllers.forEach(ctrl => {
         describe(`${ctrl.name} Controller Resilience`, () => {
-            ctrl.methods.forEach(method => {
+            const methodsToTest = ctrl.methods;
+
+            methodsToTest.forEach(method => {
                 it(`should call next(err) when DB fails in ${method}`, async () => {
                     const error = new Error(`${ctrl.name} DB Error in ${method}`);
-                    // Mock findById or findOne or whatever comes first
-                    vi.spyOn(ctrl.model, 'findById').mockRejectedValue(error);
-                    vi.spyOn(ctrl.model, 'findOne').mockRejectedValue(error);
-                    vi.spyOn(ctrl.model, 'findOneAndUpdate').mockRejectedValue(error);
-                    vi.spyOn(ctrl.model, 'findByIdAndUpdate').mockRejectedValue(error);
-                    vi.spyOn(ctrl.model, 'findByIdAndDelete').mockRejectedValue(error);
+
+                    // Mock static methods of the TARGET model to reject
+                    const statics = ['findById', 'findOne', 'findOneAndUpdate', 'findByIdAndUpdate', 'findByIdAndDelete', 'create', 'updateMany', 'deleteMany', 'find', 'updateOne', 'exists'];
+                    statics.forEach(s => {
+                        if (ctrl.model[s]) {
+                            vi.spyOn(ctrl.model, s).mockRejectedValue(error);
+                        }
+                    });
+
+                    // Mock prototype save
+                    if (ctrl.model.prototype && ctrl.model.prototype.save) {
+                        vi.spyOn(ctrl.model.prototype, 'save').mockRejectedValue(error);
+                    }
 
                     const { req, res, next } = createMockReqRes({
-                        params: { id: '507f1f72bcf86cd799439011' },
+                        params: {
+                            id: '507f1f72bcf86cd799439011',
+                            productId: '507f1f72bcf86cd799439011',
+                            addressId: '507f1f72bcf86cd799439011',
+                            userId: '507f1f72bcf86cd799439011'
+                        },
+                        body: {
+                            name: 'Updated Name',
+                            description: 'Updated Desc',
+                            price: 99.99,
+                            productId: '507f1f72bcf86cd799439011',
+                            parentCategory: '507f1f72bcf86cd799439012', // Different from id
+                            category: '507f1f72bcf86cd799439011',
+                            type: 'credit_card',
+                            cardNumber: '1234123412341234',
+                            cardHolderName: 'Tester',
+                            expiryDate: '12/25',
+                            quantity: 1,
+                            isDefault: true,
+                            displayName: 'New Name',
+                            role: 'customer',
+                            user: '507f1f72bcf86cd799439011',
+                            products: [],
+                            status: 'processing',
+                            shippingAddress: '507f1f72bcf86cd799439011',
+                            paymentMethod: '507f1f72bcf86cd799439011',
+                            rating: 5,
+                            comment: 'test'
+                        },
                         user: { userId: '507f1f72bcf86cd799439011', role: 'admin' }
                     });
 
-                    if (ctrl.service[method]) {
-                        await ctrl.service[method](req, res, next);
+                    const targetService = ctrl.service;
+                    const action = targetService[method];
+
+                    if (typeof action === 'function') {
+                        await action(req, res, next);
                         expect(next).toHaveBeenCalledWith(expect.any(Error));
                     }
                 });

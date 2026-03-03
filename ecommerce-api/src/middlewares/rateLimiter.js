@@ -1,13 +1,21 @@
 import rateLimit from "express-rate-limit";
 
 const skipTest = (req) => {
-    return process.env.NODE_ENV === 'test' && !process.env.TEST_LIMITER;
+    if (req.headers['x-test-limit-strict'] === 'true') return false;
+    if (process.env.TEST_LIMITER === 'true') return false;
+    return process.env.NODE_ENV === 'test';
 };
 
 // Rate limiter para autenticación (login/register)
 export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // Máximo 5 intentos por ventana
+    max: (req) => {
+        if (process.env.NODE_ENV === 'test') {
+            if (req.headers['x-test-limit-strict'] === 'true') return 2;
+            return 1000;
+        }
+        return 5;
+    },
     skip: skipTest,
     message: {
         message: "Too many authentication attempts, please try again after 15 minutes",

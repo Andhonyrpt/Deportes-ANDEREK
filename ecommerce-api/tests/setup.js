@@ -16,8 +16,7 @@ beforeAll(async () => {
 afterAll(async () => {
     // Final cleanup
     if (mongoose.connection.readyState !== 0) {
-        // Drop database to ensure a clean state for the next run
-        await mongoose.connection.db.dropDatabase();
+        // Disconnect safely. Individual tests handle their own cleanup in beforeEach.
         await mongoose.disconnect();
     }
 });

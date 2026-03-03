@@ -6,7 +6,16 @@ import PaymentMethod from '../../src/models/paymentMethod.js';
 import { createMockReqRes } from '../helpers/createMockReqRes.js';
 
 // Mock dependencias
-vi.mock('../../src/models/shippingAddress.js');
+vi.mock('../../src/models/shippingAddress.js', () => {
+    const mockModel = vi.fn().mockImplementation(function (data) {
+        Object.assign(this, data);
+        this.save = vi.fn().mockResolvedValue(this);
+        this._id = 'mock_id_123';
+    });
+    mockModel.updateMany = vi.fn().mockResolvedValue({ modifiedCount: 1 });
+    mockModel.findOne = vi.fn();
+    return { default: mockModel };
+});
 vi.mock('../../src/models/paymentMethod.js');
 
 describe('Shipping & Payment Unit Tests', () => {
@@ -17,7 +26,7 @@ describe('Shipping & Payment Unit Tests', () => {
     describe('ShippingAddress Controller', () => {
         it('should call updateMany to deselect previous defaults when creating a new default address', async () => {
             const { req, res, next } = createMockReqRes({
-                body: { name: 'Home', isDefault: true, address: '123 St', city: 'City', state: 'ST', postalCode: '12345', phone: '1234567890' },
+                body: { name: 'Home', isDefault: true, address: '123 Test St', city: 'Test City', state: 'TS', postalCode: '12345', phone: '1234567890' },
                 user: { userId: 'user123' }
             });
 
