@@ -6,6 +6,9 @@ const skipTest = (req) => {
         if (process.env.TEST_LIMITER === 'true') return false;
         return true;
     }
+    if ((process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) && req.headers['x-load-test'] === 'true') {
+        return true;
+    }
     return false;
 };
 

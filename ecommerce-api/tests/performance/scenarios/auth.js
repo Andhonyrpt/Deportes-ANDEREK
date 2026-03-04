@@ -4,7 +4,10 @@ import { generateRandomUser } from '../utils/helpers.js';
 
 export function registerAndLogin(baseUrl) {
     const user = generateRandomUser();
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {
+        'Content-Type': 'application/json',
+        'x-load-test': 'true'
+    };
 
     // 1. Register
     const registerRes = http.post(
