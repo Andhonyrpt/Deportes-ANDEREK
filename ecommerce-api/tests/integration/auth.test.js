@@ -36,7 +36,7 @@ describe('Auth Integration Tests', () => {
             expect(user.role).toBe('guest'); // Default role in controller
         });
 
-        it('should return 400 if user already exists', async () => {
+        it('should return 201 if user already exists to prevent enumeration', async () => {
             const userData = {
                 displayName: 'Integration Test User',
                 email: 'duplicate@example.com',
@@ -52,8 +52,10 @@ describe('Auth Integration Tests', () => {
                 .post('/api/auth/register')
                 .send(userData);
 
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message', 'User already exist');
+            expect(response.status).toBe(201);
+            expect(response.body).toHaveProperty('email', userData.email);
+            expect(response.body).toHaveProperty('displayName', userData.displayName);
+            expect(response.body).toHaveProperty('phone', userData.phone);
         });
 
         it('should return 422 for invalid email format', async () => {

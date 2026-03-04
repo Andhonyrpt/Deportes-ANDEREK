@@ -1,9 +1,12 @@
 import rateLimit from "express-rate-limit";
 
 const skipTest = (req) => {
-    if (req.headers['x-test-limit-strict'] === 'true') return false;
-    if (process.env.TEST_LIMITER === 'true') return false;
-    return process.env.NODE_ENV === 'test';
+    if (process.env.NODE_ENV === 'test') {
+        if (req.headers['x-test-limit-strict'] === 'true') return false;
+        if (process.env.TEST_LIMITER === 'true') return false;
+        return true;
+    }
+    return false;
 };
 
 // Rate limiter para autenticación (login/register)

@@ -42,10 +42,11 @@ Estos tests verifican la robustez de la API contra ataques comunes y errores de 
 | **Race: Multi-Default Addr**| `shippingAddressController`| Integración | ❌ VULNERABLE |
 | **Race: Lost Cart Update** | `cartController` | Integración | ❌ VULNERABLE |
 | **Resilience: Order Rollback**| `orderController` | Integración | ❌ VULNERABLE |
-| **Resilience: RateLimit Skip**| `rateLimiter` | Integración | ❌ MIS-CONFIG |
+| **Resilience: RateLimit Skip**| `rateLimiter` | Integración | ✅ Fixed |
 | **Logic: State Machine** | `orderController` | Integración | ❌ VULNERABLE |
 | **Security: JWT Resilience** | `authMiddleware` | Integración | ✅ PASS |
 | **Security: Regex Injection** | `productController` | Integración | ✅ PASS |
+| **Security: User Enumeration** | `authController` | Integración | ✅ Fixed |
 
 ---
 

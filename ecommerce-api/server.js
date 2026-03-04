@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 import cors from 'cors';
+import helmet from 'helmet';
 import express from "express";
 import mongoose from 'mongoose';
 import dbConnection from './src/config/database.js';
@@ -22,6 +23,8 @@ export const app = express();
 if (process.env.NODE_ENV !== 'test') {
     dbConnection();
 }
+
+app.use(helmet());
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN?.split(','),

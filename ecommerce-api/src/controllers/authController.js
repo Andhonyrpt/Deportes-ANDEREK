@@ -34,7 +34,7 @@ async function register(req, res, next) {
 
         const userExist = await checkUserExist(email);
         if (userExist) {
-            return res.status(400).json({ message: 'User already exist' });
+            return res.status(201).json({ displayName, email, phone });
         }
 
         let role = 'guest';

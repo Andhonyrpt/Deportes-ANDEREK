@@ -55,16 +55,16 @@ describe('authController Unit Tests', () => {
             });
         });
 
-        it('should return 400 if user already exists', async () => {
-            const userData = { email: 'test@example.com' };
+        it('should return 201 if user already exists to prevent enumeration', async () => {
+            const userData = { email: 'test@example.com', displayName: 'Test', phone: '123' };
             const { req, res, next } = createMockReqRes({ body: userData });
 
             User.findOne.mockResolvedValue({ email: userData.email });
 
             await register(req, res, next);
 
-            expect(res.status).toHaveBeenCalledWith(400);
-            expect(res.json).toHaveBeenCalledWith({ message: 'User already exist' });
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith({ displayName: userData.displayName, email: userData.email, phone: userData.phone });
         });
     });
 
