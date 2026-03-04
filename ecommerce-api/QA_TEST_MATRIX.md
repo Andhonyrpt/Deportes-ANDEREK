@@ -24,68 +24,41 @@
 
 ---
 
-## 1. SEGURIDAD Y HARDENING (REMEDIADO) ✅
-Estos tests verifican la robustez de la API contra ataques comunes y errores de lógica crítica.
-
-| Escenario | Controlador | Tipo | Resultado |
-| :--- | :---: | :---: | :---: |
-| **IDOR en Carrito** | `cartController` | Integración | ✅ Fixed |
-| **Race Condition (Stock)** | `orderController`| Integración | ✅ Fixed |
-| **NoSQL Injection** | `productController`| Integración | ✅ Fixed |
-| **ReDoS (Regex DoS)** | `productController`| Integración | ✅ Fixed |
-| **JWT Algorithm Confusion** | `authController` | Integración | ✅ Fixed |
-| **Escalamiento de Roles** | `userController` | Integración | ✅ Fixed |
-| **IDOR en Notificaciones** | `notificationController`| Integración | ✅ Fixed |
-| **Category Circular Ref** | `categoryController`| Integración | ✅ Fixed |
-| **Race: Multi-Review** | `reviewController` | Integración | ✅ Fixed |
-| **Race: Multi-Cart** | `cartController` | Integración | ✅ Fixed |
-| **Race: Multi-Default Addr**| `shippingAddressController`| Integración | ✅ Fixed |
-| **Race: Lost Cart Update** | `cartController` | Integración | ✅ Fixed |
-| **Resilience: Order Rollback**| `orderController` | Integración | ✅ Fixed |
-| **Resilience: RateLimit Skip**| `rateLimiter` | Integración | ✅ Fixed |
-| **Logic: State Machine** | `orderController` | Integración | ✅ Fixed |
-| **Security: JWT Resilience** | `authMiddleware` | Integración | ✅ PASS |
-| **Security: Regex Injection** | `productController` | Integración | ✅ PASS |
-| **Security: User Enumeration** | `authController` | Integración | ✅ Fixed |
-
----
-
-## 2. LISTADO DETALLADO POR COMPONENTE
+## 1. LISTADO DETALLADO POR COMPONENTE
 
 **Total de Escenarios Verificados: 301**
 
-### 2.1 AUTENTICACIÓN (`authController`)
+### 1.1 AUTENTICACIÓN (`authController`)
 - **Existentes (14)**: Registro exitoso, duplicados, validaciones de formato, login, tokens expirados, algorithm confusion (none), refresh tokens.
 
-### 2.2 PRODUCTOS (`productController`)
+### 1.2 PRODUCTOS (`productController`)
 - **Existentes (22)**: CRUD completo admin/customer, búsqueda avanzada, filtros NoSQLi, protección contra ReDoS, paginación, RBAC.
 
-### 2.3 CARRITO (`cartController`)
+### 1.3 CARRITO (`cartController`)
 - **Existentes (18)**: Gestión de items (add/update/delete), persistencia por usuario (JWT context), protección IDOR absoluta, concurrencia en adición.
 
-### 2.4 ÓRDENES (`orderController`)
+### 1.4 ÓRDENES (`orderController`)
 - **Existentes (18)**: Creación atómica (atomicity rollback), prevención de over-selling, estados de pago (refunded on cancel), RBAC de listados.
 
-### 2.5 USUARIOS (`userController`)
+### 1.5 USUARIOS (`userController`)
 - **Existentes (14)**: Perfiles, cambio de password seguro, protección de campos sensibles (role/isActive), soft-delete, búsquedas protegidas.
 
-### 2.6 NOTIFICACIONES (`notificationController`)
+### 1.6 NOTIFICACIONES (`notificationController`)
 - **Existentes (10)**: Sistema de alertas, marcado masivo, listados por usuario, protección de privacidad (IDOR), validación de existencia.
 
 *(Otras categorías como Reviews, Wishlist y Categorías cuentan con cobertura del 100% en integración y unitarios según los últimos reportes de Vitest).*
 
 ---
 
-## 3. RESUMEN EJECUTIVO DE CALIDAD
+## 2. RESUMEN EJECUTIVO DE CALIDAD
 
 | Métrica | Valor Final |
 | :--- | :--- |
 | **Tests Totales** | 212 |
 | **Tests Integración** | 126 |
 | **Tests Unitarios** | 86 |
-| **Vulnerabilidades Detectadas** | 21 |
-| **Vulnerabilidades Remediadas** | 21 |
-| **ESTADO GENERAL** | 💎 **DIAMANTE - PRODUCTION READY - 100% SECURE** |
+| **ESTADO GENERAL** | 💎 **DIAMANTE - PRODUCTION READY** |
 
 ---
 *QA Senior Automation Report - Final Audit by Antigravity AI*
+*(Para información detallada sobre vulnerabilidades mitigadas, consulte el documento hermano: SECURITY_MATRIX.md)*
