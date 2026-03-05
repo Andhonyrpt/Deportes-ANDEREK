@@ -4,8 +4,23 @@ import { check, sleep } from 'k6';
 export function addToCart(baseUrl, token) {
     if (!token) return;
 
+    let productId = '64a7b5c4f2a1b2c3d4e5f600'; // Fallback
+
+    // Fetch a real product dynamically to avoid 404s
+    const prodRes = http.get(`${baseUrl}/products?limit=10`, {
+        headers: { 'x-load-test': 'true' }
+    });
+    if (prodRes.status === 200) {
+        try {
+            const body = prodRes.json();
+            if (body.products && body.products.length > 0) {
+                productId = body.products[Math.floor(Math.random() * body.products.length)]._id;
+            }
+        } catch (e) { }
+    }
+
     const payload = JSON.stringify({
-        productId: '64a7b5c4f2a1b2c3d4e5f600', // Mock product ID, mongoose Object ID format
+        productId: productId,
         quantity: Math.floor(Math.random() * 3) + 1 // Add 1 to 3 items
     });
 

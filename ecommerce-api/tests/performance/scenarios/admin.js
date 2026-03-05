@@ -4,7 +4,21 @@ import { check, sleep } from 'k6';
 export function adminOperations(baseUrl, token) {
     if (!token) return;
 
-    const productId = '64a7b5c4f2a1b2c3d4e5f600'; // Mock product ID
+    let productId = '64a7b5c4f2a1b2c3d4e5f600'; // Fallback
+
+    // Fetch a real product dynamically to avoid 404s
+    const prodRes = http.get(`${baseUrl}/products?limit=10`, {
+        headers: { 'x-load-test': 'true' }
+    });
+    if (prodRes.status === 200) {
+        try {
+            const body = prodRes.json();
+            if (body.products && body.products.length > 0) {
+                productId = body.products[Math.floor(Math.random() * body.products.length)]._id;
+            }
+        } catch (e) { }
+    }
+
     const payload = JSON.stringify({
         price: Math.floor(Math.random() * 500) + 10,
         stock: Math.floor(Math.random() * 100),
