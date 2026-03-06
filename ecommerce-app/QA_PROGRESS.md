@@ -14,13 +14,42 @@ Este documento detalla el plan de pruebas End-to-End para el `ecommerce-app`, pe
 | Escenario                      | Casos de Prueba                                                                 | Estado        | Fecha         | Notas                                     |
 | :----------------------------- | :------------------------------------------------------------------------------ | :------------ | :------------ | :---------------------------------------- |
 | **1. Registro & Login**        | - Form visibility<br>- Validations (mismatch, short pass)<br>- Success Login/Reg | ✅ **Validado** | 2026-03-05    | Implementado con mocks de API.             |
-| **2. Carrito de Compras**      | - Add/Remove items<br>- Quantity updates<br>- Persistencia (localStorage)       | 📅 Pendiente  | -             | Requiere `data-testid` en `CartView`.     |
-| **3. Checkout (Flujo Completo)** | - Address selection<br>- Payment selection<br>- Order confirmation              | 📅 Pendiente  | -             | Escbozo inicial en `AGENTS.testing.md`. |
-| **4. Perfil de Usuario**       | - Profile view<br>- Address management<br>- Order history                       | 📅 Pendiente  | -             |                                           |
+| **2. Carrito de Compras**      | - Agregar/Quitar un producto<br>- Actualizar cantidades<br>- Persistencia (reload) | 📅 Pendiente  | -             | Requiere `data-testid` en `CartView`.     |
+| **3. Checkout (Flujo Completo)** | - Fase 1-4 (Dirección, Pago, Review, Confirm)<br>- Vaciado de carrito           | 📅 Pendiente  | -             | Requiere integración de fases 1-4.        |
+| **4. Perfil de Usuario**       | - Vista de perfil<br>- Gestión de direcciones<br>- Historial de pedidos           | 📅 Pendiente  | -             |                                           |
+| **5. Catálogo & Búsqueda**     | - Navegar categorías<br>- Búsqueda de productos<br>- Ordenamiento (precio/nombre) | 📅 Pendiente  | -             |                                           |
+| **6. Casos de Borde & UX**     | - Error de red (Simulado)<br>- Responsividad (Mobile/Desktop)<br>- Sesión expirada | 📅 Pendiente  | -             |                                           |
 
 ---
 
-## Detalle de Validación: Escenario 1 (Registro & Login)
+## Detalle de Validación: Escenario 2 (Carrito de Compras)
+
+### Casos Definidos
+- [ ] **Agregar al Carrito**: Validar que el botón de compra añade el item y abre el carrito.
+- [ ] **Modificar Cantidad**: Incrementar y decrementar items asegurando que el total se actualice.
+- [ ] **Eliminar Item**: Ver que el producto desaparece del listado y los totales bajan.
+- [ ] **Persistencia**: Recargar la página (`cy.reload`) y validar que los items se mantienen.
+
+---
+
+## Detalle de Validación: Escenario 3 (Checkout - 4 Fases)
+
+### Casos Definidos
+- [ ] **Fase 1 (Dirección)**: Seleccionar dirección existente o crear una nueva.
+- [ ] **Fase 2 (Pago)**: Seleccionar tarjeta existente o agregar una nueva.
+- [ ] **Fase 3 (Revisión)**: Verificar cálculo de Subtotal, IVA (16%), Envío y Total Final.
+- [ ] **Fase 4 (Confirmación)**: Simular pago exitoso, redirección y verificación de vaciado de carrito.
+
+---
+
+## Detalle de Validación: Escenario 4 (Perfil de Usuario)
+
+### Casos Definidos
+- [ ] **Información Personal**: Validar que se muestranDisplayName y Email.
+- [ ] **Direcciones**: Probar eliminación de direcciones guardadas.
+- [ ] **Pedidos**: Listar el historial de compras y acceder al detalle de un pedido.
+
+---
 
 ### Casos Ejecutados
 1.  **Registro**:
