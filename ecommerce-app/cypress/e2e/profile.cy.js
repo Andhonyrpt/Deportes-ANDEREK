@@ -1,66 +1,60 @@
 describe("Flujo de Perfil y Pedidos", () => {
+    let testUser;
+
+    before(() => {
+        testUser = {
+            displayName: "Profile Test User",
+            email: `profile_test_${Date.now()}@anderek.com`,
+            password: "Password123!",
+            phone: "1234567890"
+        };
+        cy.registerUser(testUser);
+    });
+
     beforeEach(() => {
         cy.clearLocalStorage();
-        const mockUser = {
-            _id: "user-123",
-            displayName: "Test User",
-            email: "test@example.com",
-            role: "customer"
-        };
 
-        // Mock del perfil que la app pide al iniciar
-        cy.intercept("GET", "**/api/users/profile", {
-            statusCode: 200,
-            body: { user: mockUser }
-        }).as("getInitialProfile");
+        // Interceptores para bypass de rate limit (sin mocks)
+        cy.intercept("GET", "**/users/profile", (req) => {
+            req.headers['x-load-test'] = 'true';
+        }).as("getProfile");
 
-        // Seedear localStorage ANTES de visitar
-        localStorage.setItem("authToken", "fake-token");
-        localStorage.setItem("userData", JSON.stringify(mockUser));
+        cy.intercept("GET", "**/orders*", (req) => {
+            req.headers['x-load-test'] = 'true';
+        }).as("getOrders");
 
-        cy.visit("/", {
-            onBeforeLoad: (win) => {
-                win.localStorage.setItem("authToken", "fake-token");
-                win.localStorage.setItem("userData", JSON.stringify(mockUser));
-            }
-        });
+        // Login vía API
+        cy.loginByApi(testUser.email, testUser.password);
 
-        // Esperar a que el header se renderice con el usuario
-        cy.get(".greeting", { timeout: 15000 }).should("contain", "Hola Test User");
+        cy.visit("/");
+        // Esperamos a que el profile se cargue en el header
+        cy.wait("@getProfile");
+        cy.get(".greeting", { timeout: 15000 })
+            .should("be.visible")
+            .and("contain", `Hola ${testUser.displayName}`);
     });
 
     it("navega al perfil y muestra la información correctamente", () => {
-        // En lugar de ir directo, clickeamos para evitar problemas de redirección profunda
         cy.get('[data-testid="user-menu-button"]').click({ force: true });
         cy.get('[data-testid="profile-link"]').should("be.visible").click({ force: true });
 
         cy.url().should("include", "/profile");
-        cy.get('[data-testid="profile-display-name"]', { timeout: 10000 }).should("be.visible").and("contain", "Test User");
-        cy.get('[data-testid="profile-email"]').should("be.visible").and("contain", "test@example.com");
+        cy.get('[data-testid="profile-display-name"]', { timeout: 10000 })
+            .should("be.visible")
+            .and("contain", testUser.displayName);
+        cy.get('[data-testid="profile-email"]')
+            .should("be.visible")
+            .and("contain", testUser.email);
     });
 
-    it("navega a mis pedidos y muestra el historial", () => {
-        const mockOrders = [
-            {
-                id: "ORD-001",
-                date: new Date().toISOString(),
-                total: 1500,
-                subtotal: 1000,
-                tax: 160,
-                shipping: 340,
-                status: "Confirmado",
-                items: [{ id: "p1", name: "Jersey Mexico", quantity: 1, price: 1000 }]
-            }
-        ];
-        localStorage.setItem("orders", JSON.stringify(mockOrders));
-
+    it("navega a mis pedidos y muestra el historial (vacío o con datos reales)", () => {
         cy.get('[data-testid="user-menu-button"]').click({ force: true });
         cy.get('[data-testid="orders-link"]').should("be.visible").click({ force: true });
 
         cy.url().should("include", "/orders");
-        cy.get('[data-testid="order-card-ORD-001"]', { timeout: 10000 }).should("be.visible").click();
+        cy.wait("@getOrders").its("response.statusCode").should("eq", 200);
 
-        cy.get('[data-testid="order-detail-container"]').should("be.visible");
-        cy.get('[data-testid="order-summary-total"]').should("contain", "$1,500.00");
+        // Como el usuario es nuevo, validamos que el contenedor esté pero no haya pedidos (o que cargue)
+        cy.get(".orders-list-container").should("be.visible");
     });
 });

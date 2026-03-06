@@ -28,7 +28,8 @@ app.use(helmet());
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN?.split(','),
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-load-test']
 }));
 
 // Middlewares en el orden correcto

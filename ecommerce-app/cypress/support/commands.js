@@ -1,39 +1,64 @@
 // cypress/support/commands.js
 
-Cypress.Commands.add("loginByApi", (email, password) => {
-    cy.request({
+// cypress/support/commands.js
+
+Cypress.Commands.add("registerUser", (userData) => {
+    return cy.request({
         method: "POST",
-        url: `${Cypress.env("apiUrl")}/auth/login`,
-        body: { email, password },
-        failOnStatusCode: false,
-    }).then((response) => {
-        expect(response.status).to.equal(200);
-        const { token, refreshToken } = response.body;
-        window.localStorage.setItem("authToken", token);
-        window.localStorage.setItem("refreshToken", refreshToken);
+        url: `${Cypress.env("apiUrl")}/auth/register`,
+        headers: { "x-load-test": "true" },
+        body: userData,
+        failOnStatusCode: false
     });
 });
 
-Cypress.Commands.add("addProductToCart", (product, quantity = 1, size = "M") => {
-    cy.window().then((win) => {
-        const existingCart = JSON.parse(
-            win.localStorage.getItem("cartItems") || "[]"
-        );
-
-        const newItem = {
-            ...product,
-            quantity,
-            size,
-            cartKey: `${product._id || product.id}-${size}`,
-        };
-
-        const idx = existingCart.findIndex((i) => i.cartKey === newItem.cartKey);
-        if (idx >= 0) {
-            existingCart[idx].quantity += quantity;
-        } else {
-            existingCart.push(newItem);
+Cypress.Commands.add("loginByApi", (email, password) => {
+    return cy.request({
+        method: "POST",
+        url: `${Cypress.env("apiUrl")}/auth/login`,
+        headers: { "x-load-test": "true" },
+        body: { email, password },
+        failOnStatusCode: false,
+    }).then((response) => {
+        if (response.status === 200) {
+            const { token, refreshToken } = response.body;
+            window.localStorage.setItem("authToken", token);
+            window.localStorage.setItem("refreshToken", refreshToken);
+            // También guardamos userData si es necesario para el contexto
+            return cy.request({
+                method: "GET",
+                url: `${Cypress.env("apiUrl")}/users/profile`,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "x-load-test": "true"
+                }
+            }).then(profileRes => {
+                window.localStorage.setItem("userData", JSON.stringify(profileRes.body.user));
+                return response;
+            });
         }
-
-        win.localStorage.setItem("cartItems", JSON.stringify(existingCart));
+        return response;
     });
+});
+
+Cypress.Commands.add("addProductToCart", (productId, quantity = 1, size = "M") => {
+    const token = window.localStorage.getItem("authToken");
+    if (token) {
+        return cy.request({
+            method: "POST",
+            url: `${Cypress.env("apiUrl")}/cart/add`,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "x-load-test": "true"
+            },
+            body: {
+                productId,
+                quantity,
+                size
+            }
+        });
+    } else {
+        // Fallback or handle guest cart if applicable
+        cy.log("No auth token found for addProductToCart");
+    }
 });

@@ -4,6 +4,16 @@ describe("Flujo de Registro", () => {
     beforeEach(() => {
         // Limpiar localStorage antes de cada prueba para asegurar independencia
         cy.clearLocalStorage();
+
+        // Interceptores para debug y bypass de rate limit
+        cy.intercept("GET", "**/auth/check-email*", (req) => {
+            req.headers['x-load-test'] = 'true';
+        }).as("checkEmail");
+
+        cy.intercept("POST", "**/auth/register", (req) => {
+            req.headers['x-load-test'] = 'true';
+        }).as("registerRequest");
+
         cy.visit("/register");
     });
 
@@ -31,32 +41,25 @@ describe("Flujo de Registro", () => {
     });
 
     it("registra un usuario nuevo y redirige a /login", () => {
-        cy.intercept("GET", "**/auth/check-email*", {
-            statusCode: 200,
-            body: { taken: false }, // Corregido segun services/auth.js: returns response.data
-        }).as("checkEmail");
+        const uniqueEmail = `test_${Date.now()}@anderek.com`;
 
-        cy.intercept("POST", "**/auth/register", {
-            statusCode: 201,
-            body: {
-                displayName: users.newUser.displayName,
-                email: users.newUser.email,
-            },
-        }).as("registerUser");
+        cy.get('[data-testid="input-displayName"]').type("Dynamic User");
+        cy.get('[data-testid="input-email"]').type(uniqueEmail);
 
-        cy.get('[data-testid="input-displayName"]').type(users.newUser.displayName);
-        cy.get('[data-testid="input-email"]').type(users.newUser.email);
-
+        // Sin mocks, la validación de email se hace contra la API real
         cy.get('[data-testid="input-email"]').blur();
-        cy.wait("@checkEmail");
+        cy.wait("@checkEmail").its("response.statusCode").should("eq", 200);
 
-        cy.get('[data-testid="input-password"]').type(users.newUser.password);
-        cy.get('[data-testid="input-verifyPassword"]').type(users.newUser.password);
-        cy.get('[data-testid="input-phone"]').type(users.newUser.phone);
+        cy.get('[data-testid="input-password"]').type("Password123!");
+        cy.get('[data-testid="input-verifyPassword"]').type("Password123!");
+        cy.get('[data-testid="input-phone"]').type("5551234567");
 
         cy.get('[data-testid="register-submit"]').click();
-        cy.wait("@registerUser");
 
-        cy.url().should("include", "/login");
+        // Validamos la respuesta exitosa
+        cy.wait("@registerRequest").its("response.statusCode").should("eq", 201);
+
+        // Validamos la redirección real tras éxito en el backend con mayor timeout por si es lento
+        cy.url().should("include", "/login", { timeout: 10000 });
     });
 });
