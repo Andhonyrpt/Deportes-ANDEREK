@@ -12,9 +12,10 @@ export default function Input({
   error,
   showError,
   autoComplete,
+  "data-testid": testId,
 }) {
   const errorId = `${id}-error`;
-  const invalid = Boolean(showError, error);
+  const invalid = Boolean(showError && error);
   const className = "";
 
   return (
@@ -24,10 +25,11 @@ export default function Input({
           {label}
         </label>
       )}
-      
+
       <input
         id={id}
-        className={`form-input ${invalid} ? "isInvalid" : "" `}
+        data-testid={testId || id}
+        className={`form-input ${invalid ? "isInvalid" : ""}`}
         name={name}
         value={value}
         type={type}

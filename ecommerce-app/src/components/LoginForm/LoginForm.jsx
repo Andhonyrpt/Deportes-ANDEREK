@@ -35,10 +35,11 @@ export default function LoginForm({ onSuccess }) {
             <div className="login-card">
                 <h2>Iniciar Sesión</h2>
 
-                <form className="login-form" onSubmit={onSubmit}>
+                <form className="login-form" onSubmit={onSubmit} data-testid="login-form">
                     <div className="form-group">
                         <Input
                             id="email"
+                            data-testid="input-email"
                             label="Email: "
                             type="email"
                             value={email}
@@ -51,6 +52,7 @@ export default function LoginForm({ onSuccess }) {
                     <div className="form-group">
                         <Input
                             id="password"
+                            data-testid="input-password"
                             label="Contraseña: "
                             type="password"
                             value={password}
@@ -60,9 +62,9 @@ export default function LoginForm({ onSuccess }) {
                         />
                     </div>
 
-                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                    {error && <ErrorMessage data-testid="error-message">{error}</ErrorMessage>}
 
-                    <Button disabled={loading} type="submit" variant="primary">
+                    <Button disabled={loading} type="submit" variant="primary" data-testid="login-submit">
                         {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                     </Button>
                 </form>

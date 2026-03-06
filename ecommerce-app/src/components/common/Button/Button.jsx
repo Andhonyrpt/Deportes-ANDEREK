@@ -8,6 +8,7 @@ export default function Button({
     variant = "primary",
     size = "base",
     className = "",
+    "data-testid": testId,
 }) {
     const buttonClasses = [
         "btn",
@@ -21,6 +22,7 @@ export default function Button({
     return (
         <button
             type={type}
+            data-testid={testId}
             className={buttonClasses}
             onClick={onClick}
             disabled={disabled}

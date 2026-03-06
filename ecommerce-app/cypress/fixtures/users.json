@@ -1,0 +1,13 @@
+{
+    "newUser": {
+        "displayName": "Cypress Test User",
+        "email": "cypress_test@anderek.com",
+        "password": "Cypress123!",
+        "phone": "5551234567"
+    },
+    "existingUser": {
+        "displayName": "Existing User",
+        "email": "usuario@anderek.com",
+        "password": "Password123!"
+    }
+}

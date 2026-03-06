@@ -172,11 +172,12 @@ export default function RegisterForm({ onSuccess }) {
             <div className="register-card">
                 <h2>Registrar usuario</h2>
 
-                <form className="register-form" onSubmit={onSubmit} >
+                <form className="register-form" onSubmit={onSubmit} data-testid="register-form" >
                     {/* Display name */}
                     <div className="form-group">
                         <Input
                             id="displayName"
+                            data-testid="input-displayName"
                             label="Display Name: "
                             type="text"
                             value={displayName}
@@ -199,6 +200,7 @@ export default function RegisterForm({ onSuccess }) {
                     <div className="form-group">
                         <Input
                             id="email"
+                            data-testid="input-email"
                             label="Email: "
                             type="email"
                             value={email}
@@ -230,6 +232,7 @@ export default function RegisterForm({ onSuccess }) {
                     <div className="form-group">
                         <Input
                             id="password"
+                            data-testid="input-password"
                             label="Contraseña: "
                             type="password"
                             value={password}
@@ -254,6 +257,7 @@ export default function RegisterForm({ onSuccess }) {
                     <div className="form-group">
                         <Input
                             id="verifyPassword"
+                            data-testid="input-verifyPassword"
                             label="Repite tu contraseña: "
                             type="password"
                             value={verifyPassword}
@@ -279,6 +283,7 @@ export default function RegisterForm({ onSuccess }) {
                     <div className="form-group">
                         <Input
                             id="phone"
+                            data-testid="input-phone"
                             label="Número de teléfono: "
                             type="tel"
                             value={phone}
@@ -300,9 +305,9 @@ export default function RegisterForm({ onSuccess }) {
                         />
                     </div>
 
-                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                    {error && <ErrorMessage data-testid="error-message">{error}</ErrorMessage>}
 
-                    <Button disabled={loading} type="submit" variant="primary">
+                    <Button disabled={loading} type="submit" variant="primary" data-testid="register-submit">
                         {loading ? "Registrando..." : "Registrar"}
                     </Button>
                 </form>
