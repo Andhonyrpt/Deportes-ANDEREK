@@ -32,9 +32,9 @@ export const validateAddress = (values) => {
 
     if (
         !values.phone?.trim() ||
-        values.phone?.trim() !== 10
+        values.phone?.trim().length !== 10
     ) errors.phone = "Escribe un número de teléfono válido de 10 dígitos";
-    
+
     // if (
     //     !values.addressType.trim() ||
     //     values.addressType.trim() !== "home" ||

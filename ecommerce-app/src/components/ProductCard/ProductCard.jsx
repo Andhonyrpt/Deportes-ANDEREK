@@ -137,6 +137,7 @@ export default function ProductCard({ product, orientation }) {
                 <Button variant="primary" size="sm"
                     disabled={!selectedVariant || selectedVariant.stock === 0}
                     onClick={handleAddToCart}
+                    data-testid="add-to-cart-button"
                 >
                     Agregar al Carrito
                 </Button>

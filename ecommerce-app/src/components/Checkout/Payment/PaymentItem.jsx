@@ -26,6 +26,7 @@ export default function PaymentItem({ paymentMethod, isSelected, onSelect, onEdi
             <div className="payment-actions">
                 <Button onClick={() => onSelect(paymentMethod)}
                     disabled={isSelected}
+                    data-testid="select-payment"
                 >
                     {isSelected ? "Seleccionada" : "Seleccionar"}
                 </Button>

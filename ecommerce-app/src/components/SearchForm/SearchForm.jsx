@@ -13,6 +13,7 @@ export default function SearchForm({ searchQuery, setSearchQuery, handleSearch }
                     placeholder="Buscar jerseys..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    data-testid="search-input"
                 />
 
                 {searchQuery && (
@@ -29,6 +30,7 @@ export default function SearchForm({ searchQuery, setSearchQuery, handleSearch }
                 type="submit"
                 className="search-btn"
                 aria-label="Buscar"
+                data-testid="search-submit"
             >
                 <Icon name="search" size={18} />
             </button>

@@ -14,7 +14,7 @@ export default function CartView() {
 
     return (
 
-        <div className="cart-view">
+        <div className="cart-view" data-testid="cart-container">
 
             <div className="cart-view-header">
                 <h2>
@@ -34,7 +34,7 @@ export default function CartView() {
                 const totalItem = itemPrice * itemQuantity;
 
                 return (
-                    <div className="cart-item" key={currentItemId}>
+                    <div className="cart-item" key={currentItemId} data-testid={`cart-item-${p._id}`}>
 
                         <div className="cart-item-image">
                             <img src={p.imagesUrl[0]} alt={p.name} loading="lazy" />
@@ -78,10 +78,11 @@ export default function CartView() {
                             <Button variant="secondary"
                                 size="sm"
                                 onClick={() => updateQuantity(p._id, currentSize, item.quantity - 1)}
+                                data-testid="quantity-decrement"
                             >
                                 <Icon name="minus" size={15}></Icon>
                             </Button>
-                            <span>{item.quantity}</span>
+                            <span data-testid="quantity-value">{item.quantity}</span>
                             <Button variant="secondary"
                                 size="sm"
                                 onClick={() => {
@@ -90,18 +91,20 @@ export default function CartView() {
                                     }
                                 }}
                                 disabled={item.quantity >= availableStock}// Se bloquea si llega al límite
+                                data-testid="quantity-increment"
                             >
                                 <Icon name="plus" size={15}></Icon>
                             </Button>
                         </div>
 
-                        <div className="cart-item-total">
+                        <div className="cart-item-total" data-testid="item-total">
                             ${totalItem.toFixed(2)}
                         </div>
 
                         <Button variant="ghost" className="danger" size="sm"
                             onClick={() => removeFromCart(p._id, currentSize,)}
                             title="Eliminar articulo"
+                            data-testid="remove-item"
                         >
                             <Icon name="trash" size={15}></Icon>
                         </Button>

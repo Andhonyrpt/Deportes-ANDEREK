@@ -16,8 +16,11 @@ function setIn(obj, path, value) {
     const clone = structuredClone(obj);
     let cur = clone;
     for (let i = 0; i < keys.length - 1; i++) {
-        if (cur = cur[keys[i]]) cur[keys[i]] = {};
-        cur = cur[keys[i]];
+        const key = keys[i];
+        if (!cur[key]) {
+            cur[key] = {};
+        }
+        cur = cur[key];
     }
 
     cur[keys[keys.length - 1]] = value;

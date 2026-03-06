@@ -27,6 +27,7 @@ export default function AddressItem({ address, isSelected, onSelect, onEdit, onD
             <div className="address-actions">
                 <Button onClick={() => onSelect(address)}
                     disabled={isSelected}
+                    data-testid="select-address"
                 >
                     {isSelected ? "Seleccionada" : "Seleccionar"}
                 </Button>

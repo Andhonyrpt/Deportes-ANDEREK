@@ -147,6 +147,7 @@ export default function Header() {
                             <Link to="/cart"
                                 className='cart-btn'
                                 aria-label='Ver carrito de compras'
+                                data-testid="cart-nav-link"
                             >
                                 <Icon name="shoppingCart" size={24} />
                                 {totalItems > 0 && (

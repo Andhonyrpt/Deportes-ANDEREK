@@ -420,6 +420,7 @@ export default function Checkout() {
                         selected={selectedPayment}
                         summaryContent={
                             <div className="selected-payment">
+                                <p><strong>{selectedPayment?.bankName}</strong></p>
                                 <p>{selectedPayment?.alias}</p>
                                 <p>**** {selectedPayment?.cardNumber?.slice(-4) || "----"}</p>
                             </div>
@@ -483,18 +484,18 @@ export default function Checkout() {
                             </p>
                             <div className="order-costs">
                                 <p>
-                                    <strong>Subtotal:</strong> {formatMoney(subtotal)}
+                                    <strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}
                                 </p>
                                 <p>
-                                    <strong>IVA (16%):</strong> {formatMoney(taxAmount)}
+                                    <strong data-testid="summary-tax">IVA (16%):</strong> {formatMoney(taxAmount)}
                                 </p>
                                 <p>
-                                    <strong>Envío:</strong>{" "}
+                                    <strong data-testid="summary-shipping">Envío:</strong>{" "}
                                     {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}
                                 </p>
                                 <hr />
                                 <p>
-                                    <strong>Total:</strong> {formatMoney(grandTotal)}
+                                    <strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}
                                 </p>
                             </div>
                             <p>
@@ -557,6 +558,7 @@ export default function Checkout() {
                                     state: { order },
                                 });
                             }}
+                            data-testid="pay-button"
                         >
                             Confirmar y Pagar
                         </Button>

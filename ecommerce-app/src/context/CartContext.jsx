@@ -41,9 +41,9 @@ export function CartProvider({ children }) {
                     console.error(error);
                 }
             } else if (!isAuth) {
-                // Si no hay sesión, "reseteamos" todo para el siguiente usuario
+                // Si no hay sesión, "reseteamos" el cartId pero dejamos que el reducer
+                // use lo que hay en localStorage para el carrito de invitado
                 setCartId(null);
-                dispatch({ type: CART_ACTIONS.INIT, payload: [] });
             }
         }
         initializeCart();

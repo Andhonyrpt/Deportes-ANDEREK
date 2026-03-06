@@ -90,6 +90,7 @@ export default function PaymentForm({
                         onBlur={form.onBlur}
                         error={form.getFieldError(field.name)}
                         showError={form.isTouched(field.name)}
+                        data-testid={`payment-${field.id}`}
                     />
                 ))}
 
@@ -110,7 +111,7 @@ export default function PaymentForm({
                 {form.submitError && (<p className="payment-submitError">{form.submitError}</p>)}
 
                 <div className="payment-form-actions" >
-                    <Button type="submit" disabled={form.isSubmitting}>
+                    <Button type="submit" disabled={form.isSubmitting} data-testid="payment-submit">
                         {form.isSubmitting ? "Guardando..." : isEdit ? "Guardar Cambios" : "Agregar Método de Pago"}
                     </Button>
 

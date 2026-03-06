@@ -10,50 +10,50 @@ const addressFields = [
     {
         id: "name",
         label: "Nombre completo:",
-        name: "address.name",
+        name: "name",
         autoComplete: "name",
     },
     {
         id: "address1",
         label: "Dirección:",
-        name: "address.address1",
+        name: "address1",
         autoComplete: "street-address",
     },
     {
         id: "city",
         label: "Ciudad:",
-        name: "address.city",
+        name: "city",
         autoComplete: "address-level2",
     },
     {
         id: "state",
         label: "Estado:",
-        name: "address.state",
+        name: "state",
         autoComplete: "address-level1",
     },
     {
         id: "postalCode",
         label: "Código postal:",
-        name: "address.postalCode",
+        name: "postalCode",
         autoComplete: "postal-code",
     },
     {
         id: "country",
         label: "País:",
-        name: "address.country",
+        name: "country",
         autoComplete: "country-name",
     },
     {
         id: "phone",
         label: "Teléfono:",
-        name: "address.phone",
+        name: "phone",
         type: "tel",
         autoComplete: "tel",
     },
     {
         id: "reference",
         label: "Referencia:",
-        name: "address.reference"
+        name: "reference"
     },
 ];
 
@@ -102,6 +102,7 @@ export default function AddressForm({
                         onBlur={form.onBlur}
                         error={form.getFieldError(field.name)}
                         showError={form.isTouched(field.name)}
+                        data-testid={`address-${field.id}`}
                     />
                 ))}
 
@@ -122,7 +123,7 @@ export default function AddressForm({
 
 
                 <div className="address-form-actions">
-                    <Button type="submit" disabled={form.isSubmitting}>
+                    <Button type="submit" disabled={form.isSubmitting} data-testid="address-submit">
                         {form.isSubmitting ? "Guardando..." : isEdit ? "Guardar Cambios" : "Agregar Dirección"}
                     </Button>
 
