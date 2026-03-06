@@ -9,16 +9,22 @@ Este documento detalla el plan de pruebas End-to-End para el `ecommerce-app`, pe
 
 ---
 
-## Matriz de Escenarios
+### Matriz de Progreso E2E
 
-| Escenario                      | Casos de Prueba                                                                 | Estado        | Fecha         | Notas                                     |
-| :----------------------------- | :------------------------------------------------------------------------------ | :------------ | :------------ | :---------------------------------------- |
-| **1. Registro & Login**        | - Form visibility<br>- Validations (mismatch, short pass)<br>- Success Login/Reg | ✅ **Validado** | 2026-03-05    | Implementado con mocks de API.             |
-| **2. Carrito de Compras**      | - Agregar/Quitar un producto<br>- Actualizar cantidades<br>- Persistencia (reload) | ✅ **Validado** | 2026-03-06    | Corregida persistencia en CartContext.     |
-| **3. Checkout (Flujo Completo)** | - Fase 1-4 (Dirección, Pago, Review, Confirm)<br>- Vaciado de carrito           | ✅ **Validado** | 2026-03-06    | Corregido bundle de Checkout y useFormReducer. |
-| **4. Perfil de Usuario**       | - Vista de perfil<br>- Gestión de direcciones<br>- Historial de pedidos           | 📅 Pendiente  | -             |                                           |
-| **5. Catálogo & Búsqueda**     | - Navegar categorías<br>- Búsqueda de productos<br>- Ordenamiento (precio/nombre) | 📅 Pendiente  | -             |                                           |
-| **6. Casos de Borde & UX**     | - Error de red (Simulado)<br>- Responsividad (Mobile/Desktop)<br>- Sesión expirada | 📅 Pendiente  | -             |                                           |
+| Caso de Prueba | Escenario | Estado | Notas |
+| :--- | :--- | :--- | :--- |
+| CP-01 | Registro Exitoso | ✅ PASSED | Validado con interceptación de API |
+| CP-02 | Login Exitoso | ✅ PASSED | Redirección a home correcta |
+| CP-03 | Login Fallido | ✅ PASSED | Mensaje de error visible |
+| CP-04 | Flujo de Carrito | ✅ PASSED | Persistencia en localStorage |
+| CP-05 | Checkout (Mock) | ✅ PASSED | Generación de pedido mock |
+| CP-06 | Ver Perfil | ✅ PASSED | Datos de usuario correctos |
+| CP-07 | Historial de Pedidos| ✅ PASSED | Lista de pedidos y detalle |
+| CP-08 | Búsqueda Catalogo | ✅ PASSED | Filtrado por texto funcional |
+| CP-09 | Navegar Categorías| ✅ PASSED | Menú de categorías lateral |
+| CP-10 | Menú Móvil | ✅ PASSED | Visible en viewport 375px |
+| CP-11 | Sesión Expirada | ✅ PASSED | Redirección automática a /login |
+| CP-12 | Búsqueda Vacía | ✅ PASSED | Manejo de "no resultados encontrados" |
 
 ---
 

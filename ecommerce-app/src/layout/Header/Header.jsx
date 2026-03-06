@@ -164,6 +164,7 @@ export default function Header() {
                                     onClick={handleUserMenuToggle}
                                     aria-label='Menu de usuario'
                                     aria-expanded={isUserMenuOpen}
+                                    data-testid="user-menu-button"
                                 >
                                     <div className='user-avatar'>
                                         <span className='user-initials'>
@@ -240,6 +241,7 @@ export default function Header() {
                                                 <div className="user-links">
                                                     <Link to="/profile"
                                                         className="user-link"
+                                                        data-testid="profile-link"
                                                     >
                                                         <Icon name="user" size={16} />
                                                         Mi Cuenta
@@ -247,6 +249,7 @@ export default function Header() {
 
                                                     <Link to="/orders"
                                                         className="user-link"
+                                                        data-testid="orders-link"
                                                     >
                                                         <Icon name="package" size={16} />
                                                         Mis Pedidos

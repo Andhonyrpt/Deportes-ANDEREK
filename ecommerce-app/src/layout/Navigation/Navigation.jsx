@@ -31,7 +31,9 @@ export default function Navigation({ activeCategory, activeSubcategory, onSubcat
                 <div className='categories-dropdown'>
                     <button
                         className='dropdown-btn'
-                        onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}>
+                        onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                        data-testid="category-menu-button"
+                    >
                         {activeCategory ? activeCategory?.name : 'Ligas del mundo'}
                         <Icon name="chevronDown" size={14} />
                     </button>
@@ -46,6 +48,7 @@ export default function Navigation({ activeCategory, activeSubcategory, onSubcat
                                     >
                                         <Link
                                             to={`/category/${category._id}`}
+                                            data-testid={`category-link-${category._id}`}
                                         >
                                             {category.name}
                                         </Link>
@@ -61,6 +64,7 @@ export default function Navigation({ activeCategory, activeSubcategory, onSubcat
                         onClick={() => setIsSubcategoriesMenuOpen(!isSubcategoriesMenuOpen)}
                         className='dropdown-btn'
                         disabled={isSubcategoryButtonDisabled}
+                        data-testid="subcategory-menu-button"
                     >
                         {activeSubcategory ? activeSubcategory?.name : "Equipos"}
                         <Icon name="chevronDown" size={14} />

@@ -38,7 +38,7 @@ export default function ProfileCard() {
                     />
 
                     <div className='profile-names'>
-                        <h2>
+                        <h2 data-testid="profile-display-name">
                             {currentUser.displayName || currentUser.name || currentUser.email}
                         </h2>
                         <span className='profile-role-badge'
@@ -51,7 +51,7 @@ export default function ProfileCard() {
                 <div className='profile-info'>
                     <div className='info-item'>
                         <label>Email:</label>
-                        <span>{currentUser.email || "No disponible"}</span>
+                        <span data-testid="profile-email">{currentUser.email || "No disponible"}</span>
                     </div>
 
                     <div className='info-item'>
@@ -77,7 +77,7 @@ export default function ProfileCard() {
                 <div className='profile-actions'>
                     <h3>Acciones de la cuenta</h3>
                     {actions.map((action, idx) => (
-                        <Button key={idx} type='button' onClick={action.action}>
+                        <Button key={idx} type='button' onClick={action.action} data-testid={`profile-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}>
                             {action.label}
                         </Button>
                     ))}

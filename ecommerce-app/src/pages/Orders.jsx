@@ -115,6 +115,7 @@ export default function Orders() {
                                     key={order.id}
                                     className={`order-card${isActive ? "-active" : ""}`}
                                     onClick={() => setSelectedOrderId(order.id)}
+                                    data-testid={`order-card-${order.id}`}
                                 >
                                     <div className="order-card-head">
                                         <span className="order-id">#{order.id}</span>
@@ -140,7 +141,7 @@ export default function Orders() {
 
                 <div className="orders-detail-card">
                     {selectedOrder ? (
-                        <>
+                        <div data-testid="order-detail-container">
                             <div className="order-detail-header">
                                 <div>
                                     <p className="eyebrow">Pedido #{selectedOrder.id}</p>
@@ -172,7 +173,7 @@ export default function Orders() {
                                                 : formatMoney(selectedOrder.shipping || 0)}
                                         </strong>
                                     </li>
-                                    <li className="order-summary-total">
+                                    <li className="order-summary-total" data-testid="order-summary-total">
                                         <span>Total</span>
                                         <strong>{formatMoney(selectedOrder.total || 0)}</strong>
                                     </li>
@@ -238,7 +239,7 @@ export default function Orders() {
                                 </ul>
                             </div>
 
-                        </>
+                        </div>
                     ) : (
                         <div className="orders-empty">
                             <h3>Selecciona un pedido de la lista</h3>

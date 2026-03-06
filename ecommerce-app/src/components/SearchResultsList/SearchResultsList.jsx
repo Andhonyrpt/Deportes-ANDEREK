@@ -40,7 +40,8 @@ export default function SearchResultsList() {
                 const data = await fetchProducts();
 
                 if (isMounted) {
-                    setProducts(data);
+                    const productsList = data?.products || (Array.isArray(data) ? data : []);
+                    setProducts(productsList);
                 }
 
             } finally {

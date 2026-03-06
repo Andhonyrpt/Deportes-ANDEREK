@@ -23,7 +23,7 @@ export default function Home() {
         setLoading(true);
         setError(null);
         const productsData = await fetchProducts();
-        setProducts(productsData.products);
+        setProducts(productsData?.products || []);
     };
 
     useEffect(() => {

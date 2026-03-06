@@ -14,7 +14,9 @@ export function AuthProvider({ children }) {
         const saved = localStorage.getItem("userData");
         return saved ? JSON.parse(saved) : null;
     });
-    const [isAuth, setIsAuth] = useState(false);
+    const [isAuth, setIsAuth] = useState(() => {
+        return !!localStorage.getItem("authToken") && !!localStorage.getItem("userData");
+    });
     const [loading, setLoading] = useState(true);
 
     const saveToken = (token) => {
