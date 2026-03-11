@@ -1,8 +1,3 @@
-import dotenv from "dotenv";
-if (process.env.NODE_ENV !== 'test') {
-    dotenv.config();
-}
-
 import cors from 'cors';
 import helmet from 'helmet';
 import express from "express";
@@ -20,9 +15,11 @@ dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependencia c
 setupGlobalErrorHandlers();
 
 export const app = express();
-if (process.env.NODE_ENV !== 'test') {
-    dbConnection();
-}
+
+app.set('trust proxy', 1);
+
+dbConnection();
+
 
 app.use(helmet());
 
@@ -80,8 +77,6 @@ app.use((req, res) => {
 // El errorHandler debe ir AL FINAL, después de todas las rutas
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(process.env.PORT, () => {
-        console.log(`Server running on http:localhost:${process.env.PORT}`);
-    });
-}
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on http:localhost:${process.env.PORT}`);
+});
