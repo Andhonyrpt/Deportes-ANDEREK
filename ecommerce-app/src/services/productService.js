@@ -1,4 +1,3 @@
-// import products from "../data/products.json";
 import { http } from "./http";
 
 export const fetchProducts = async (page = 1, limit = 10) => {

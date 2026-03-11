@@ -10,561 +10,323 @@ import Button from "../components/common/Button";
 import ErrorMessage from "../components/common/ErrorMessage/ErrorMessage";
 import Loading from "../components/common/Loading/Loading";
 import { useCart } from "../context/CartContext";
-// import { getPaymentMethods } from "../services/paymentMethodService.js";
-// import { getShippingAddresses } from "../services/shippingAddressService.js";
+import { useAuth } from "../context/AuthContext";
 import {
-    STORAGE_KEYS,
-    normalizeAddress,
-    normalizePayment,
-    readLocalJSON,
-    writeLocalJSON,
-} from "../utils/storageHelpers.js";
+    getShippingAddresses,
+    createShippingAddress,
+    deleteShippingAddress
+} from "../services/shippingService.js";
+import {
+    getPaymentMethods,
+    createPaymentMethod,
+    deletePaymentMethod
+} from "../services/paymentService.js";
+import { createOrder } from "../services/orderService.js";
 import "./Checkout.css";
 
 export default function Checkout() {
     const navigate = useNavigate();
     const { cartItems, total, clearCart } = useCart();
+    const { user } = useAuth();
 
     // Cálculos financieros simples
     const subtotal = typeof total === "number" ? total : 0;
     const TAX_RATE = 0.16; // IVA 16%
-    const SHIPPING_RATE = 350; // nuevo costo de envío si subtotal < threshold
-    const FREE_SHIPPING_THRESHOLD = 1000; // envío gratis sobre este subtotal
+    const SHIPPING_RATE = 350;
+    const FREE_SHIPPING_THRESHOLD = 1000;
 
     const taxAmount = parseFloat((subtotal * TAX_RATE).toFixed(2));
     const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_RATE;
-    const grandTotal = parseFloat(
-        (subtotal + taxAmount + shippingCost).toFixed(2)
-    );
+    const grandTotal = parseFloat((subtotal + taxAmount + shippingCost).toFixed(2));
+
     const formatMoney = (v) =>
         new Intl.NumberFormat("es-MX", {
             style: "currency",
             currency: "MXN",
         }).format(v);
 
-    // Efecto para redirigir si no hay productos
-    useEffect(() => {
-        // Si estamos suprimiendo la redirección (p.ej. porque estamos confirmando)
-        // no navegamos al carrito aunque esté vacío.
-        if (!cartItems || cartItems.length === 0) {
-            if (!suppressRedirect.current) {
-                navigate("/cart");
-            }
-        }
-    }, [cartItems, navigate]);
-
     // Flag para evitar redirecciones automáticas cuando estamos confirmando la compra
     const suppressRedirect = useRef(false);
 
-    // Estados para direcciones y métodos de pago (se cargarán desde servicios)
+    // Efecto para redirigir si no hay productos
+    useEffect(() => {
+        // Log para debug de redirección
+        console.log("Checkout Check: cartItems", cartItems?.length, "suppress", suppressRedirect.current);
+
+        if (!suppressRedirect.current && (!cartItems || cartItems.length === 0)) {
+            // navigate("/cart"); // Comentado temporalmente para dump de estado en test
+        }
+    }, [cartItems, navigate]);
+
+    // Estados para direcciones y métodos de pago
     const [addresses, setAddresses] = useState([]);
     const [payments, setPayments] = useState([]);
     const [loadingLocal, setLoadingLocal] = useState(true);
     const [localError, setLocalError] = useState(null);
 
-    // Estado para controlar la visualización de formularios
+    // Estados para selección y formularios
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [selectedPayment, setSelectedPayment] = useState(null);
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
-    const [editingAddress, setEditingAddress] = useState(null);
-    const [editingPayment, setEditingPayment] = useState(null);
     const [addressSectionOpen, setAddressSectionOpen] = useState(true);
     const [paymentSectionOpen, setPaymentSectionOpen] = useState(true);
 
-    // Estado para la selección actual
-    const [selectedAddress, setSelectedAddress] = useState(null);
-    const [selectedPayment, setSelectedPayment] = useState(null);
-
+    // Cargar datos al montar
     useEffect(() => {
-        if (!selectedAddress) {
-            setAddressSectionOpen(true);
-        }
-    }, [selectedAddress]);
+        // Solo cargar si estamos autenticados y no estamos cargando el perfil globalmente
+        if (!user?._id) return;
 
-    useEffect(() => {
-        if (!selectedPayment) {
-            setPaymentSectionOpen(true);
-        }
-    }, [selectedPayment]);
-
-    // Cargar direcciones y métodos desde servicios al montar el componente
-    useEffect(() => {
-        let isMounted = true;
-
-        async function loadData() {
+        const loadData = async () => {
+            console.log("Checkout: Iniciando carga de datos para usuario", user._id);
             setLoadingLocal(true);
-            setLocalError(null);
             try {
-                const savedAddresses = readLocalJSON(STORAGE_KEYS.addresses);
-                const savedPayments = readLocalJSON(STORAGE_KEYS.payments);
+                const [addrRes, payRes] = await Promise.all([
+                    getShippingAddresses(),
+                    getPaymentMethods(user._id)
+                ]);
 
-                let addressesWithIds = [];
-                let normalizedPayments = [];
+                const addrList = addrRes.addresses || [];
+                const payList = payRes.paymentMethods || [];
 
-                if (savedAddresses && savedAddresses.length > 0) {
-                    addressesWithIds = savedAddresses
-                        .map((addr, idx) => normalizeAddress(addr, idx))
-                        .filter(Boolean);
-                } else {
-                    // const addrList = await getShippingAddresses();
-                    // addressesWithIds = (addrList || [])
-                    //   .map((addr, idx) => normalizeAddress(addr, idx))
-                    //   .filter(Boolean);
-                }
+                console.log("Checkout: Direcciones recibidas", addrList);
+                console.log("Checkout: Pagos recibidos", payList);
 
-                if (savedPayments && savedPayments.length > 0) {
-                    normalizedPayments = savedPayments
-                        .map((pay, idx) => normalizePayment(pay, idx))
-                        .filter(Boolean);
-                } else {
-                    // const payList = await getPaymentMethods();
-                    // normalizedPayments = (payList || [])
-                    //   .map((pay, idx) => normalizePayment(pay, idx))
-                    //   .filter(Boolean);
-                }
+                setAddresses(addrList);
+                setPayments(payList);
 
-                if (!isMounted) return;
+                // Seleccionar defaults
+                const defAddr = addrList?.find(a => a.isDefault) || addrList?.[0] || null;
+                const defPay = payList?.find(p => p.isDefault) || payList?.[0] || null;
 
-                setAddresses(addressesWithIds);
-                setPayments(normalizedPayments);
-
-                writeLocalJSON(STORAGE_KEYS.addresses, addressesWithIds);
-                writeLocalJSON(STORAGE_KEYS.payments, normalizedPayments);
-
-                // Seleccionar valores por defecto si existen
-                const defaultAddr =
-                    addressesWithIds.find((a) => a.default || a.isDefault) ||
-                    addressesWithIds[0] ||
-                    null;
-                const defaultPay =
-                    normalizedPayments.find((p) => p.isDefault || p.default) ||
-                    normalizedPayments[0] ||
-                    null;
-
-                setSelectedAddress(defaultAddr);
-                setSelectedPayment(defaultPay);
-                setAddressSectionOpen(!defaultAddr);
-                setPaymentSectionOpen(!defaultPay);
+                setSelectedAddress(defAddr);
+                setSelectedPayment(defPay);
+                setAddressSectionOpen(!defAddr);
+                setPaymentSectionOpen(!defPay);
             } catch (err) {
-                if (isMounted) {
-                    setLocalError("No se pudo cargar direcciones o métodos de pago.");
-                }
+                console.error("Checkout loadData error:", err);
+                setLocalError("Error al cargar datos del perfil");
             } finally {
-                if (isMounted) {
-                    setLoadingLocal(false);
-                }
+                setLoadingLocal(false);
             }
-        }
+        };
 
         loadData();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+    }, [user?._id]);
 
-    const handleRetry = () => {
-        window.location.reload();
-    };
+    const handleRetry = () => window.location.reload();
 
-    const persistAddresses = (next) => {
-        setAddresses(next);
-        writeLocalJSON(STORAGE_KEYS.addresses, next);
-    };
-
-    const persistPayments = (next) => {
-        setPayments(next);
-        writeLocalJSON(STORAGE_KEYS.payments, next);
-    };
-
+    // Manejadores de Dirección
     const handleAddressToggle = () => {
         setShowAddressForm(false);
-        setEditingAddress(null);
-        setAddressSectionOpen((prev) => !prev);
+        setAddressSectionOpen(prev => !prev);
     };
 
+    const handleAddressSubmit = async (formData) => {
+        try {
+            setLoadingLocal(true);
+            await createShippingAddress({ ...formData, isDefault: addresses.length === 0 });
+            const updated = await getShippingAddresses();
+            const addrList = updated?.addresses || updated || [];
+            if (Array.isArray(addrList)) {
+                setAddresses(addrList);
+                setSelectedAddress(addrList[addrList.length - 1]);
+            }
+            setShowAddressForm(false);
+            setAddressSectionOpen(false);
+        } catch (err) {
+            setLocalError("Error al guardar la dirección");
+        } finally {
+            setLoadingLocal(false);
+        }
+    };
+
+    const handleAddressDelete = async (id) => {
+        try {
+            await deleteShippingAddress(id);
+            const updated = await getShippingAddresses();
+            const addrList = updated?.addresses || updated || [];
+            if (Array.isArray(addrList)) {
+                setAddresses(addrList);
+                if (selectedAddress?._id === id) setSelectedAddress(addrList[0] || null);
+            }
+        } catch (err) {
+            setLocalError("Error al eliminar la dirección");
+        }
+    };
+
+    // Manejadores de Pago
     const handlePaymentToggle = () => {
         setShowPaymentForm(false);
-        setEditingPayment(null);
-        setPaymentSectionOpen((prev) => !prev);
+        setPaymentSectionOpen(prev => !prev);
     };
 
-    // Manejadores para direcciones
-    const handleAddressSubmit = (formData) => {
-        let normalizedRecord = normalizeAddress(
-            { ...formData, id: editingAddress?.id },
-            addresses.length
+    const handlePaymentSubmit = async (formData) => {
+        try {
+            setLoadingLocal(true);
+            await createPaymentMethod({ ...formData, user: user._id, isDefault: payments.length === 0 });
+            const updated = await getPaymentMethods(user._id);
+            const payList = updated?.paymentMethods || updated || [];
+            if (Array.isArray(payList)) {
+                setPayments(payList);
+                setSelectedPayment(payList[payList.length - 1]);
+            }
+            setShowPaymentForm(false);
+            setPaymentSectionOpen(false);
+        } catch (err) {
+            setLocalError("Error al guardar el método de pago");
+        } finally {
+            setLoadingLocal(false);
+        }
+    };
+
+    const handlePaymentDelete = async (id) => {
+        try {
+            await deletePaymentMethod(id);
+            const updated = await getPaymentMethods(user._id);
+            const payList = updated?.paymentMethods || updated || [];
+            if (Array.isArray(payList)) {
+                setPayments(payList);
+                if (selectedPayment?._id === id) setSelectedPayment(payList[0] || null);
+            }
+        } catch (err) {
+            setLocalError("Error al eliminar el pago");
+        }
+    };
+
+    const handlePlaceOrder = async () => {
+        if (!selectedAddress || !selectedPayment || !cartItems.length) return;
+
+        try {
+            setLoadingLocal(true);
+            const orderData = {
+                user: user._id,
+                products: cartItems.map(item => ({
+                    productId: item._id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    size: item.selectedSize || "M"
+                })),
+                shippingAddress: selectedAddress._id,
+                paymentMethod: selectedPayment._id,
+                shippingCost: shippingCost,
+                total: grandTotal
+            };
+
+            const response = await createOrder(orderData);
+
+            if (response) {
+                suppressRedirect.current = true;
+                await clearCart();
+                navigate("/order-confirmation", { state: { order: response.order || response } });
+            }
+        } catch (err) {
+            setLocalError("Error al procesar la orden");
+        } finally {
+            setLoadingLocal(false);
+        }
+    };
+
+    if (loadingLocal && !addresses.length && !payments.length) {
+        return (
+            <div className="checkout-loading">
+                <Loading message="Sincronizando con el servidor..." />
+            </div>
         );
-
-        let updatedAddresses = editingAddress
-            ? addresses.map((addr) =>
-                addr.id === editingAddress.id ? normalizedRecord : addr
-            )
-            : [...addresses, normalizedRecord];
-
-        if (normalizedRecord?.default) {
-            updatedAddresses = updatedAddresses.map((addr) =>
-                addr.id === normalizedRecord.id
-                    ? { ...addr, default: true, isDefault: true }
-                    : { ...addr, default: false, isDefault: false }
-            );
-            normalizedRecord =
-                updatedAddresses.find((addr) => addr.id === normalizedRecord.id) ||
-                normalizedRecord;
-        }
-
-        persistAddresses(updatedAddresses);
-
-        const nextSelection =
-            normalizedRecord &&
-                (normalizedRecord.default ||
-                    !selectedAddress ||
-                    selectedAddress.id === normalizedRecord.id)
-                ? normalizedRecord
-                : selectedAddress;
-
-        setSelectedAddress(nextSelection);
-        setShowAddressForm(false);
-        setEditingAddress(null);
-        setAddressSectionOpen(false);
-    };
-
-    const handleAddressEdit = (address) => {
-        setEditingAddress(address);
-        setShowAddressForm(true);
-        setAddressSectionOpen(true);
-    };
-
-    const handleAddressDelete = (addressId) => {
-        let updatedAddresses = addresses.filter((addr) => addr.id !== addressId);
-        let nextSelection = selectedAddress;
-
-        if (selectedAddress?.id === addressId) {
-            nextSelection = null;
-        }
-
-        if (updatedAddresses.length > 0) {
-            if (!nextSelection) {
-                nextSelection =
-                    updatedAddresses.find((addr) => addr.default || addr.isDefault) ||
-                    updatedAddresses[0];
-            }
-
-            if (nextSelection) {
-                updatedAddresses = updatedAddresses.map((addr) =>
-                    addr.id === nextSelection.id
-                        ? { ...addr, default: true, isDefault: true }
-                        : { ...addr, default: false, isDefault: false }
-                );
-                nextSelection =
-                    updatedAddresses.find((addr) => addr.id === nextSelection.id) ||
-                    nextSelection;
-            }
-        } else {
-            nextSelection = null;
-        }
-
-        persistAddresses(updatedAddresses);
-        setSelectedAddress(nextSelection);
-    };
-
-    // Manejadores para métodos de pago
-    const handlePaymentSubmit = (formData) => {
-        let normalizedRecord = normalizePayment(
-            { ...formData, id: editingPayment?.id },
-            payments.length
-        );
-
-        let updatedPayments = editingPayment
-            ? payments.map((pay) =>
-                pay.id === editingPayment.id ? normalizedRecord : pay
-            )
-            : [...payments, normalizedRecord];
-
-        if (normalizedRecord?.isDefault || normalizedRecord?.default) {
-            updatedPayments = updatedPayments.map((pay) =>
-                pay.id === normalizedRecord.id
-                    ? { ...pay, default: true, isDefault: true }
-                    : { ...pay, default: false, isDefault: false }
-            );
-            normalizedRecord =
-                updatedPayments.find((pay) => pay.id === normalizedRecord.id) ||
-                normalizedRecord;
-        }
-
-        persistPayments(updatedPayments);
-
-        const nextSelection =
-            normalizedRecord &&
-                (normalizedRecord.isDefault ||
-                    normalizedRecord.default ||
-                    !selectedPayment ||
-                    selectedPayment.id === normalizedRecord.id)
-                ? normalizedRecord
-                : selectedPayment;
-
-        setSelectedPayment(nextSelection);
-        setShowPaymentForm(false);
-        setEditingPayment(null);
-        setPaymentSectionOpen(false);
-    };
-
-    const handlePaymentEdit = (payment) => {
-        setEditingPayment(payment);
-        setShowPaymentForm(true);
-        setPaymentSectionOpen(true);
-    };
-
-    const handlePaymentDelete = (paymentId) => {
-        let updatedPayments = payments.filter((pay) => pay.id !== paymentId);
-        let nextSelection = selectedPayment;
-
-        if (selectedPayment?.id === paymentId) {
-            nextSelection = null;
-        }
-
-        if (updatedPayments.length > 0) {
-            if (!nextSelection) {
-                nextSelection =
-                    updatedPayments.find((pay) => pay.isDefault || pay.default) ||
-                    updatedPayments[0];
-            }
-
-            if (nextSelection) {
-                updatedPayments = updatedPayments.map((pay) =>
-                    pay.id === nextSelection.id
-                        ? { ...pay, default: true, isDefault: true }
-                        : { ...pay, default: false, isDefault: false }
-                );
-                nextSelection =
-                    updatedPayments.find((pay) => pay.id === nextSelection.id) ||
-                    nextSelection;
-            }
-        } else {
-            nextSelection = null;
-        }
-
-        persistPayments(updatedPayments);
-        setSelectedPayment(nextSelection);
-    };
+    }
 
     return (
-        // Mostrar loading o error antes del contenido principal
-        loadingLocal ? (
-            <div className="checkout-loading">
-                <Loading message="Cargando direcciones y métodos de pago..." />
+        <div className="checkout-container">
+            {localError && <ErrorMessage message={localError} />}
+            <div data-testid="debug-checkout" style={{ display: 'none' }}>
+                Addresses Length: {addresses?.length}, 
+                Selected Address ID: {selectedAddress?._id || 'none'},
+                Address Name: {selectedAddress?.name || 'none'}
             </div>
-        ) : localError ? (
-            <div className="checkout-error">
-                <ErrorMessage message={localError}>
-                    <div style={{ textAlign: "center", marginTop: 12 }}>
-                        <Button onClick={handleRetry} variant="primary">
-                            Reintentar
-                        </Button>
-                    </div>
-                </ErrorMessage>
-            </div>
-        ) : (
-            <div className="checkout-container">
-                <div className="checkout-left">
-                    <SummarySection
-                        title="1. Dirección de envío"
-                        selected={selectedAddress}
-                        summaryContent={
-                            <div className="selected-address">
-                                <p>{selectedAddress?.name}</p>
-                                <p>{selectedAddress?.address1}</p>
-                                <p>
-                                    {selectedAddress?.city}, {selectedAddress?.postalCode}
-                                </p>
-                            </div>
-                        }
-                        isExpanded={
-                            showAddressForm || addressSectionOpen || !selectedAddress
-                        }
-                        onToggle={handleAddressToggle}
-                    >
-                        {!showAddressForm && !editingAddress ? (
-                            <AddressList
-                                addresses={addresses}
-                                selectedAddress={selectedAddress}
-                                onSelect={(address) => {
-                                    setSelectedAddress(address);
-                                    setShowAddressForm(false);
-                                    setEditingAddress(null);
-                                    setAddressSectionOpen(false);
-                                }}
-                                onEdit={handleAddressEdit}
-                                onDelete={handleAddressDelete}
-                                onAdd={() => {
-                                    setEditingAddress(null);
-                                    setShowAddressForm(true);
-                                    setAddressSectionOpen(true);
-                                }}
-                            />
-                        ) : (
-                            <AddressForm
-                                key={editingAddress?.id || "new"}
-                                onSubmit={handleAddressSubmit}
-                                onCancel={() => {
-                                    setShowAddressForm(false);
-                                    setEditingAddress(null);
-                                    setAddressSectionOpen(true);
-                                }}
-                                initialValues={editingAddress || {}}
-                                isEdit={!!editingAddress}
-                            />
-                        )}
-                    </SummarySection>
 
-                    <SummarySection
-                        title="2. Método de pago"
-                        selected={selectedPayment}
-                        summaryContent={
-                            <div className="selected-payment">
-                                <p><strong>{selectedPayment?.bankName}</strong></p>
-                                <p>{selectedPayment?.alias}</p>
-                                <p>**** {selectedPayment?.cardNumber?.slice(-4) || "----"}</p>
-                            </div>
-                        }
-                        isExpanded={
-                            showPaymentForm || paymentSectionOpen || !selectedPayment
-                        }
-                        onToggle={handlePaymentToggle}
-                    >
-                        {!showPaymentForm && !editingPayment ? (
-                            <PaymentList
-                                paymentMethods={payments}
-                                selectedPayment={selectedPayment}
-                                onSelect={(payment) => {
-                                    setSelectedPayment(payment);
-                                    setShowPaymentForm(false);
-                                    setEditingPayment(null);
-                                    setPaymentSectionOpen(false);
-                                }}
-                                onEdit={handlePaymentEdit}
-                                onDelete={handlePaymentDelete}
-                                onAdd={() => {
-                                    setEditingPayment(null);
-                                    setShowPaymentForm(true);
-                                    setPaymentSectionOpen(true);
-                                }}
-                            />
-                        ) : (
-                            <PaymentForm
-                                key={editingPayment?.id || "new"}
-                                onSubmit={handlePaymentSubmit}
-                                onCancel={() => {
-                                    setShowPaymentForm(false);
-                                    setEditingPayment(null);
-                                    setPaymentSectionOpen(true);
-                                }}
-                                initialValues={editingPayment || {}}
-                                isEdit={!!editingPayment}
-                            />
-                        )}
-                    </SummarySection>
-
-                    <SummarySection
-                        title="3. Revisa tu pedido"
-                        selected={true}
-                        isExpanded={true}
-                    >
-                        <CartView />
-                    </SummarySection>
-                </div>
-
-                <div className="checkout-right">
-                    <div className="checkout-summary">
-                        <h3>Resumen de la Orden</h3>
-                        <div className="summary-details">
-                            <p>
-                                <strong>Dirección de envío:</strong> {selectedAddress?.name}
-                            </p>
-                            <p>
-                                <strong>Método de pago:</strong> {selectedPayment?.alias}
-                            </p>
-                            <div className="order-costs">
-                                <p>
-                                    <strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}
-                                </p>
-                                <p>
-                                    <strong data-testid="summary-tax">IVA (16%):</strong> {formatMoney(taxAmount)}
-                                </p>
-                                <p>
-                                    <strong data-testid="summary-shipping">Envío:</strong>{" "}
-                                    {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}
-                                </p>
-                                <hr />
-                                <p>
-                                    <strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}
-                                </p>
-                            </div>
-                            <p>
-                                <strong>Fecha estimada de entrega:</strong>{" "}
-                                {new Date(
-                                    Date.now() + 7 * 24 * 60 * 60 * 1000
-                                ).toLocaleDateString()}
-                            </p>
+            <div className="checkout-left">
+                <SummarySection
+                    title="1. Dirección de envío"
+                    selected={selectedAddress}
+                    summaryContent={
+                        <div className="selected-address">
+                            <p>{selectedAddress?.name}</p>
+                            <p>{selectedAddress?.address}</p>
+                            <p>{selectedAddress?.city}, {selectedAddress?.postalCode}</p>
                         </div>
-                        <Button
-                            className="pay-button"
-                            disabled={
-                                !selectedAddress ||
-                                !selectedPayment ||
-                                !cartItems ||
-                                cartItems.length === 0
-                            }
-                            title={
-                                !cartItems || cartItems.length === 0
-                                    ? "No hay productos en el carrito"
-                                    : !selectedAddress
-                                        ? "Selecciona una dirección de envío"
-                                        : !selectedPayment
-                                            ? "Selecciona un método de pago"
-                                            : "Confirmar y realizar el pago"
-                            }
-                            onClick={() => {
-                                // Crear el objeto de la orden
-                                const order = {
-                                    id: Date.now().toString(),
-                                    date: new Date().toISOString(),
-                                    items: cartItems.map((item) => ({
-                                        ...item,
-                                        subtotal: item.price * item.quantity,
-                                    })),
-                                    subtotal: subtotal,
-                                    tax: taxAmount,
-                                    shipping: shippingCost,
-                                    total: grandTotal,
-                                    shippingAddress: selectedAddress,
-                                    paymentMethod: selectedPayment,
-                                    status: "confirmed",
-                                };
+                    }
+                    isExpanded={showAddressForm || addressSectionOpen || !selectedAddress}
+                    onToggle={handleAddressToggle}
+                >
+                    {!showAddressForm ? (
+                        <AddressList
+                            addresses={addresses}
+                            selectedAddress={selectedAddress}
+                            onSelect={(addr) => { setSelectedAddress(addr); setAddressSectionOpen(false); }}
+                            onDelete={handleAddressDelete}
+                            onAdd={() => setShowAddressForm(true)}
+                        />
+                    ) : (
+                        <AddressForm
+                            onSubmit={handleAddressSubmit}
+                            onCancel={() => setShowAddressForm(false)}
+                        />
+                    )}
+                </SummarySection>
 
-                                // Guardar la orden en localStorage
-                                const orders = JSON.parse(
-                                    localStorage.getItem("orders") || "[]"
-                                );
-                                orders.push(order);
-                                localStorage.setItem("orders", JSON.stringify(orders));
+                <SummarySection
+                    title="2. Método de pago"
+                    selected={selectedPayment}
+                    summaryContent={
+                        <div className="selected-payment">
+                            <p><strong>{selectedPayment?.bankName}</strong></p>
+                            <p>**** {selectedPayment?.cardNumber?.slice(-4)}</p>
+                        </div>
+                    }
+                    isExpanded={showPaymentForm || paymentSectionOpen || !selectedPayment}
+                    onToggle={handlePaymentToggle}
+                >
+                    {!showPaymentForm ? (
+                        <PaymentList
+                            paymentMethods={payments}
+                            selectedPayment={selectedPayment}
+                            onSelect={(pay) => { setSelectedPayment(pay); setPaymentSectionOpen(false); }}
+                            onDelete={handlePaymentDelete}
+                            onAdd={() => setShowPaymentForm(true)}
+                        />
+                    ) : (
+                        <PaymentForm
+                            onSubmit={handlePaymentSubmit}
+                            onCancel={() => setShowPaymentForm(false)}
+                        />
+                    )}
+                </SummarySection>
 
-                                // Suprimir redirección automática al carrito vacío
-                                suppressRedirect.current = true;
+                <SummarySection title="3. Revisa tu pedido" selected={true} isExpanded={true}>
+                    <CartView />
+                </SummarySection>
+            </div>
 
-                                // Limpiar carrito
-                                clearCart();
-
-                                // Navegar a confirmación
-                                navigate("/order-confirmation", {
-                                    state: { order },
-                                });
-                            }}
-                            data-testid="pay-button"
-                        >
-                            Confirmar y Pagar
-                        </Button>
+            <div className="checkout-right">
+                <div className="checkout-summary">
+                    <h3>Resumen de la Orden</h3>
+                    <div className="order-costs">
+                        <p><strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}</p>
+                        <p><strong data-testid="summary-tax">IVA (16%):</strong> {formatMoney(taxAmount)}</p>
+                        <p><strong data-testid="summary-shipping">Envío:</strong> {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}</p>
+                        <hr />
+                        <p><strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}</p>
                     </div>
+                    <Button
+                        className="pay-button"
+                        data-testid="pay-button"
+                        disabled={!selectedAddress || !selectedPayment || !cartItems.length || loadingLocal}
+                        onClick={handlePlaceOrder}
+                    >
+                        {loadingLocal ? "Procesando..." : "Confirmar y Pagar"}
+                    </Button>
                 </div>
             </div>
-        )
+        </div>
     );
 }

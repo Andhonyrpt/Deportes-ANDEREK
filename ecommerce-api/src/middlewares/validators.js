@@ -91,7 +91,7 @@ export const sizeValidation = (field = "size", optional = false) => {
   const validator = body(field).trim().toUpperCase()
     .isIn(['S', 'M', 'L', 'XL']).withMessage("Invalid size. Expected: S, M, L, or XL");
 
-  return optional ? validator.optional() : validator.notEmpty().withMessage(`${field} is required`);
+  return optional ? validator.optional({ nullable: true }) : validator.notEmpty().withMessage(`${field} is required`);
 };
 
 // Validación de boolean
@@ -164,16 +164,16 @@ export const shippingCostValidation = () =>
 // Validación de card number
 export const cardNumberValidation = () =>
   body("cardNumber")
-    .optional()
-    .matches(/^\d{16}$/)
-    .withMessage("Card number must be 16 digits");
+    .if(body("type").isIn(["credit_card", "debit_card"])) // <--- CONDICIÓN
+    .notEmpty().withMessage("Card number is required")
+    .matches(/^\d{16}$/).withMessage("Card number must be 16 digits");
 
 // Validación de expiry date
 export const expiryDateValidation = () =>
   body("expiryDate")
-    .optional()
-    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/)
-    .withMessage("Expiry date must be in MM/YY format");
+    .if(body("type").isIn(["credit_card", "debit_card"])) // <--- CONDICIÓN
+    .notEmpty().withMessage("Expiry date is required")
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/).withMessage("Expiry date must be in MM/YY format");
 
 // Validación de payment type
 export const paymentTypeValidation = () =>
@@ -327,28 +327,31 @@ export const queryMongoIdValidation = (field, label) =>
 // Validación de card holder name
 export const cardHolderNameValidation = () =>
   body("cardHolderName")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Card holder name cannot be empty")
-    .escape();
+    .if(body("type").isIn(["credit_card", "debit_card"])) // <--- CONDICIÓN
+    .notEmpty().withMessage("Card holder name is required")
+    .trim().escape();
 
 // Validación de PayPal email
 export const paypalEmailValidation = () =>
-  body("paypalEmail").optional().isEmail().withMessage("Invalid PayPal email format");
+  body("paypalEmail")
+    .if(body('type').equals('paypal'))
+    .notEmpty().withMessage("PayPal email is required")
+    .isEmail().withMessage("Invalid PayPal email format");
 
 // Validación de bank name
 export const bankNameValidation = () =>
-  body("bankName").optional().trim().notEmpty().withMessage("Bank name cannot be empty").escape();
+  body("bankName")
+    .if(body("type").isIn(["bank_transfer", "credit_card", "debit_card"])) // <--- CONDICIÓN
+    .notEmpty().withMessage("Bank name is required")
+    .trim().escape();
 
 // Validación de account number
 export const accountNumberValidation = () =>
   body("accountNumber")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Account number cannot be empty")
-    .escape();
+    .if(body("type").equals("bank_transfer")) // <--- CONDICIÓN
+    .notEmpty().withMessage("Account number is required")
+    .isLength({ min: 6 }).withMessage("Account number too short")
+    .trim().escape();
 
 // Validación de precio en query (minPrice, maxPrice)
 export const queryPriceValidation = (field) =>

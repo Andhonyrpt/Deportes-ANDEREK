@@ -14,9 +14,9 @@ const addressFields = [
         autoComplete: "name",
     },
     {
-        id: "address1",
+        id: "address",
         label: "Dirección:",
-        name: "address1",
+        name: "address",
         autoComplete: "street-address",
     },
     {
@@ -54,7 +54,7 @@ const addressFields = [
         id: "reference",
         label: "Referencia:",
         name: "reference"
-    },
+    }
 ];
 
 export default function AddressForm({
@@ -77,8 +77,9 @@ export default function AddressForm({
 
     const onFormSubmit = (e) => {
         e.preventDefault();
-
+console.log("Hice clic en el botón"); // Paso 1
         form.handleSubmit((values) => {
+            console.log("¡Validación exitosa! Enviando:", values); // Paso 2
             onSubmit(values);
         });
     };
@@ -106,11 +107,26 @@ export default function AddressForm({
                     />
                 ))}
 
+                <div className="address-form-group">
+                    <label htmlFor="addressType">Tipo de dirección:</label>
+                    <select
+                        id="addressType"
+                        name="addressType"
+                        value={form.values.addressType || "home"}
+                        onChange={form.onChange}
+                        className="address-form-select"
+                    >
+                        <option value="home">Casa / Hogar</option>
+                        <option value="work">Trabajo / Oficina</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+
                 <div className="address-form-checkbox">
                     <input
                         type="checkbox"
-                        name="default"
-                        checked={form.values.default || false}
+                        name="isDefault"
+                        checked={form.values.isDefault || false}
                         onChange={form.onChange}
                         id="defaultAddress"
                     />

@@ -7,33 +7,38 @@ import { validatePayment } from "../../../forms/paymentValidate";
 import './PaymentForm.css';
 
 const paymentFields = [
+    // Campos para Tarjetas
     {
         id: "bankName",
         label: "Alias de la tarjeta:",
         name: "bankName",
         placeHolder: "Escribe el nombre del banco / alias de la tarjeta",
-        autoComplete: ""
+        autoComplete: "",
+        belongsTo: ["credit_card", "debit_card"]
     },
     {
         id: "cardNumber",
         label: "Número de la tarjeta:",
         name: "cardNumber",
         placeHolder: "5444-0000-0000-0000",
-        autoComplete: "cc-number"
+        autoComplete: "cc-number",
+        belongsTo: ["credit_card", "debit_card"]
     },
     {
         id: "cardHolderName",
         label: "Nombre del titular de la tarjeta:",
         name: "cardHolderName",
         placeHolder: "Andhony Rodolfo Palacios Tellez",
-        autoComplete: "cc-name"
+        autoComplete: "cc-name",
+        belongsTo: ["credit_card", "debit_card"]
     },
     {
         id: "expiryDate",
         label: "Fecha de expiración:",
         name: "expiryDate",
         placeHolder: "12/31",
-        autoComplete: "cc-exp"
+        autoComplete: "cc-exp",
+        belongsTo: ["credit_card", "debit_card"]
     },
     {
         id: "cvv",
@@ -41,7 +46,24 @@ const paymentFields = [
         name: "cvv",
         type: "password",
         maxLength: 4,
-        autoComplete: "cc-csc"
+        autoComplete: "cc-csc",
+        belongsTo: ["credit_card", "debit_card"]
+    },
+
+    // Campo para PayPal
+    {
+        id: "paypalEmail",
+        label: "Correo de PayPal:",
+        name: "paypalEmail",
+        belongsTo: ["paypal"]
+    },
+
+    // Campos para Transferencia
+    {
+        id: "accountNumber",
+        label: "Número de Cuenta:",
+        name: "accountNumber",
+        belongsTo: ["bank_transfer"]
     }
 ];
 
@@ -75,7 +97,24 @@ export default function PaymentForm({
             <form className="payment-form" noValidate onSubmit={onFormSubmit}>
                 <h3>{isEdit ? "Editar Método de Pago" : "Nuevo Método de Pago"}</h3>
 
-                {paymentFields.map((field) => (
+                <div className="payment-form-group">
+                    <label htmlFor="type">Método de Pago:</label>
+                    <select
+                        id="type"
+                        name="type"
+                        value={form.values.type || "credit_card"}
+                        onChange={form.onChange}
+                        className="payment-form-select"
+                    >
+                        <option value="credit_card">Tarjeta de Crédito</option>
+                        <option value="debit_card">Tarjeta de Débito</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank_transfer">Transferencia Bancaria</option>
+                    </select>
+                </div>
+
+                {paymentFields.filter((field) => field.belongsTo.includes(form.values.type))
+                .map((field) => (
                     <Input
                         key={field.id}
                         id={field.id}
@@ -97,8 +136,8 @@ export default function PaymentForm({
                 <div className="payment-form-checkbox">
                     <input
                         type="checkbox"
-                        name="default"
-                        checked={form.values.default || false}
+                        name="isDefault"
+                        checked={form.values.isDefault || false}
                         onChange={form.onChange}
                         id="defaultPayment"
                     />

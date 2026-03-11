@@ -24,20 +24,6 @@ import {
 
 const router = express.Router();
 
-const validateCart = [
-  // Validar que products sea un array
-  body('products')
-    .isArray({ min: 1 }).withMessage('Debe haber al menos un producto en el carrito'),
-
-  // Validar cada producto individualmente
-  body('products.*.product')
-    .notEmpty().withMessage('El campo product es obligatorio'),
-
-  body('products.*.quantity')
-    .notEmpty().withMessage('El campo quantity es obligatorio')
-    .isInt({ min: 1 }).withMessage('La cantidad debe ser un número entero mayor o igual a 1')
-];
-
 // Obtener todos los carritos (admin)
 router.get('/cart', authMiddleware, isAdmin, getCarts);
 

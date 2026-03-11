@@ -12,7 +12,7 @@ export const createOrder = async (orderData) => {
 
 export const getMyOrders = async (userId, page = 1, limit = 10) => {
     try {
-        const response = await http.post(`orders/user/${userId}`, { params: { page, limit } });
+        const response = await http.get(`orders/user/${userId}`, { params: { page, limit } });
 
         return response.data;
     } catch (error) {

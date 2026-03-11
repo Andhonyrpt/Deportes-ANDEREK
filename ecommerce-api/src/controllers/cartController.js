@@ -174,7 +174,7 @@ async function updateCartItem(req, res, next) {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    const searchSize = oldSize || size;
+    const searchSize = (oldSize && oldSize !== null) ? oldSize : size;
 
     const productIndex = cart.products.findIndex(
       (item) => item.product.toString() === productId && item.size === searchSize

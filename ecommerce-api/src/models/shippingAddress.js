@@ -44,6 +44,10 @@ const shippingAddressSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    reference: {
+        type: String,
+        trim: true
+    },
     isDefault: {
         type: Boolean,
         default: false

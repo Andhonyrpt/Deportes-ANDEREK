@@ -47,21 +47,21 @@ const addressValidations = [
 
 
 // Crear una nueva dirección
-router.post('/new-address', authMiddleware, addressValidations, validate, createShippingAddress);
+router.post('/shipping-addresses/new-address', authMiddleware, addressValidations, validate, createShippingAddress);
 
 // Obtener todas las direcciones del usuario
-router.get('/user-addresses', authMiddleware, getUserAddresses);
+router.get('/shipping-addresses/user-addresses', authMiddleware, getUserAddresses);
 
 // Obtener la dirección por defecto
-router.get('/default', authMiddleware, getDefaultAddress);
+router.get('/shipping-addresses/default', authMiddleware, getDefaultAddress);
 
 // Obtener una dirección específica (requiere autenticación)
-router.get('/user-address/:addressId', authMiddleware, [
+router.get('/shipping-addresses/user-address/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
 ], validate, getAddressById);
 
 // Actualizar una dirección (requiere autenticación)
-router.put('/user-address/:addressId', authMiddleware, [
+router.put('/shipping-addresses/user-address/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID'),
     nameOptionalValidation(),
     addressLineOptionalValidation(),
@@ -75,12 +75,12 @@ router.put('/user-address/:addressId', authMiddleware, [
 ], validate, updateShippingAddress);
 
 // Marcar dirección como default
-router.patch('/default/:addressId',authMiddleware, [
+router.patch('/shipping-addresses/default/:addressId',authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
 ], validate,  setDefaultAddress);
 
 // Eliminar una dirección
-router.delete('/delete-address/:addressId',authMiddleware, [
+router.delete('/shipping-addresses/delete-address/:addressId',authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
 ], validate,  deleteShippingAddress);
 

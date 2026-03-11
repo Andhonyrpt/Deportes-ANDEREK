@@ -1,15 +1,41 @@
-import paymentMethods from '../data/paymentMethods.json';
-// ya no funcionará
-export function getPaymentMethod() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(paymentMethods || []);
-        }, 600);
-    });
-};
+import { http } from './http';
 
-export async function getDefaultPaymentMethods() {
-    const methods = await getPaymentMethod();
+export async function getPaymentMethods(userId) {
+    try {
+        const response = await http.get(`payment-methods/user/${userId}`);
+        return response.data; // Retorna { paymentMethods: [...] }
+    } catch (error) {
+        console.error("Error fetching payment methods:", error);
+        return { paymentMethods: [] };
+    }
+}
 
-    return methods.find((m) => m.isDefault || m.default || methods[0] || null);
-};
+export async function getDefaultPaymentMethod(userId) {
+    try {
+        const response = await http.get(`payment-methods/default/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching default payment method:", error);
+        return null;
+    }
+}
+
+export async function createPaymentMethod(paymentData) {
+    try {
+        const response = await http.post('payment-methods', paymentData);
+        return response.data;
+    } catch (error) {
+        console.error("Error creating payment method:", error);
+        return null;
+    }
+}
+
+export async function deletePaymentMethod(paymentId) {
+    try {
+        const response = await http.delete(`payment-methods/${paymentId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting payment method:", error);
+        return null;
+    }
+}

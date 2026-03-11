@@ -38,11 +38,13 @@ describe("Flujo de Carrito de Compras", () => {
             req.headers['x-load-test'] = 'true';
         }).as("removeCartReq");
 
+        // Visitamos / primero para que loginByApi pueda acceder a cy.window()
+        cy.visit("/");
+
         // Login vía API para estar autenticado
         cy.loginByApi(testUser.email, testUser.password);
 
-        cy.visit("/");
-        // Esperamos a que los productos iniciales carguen
+        // Esperamos a que los productos iniciales carguen (gatillados por el primer visit)
         cy.wait("@getProducts");
     });
 
