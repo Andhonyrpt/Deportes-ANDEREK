@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
-import Category from "../models/category";
-import SubCategory from "../models/subCategory";
-import Product from "../models/product";
+import Category from "../models/category.js";
+import SubCategory from "../models/subCategory.js";
+import Product from "../models/product.js";
 
 dotenv.config();
 async function seed() {
