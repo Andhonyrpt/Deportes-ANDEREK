@@ -22,11 +22,10 @@ const categorySchema = new mongoose.Schema({
         ref: 'Category',
         default: null
     }
-});
-//, {
-//    timestamps: true // <-- agrega createdAt y updatedAt
+}, {
+    timestamps: true // <-- agrega createdAt y updatedAt
 
-//});
+});
 
 
 const Category = mongoose.model('Category', categorySchema);
