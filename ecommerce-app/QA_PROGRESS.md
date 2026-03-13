@@ -17,7 +17,7 @@ Este documento detalla el plan de pruebas End-to-End para el `ecommerce-app`, pe
 | CP-02 | Login Exitoso | ✅ PASSED | Redirección a home correcta |
 | CP-03 | Login Fallido | ✅ PASSED | Mensaje de error visible |
 | CP-04 | Flujo de Carrito | ✅ PASSED | Persistencia en localStorage |
-| CP-05 | Checkout (Mock) | ✅ PASSED | Generación de pedido mock |
+| CP-05 | Checkout (Real API)| ✅ PASSED | Validación completa: Dirección -> Pago -> Orden |
 | CP-06 | Ver Perfil | ✅ PASSED | Datos de usuario correctos |
 | CP-07 | Historial de Pedidos| ✅ PASSED | Lista de pedidos y detalle |
 | CP-08 | Búsqueda Catalogo | ✅ PASSED | Filtrado por texto funcional |

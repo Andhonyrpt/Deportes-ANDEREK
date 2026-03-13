@@ -18,8 +18,12 @@ export function CartProvider({ children }) {
     const [cartId, setCartId] = useState(null);
 
     // Funciones auxiliares
-    const getTotalItems = () => state.items.reduce((sum, i) => sum + i.quantity, 0);
-    const getTotalPrice = () => state.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    const getTotalItems = () => state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
+    const getTotalPrice = () => state.items.reduce((sum, i) => {
+        const price = i.product?.price || i.price || 0;
+        const qty = i.quantity || 0;
+        return sum + (price * qty);
+    }, 0);
 
     // Actualizar localStorage cuando cambie el carrito
     useEffect(() => {
@@ -31,14 +35,19 @@ export function CartProvider({ children }) {
         const initializeCart = async () => {
             if (isAuth && user?._id) {
                 try {
+                    console.log("DEBUG [CartContext]: Initializing cart for user", user._id);
                     const backendCart = await cartService.getCart(user._id);
+                    console.log("DEBUG [CartContext]: Backend response", backendCart);
 
                     if (backendCart?.products) {
                         setCartId(backendCart._id);
+                        // El backend devuelve { products: [{ product: {...}, quantity, size }] }
                         dispatch({ type: CART_ACTIONS.INIT, payload: backendCart.products });
+                    } else {
+                        console.log("DEBUG [CartContext]: No products in backend cart");
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error("DEBUG [CartContext]: Error", error);
                 }
             } else if (!isAuth) {
                 // Si no hay sesión, "reseteamos" el cartId pero dejamos que el reducer

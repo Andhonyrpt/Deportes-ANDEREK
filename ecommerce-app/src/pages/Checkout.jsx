@@ -30,14 +30,14 @@ export default function Checkout() {
     const { user } = useAuth();
 
     // Cálculos financieros simples
-    const subtotal = typeof total === "number" ? total : 0;
+    const subtotal = Number(total) || 0;
     const TAX_RATE = 0.16; // IVA 16%
     const SHIPPING_RATE = 350;
     const FREE_SHIPPING_THRESHOLD = 1000;
 
-    const taxAmount = parseFloat((subtotal * TAX_RATE).toFixed(2));
+    const taxAmount = Number((subtotal * TAX_RATE).toFixed(2));
     const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_RATE;
-    const grandTotal = parseFloat((subtotal + taxAmount + shippingCost).toFixed(2));
+    const grandTotal = Number((subtotal + taxAmount + shippingCost).toFixed(2));
 
     const formatMoney = (v) =>
         new Intl.NumberFormat("es-MX", {
@@ -86,8 +86,10 @@ export default function Checkout() {
                     getPaymentMethods(user._id)
                 ]);
 
-                const addrList = addrRes.addresses || [];
-                const payList = payRes.paymentMethods || [];
+                // getShippingAddresses devuelve { message, addresses: [...] }
+                const addrList = addrRes?.addresses || (Array.isArray(addrRes) ? addrRes : []);
+                // getPaymentMethods devuelve un array directo (no envuelto)
+                const payList = Array.isArray(payRes) ? payRes : (payRes?.paymentMethods || []);
 
                 console.log("Checkout: Direcciones recibidas", addrList);
                 console.log("Checkout: Pagos recibidos", payList);
@@ -127,13 +129,19 @@ export default function Checkout() {
             setLoadingLocal(true);
             await createShippingAddress({ ...formData, isDefault: addresses.length === 0 });
             const updated = await getShippingAddresses();
-            const addrList = updated?.addresses || updated || [];
-            if (Array.isArray(addrList)) {
+            console.log("Checkout: Actualización tras dirección", updated);
+            
+            const addrList = updated?.addresses || (Array.isArray(updated) ? updated : null);
+            if (addrList && Array.isArray(addrList) && addrList.length > 0) {
                 setAddresses(addrList);
                 setSelectedAddress(addrList[addrList.length - 1]);
+                setAddressSectionOpen(false);
+                setShowAddressForm(false);
+            } else if (addrList && addrList.length === 0) {
+                 // Si explícitamente es 0, lo dejamos así 
+                 setAddresses([]);
             }
-            setShowAddressForm(false);
-            setAddressSectionOpen(false);
+            // Si addrList es null (ej: 304 fallido), NO limpiamos el estado previo
         } catch (err) {
             setLocalError("Error al guardar la dirección");
         } finally {
@@ -166,13 +174,17 @@ export default function Checkout() {
             setLoadingLocal(true);
             await createPaymentMethod({ ...formData, user: user._id, isDefault: payments.length === 0 });
             const updated = await getPaymentMethods(user._id);
-            const payList = updated?.paymentMethods || updated || [];
-            if (Array.isArray(payList)) {
+            console.log("Checkout: Actualización tras pago", updated);
+            
+            const payList = Array.isArray(updated) ? updated : (updated?.paymentMethods || null);
+            if (payList && Array.isArray(payList) && payList.length > 0) {
                 setPayments(payList);
                 setSelectedPayment(payList[payList.length - 1]);
+                setPaymentSectionOpen(false);
+                setShowPaymentForm(false);
+            } else if (payList && payList.length === 0) {
+                setPayments([]);
             }
-            setShowPaymentForm(false);
-            setPaymentSectionOpen(false);
         } catch (err) {
             setLocalError("Error al guardar el método de pago");
         } finally {
