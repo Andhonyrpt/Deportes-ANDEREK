@@ -1,0 +1,88 @@
+
+
+DevTools listening on ws://127.0.0.1:58019/devtools/browser/750e64c1-c1f7-4741-b278-0da1b4f90479
+Warning: The allowCypressEnv configuration option is enabled. This allows any browser code to read values from Cypress.env(). This is insecure and will be removed in a future major version.
+
+1. Replace Cypress.env() calls with cy.env() (for sensitive values) or Cypress.expose() (for public configuration)
+2. Set allowCypressEnv: false in your Cypress configuration to disable Cypress.env()
+
+Learn more: https://on.cypress.io/cypress-env-migration
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.11.0                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v24.12.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (checkout.cy.js)                                                       │
+  │ Searched:       C:\Users\Usuario\Documents\Deportes-ANDEREK\ecommerce-app\cypress\e2e\checkout │
+  │                 .cy.js                                                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  checkout.cy.js                                                                  (1 of 1)
+
+
+  INTEGRATION TEST V3 - Full Checkout Flow
+    1) "before all" hook for "corre el flujo completo exitosamente"
+
+
+  0 passing (680ms)
+  1 failing
+
+  1) INTEGRATION TEST V3 - Full Checkout Flow
+       "before all" hook for "corre el flujo completo exitosamente":
+     Error: Registration failed: 429 {"message":"Too many authentication attempts, please try again after 15 minutes"}
+
+Because this error occurred during a `before all` hook we are skipping the remaining tests in the current suite: `INTEGRATION TEST V3 - Full ...`
+      at Context.eval (webpack://ecommerce-app/./cypress/support/commands.js:13:18)
+      at getRet (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:122806:20)
+      at tryCatcher (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise.attempt.Promise.try (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:4285:29)
+      at Context.thenFn (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:122817:66)
+      at Context.then (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:123068:21)
+      at wrapped (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:146326:19)
+      at <unknown> (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:152294:15)
+      at tryCatcher (http://127.0.0.1:3000/__cypress/runner/cypress_runner.js:1777:23)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     checkout.cy.js                                                                   │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Usuario\Documents\Deportes-ANDEREK\ecommerce-app\cypress\screenshots\ch     (1280x720)
+     eckout.cy.js\INTEGRATION TEST V3 - Full Checkout Flow -- corre el flujo completo               
+      exitosamente -- before all hook (failed).png                                                  
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  checkout.cy.js                           688ms        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     688ms        1        -        1        -        -  
+

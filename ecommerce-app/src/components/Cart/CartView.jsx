@@ -37,11 +37,11 @@ export default function CartView() {
                     <div className="cart-item" key={currentItemId} data-testid={`cart-item-${p._id}`}>
 
                         <div className="cart-item-image">
-                            <img src={p.imagesUrl[0]} alt={p.name} loading="lazy" />
+                            <img src={p?.imagesUrl?.[0] || 'https://via.placeholder.com/150'} alt={p?.name || 'Producto'} loading="lazy" />
                         </div>
 
                         <div className="cart-item-info">
-                            <h3>{p.name}</h3>
+                            <h3>{p?.name || 'Producto'}</h3>
                             {p.variants && p.variants.length > 0 && (
                                 <div className="cart-item-size-selector">
                                     <label htmlFor={`size-select-${currentItemId}`}
@@ -71,7 +71,7 @@ export default function CartView() {
                                     </select>
                                 </div>
                             )}
-                            <p className="cart-item-price">{`$${(p.price).toFixed(2)}`}</p>
+                            <p className="cart-item-price">{`$${(p?.price || 0).toFixed(2)}`}</p>
                         </div>
 
                         <div className="cart-item-quantity">

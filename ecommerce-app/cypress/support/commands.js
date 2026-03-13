@@ -1,16 +1,14 @@
-// cypress/support/commands.js
-
-// cypress/support/commands.js
-
 Cypress.Commands.add("registerUser", (userData) => {
+    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
+    cy.log(`Registering: ${userData.email} at ${apiUrl}`);
+    
     return cy.request({
         method: "POST",
-        url: `${Cypress.env("apiUrl")}/auth/register`,
-        headers: { "x-load-test": "true" },
+        url: `${apiUrl}/auth/register`,
         body: userData,
         failOnStatusCode: false
     }).then((res) => {
-        // Permitimos 400 si el usuario ya existe para reuso en tests consecutivos
+        cy.log(`Register response: ${res.status}`);
         if (res.status !== 201 && res.status !== 400) {
             throw new Error(`Registration failed: ${res.status} ${JSON.stringify(res.body)}`);
         }
@@ -18,60 +16,61 @@ Cypress.Commands.add("registerUser", (userData) => {
 });
 
 Cypress.Commands.add("loginByApi", (email, password) => {
-    cy.request({
+    const apiUrl = Cypress.env("apiUrl") || "http://localhost:4000/api";
+    cy.log(`Logging in: ${email} at ${apiUrl}`);
+
+    return cy.request({
         method: "POST",
-        url: `${Cypress.env("apiUrl")}/auth/login`,
-        headers: { "x-load-test": "true" },
+        url: `${apiUrl}/auth/login`,
         body: { email, password },
-        failOnStatusCode: false,
+        failOnStatusCode: false
     }).then((loginRes) => {
+        cy.log(`Login response: ${loginRes.status}`);
         if (loginRes.status !== 200) {
             throw new Error(`Login failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
         }
-        const { token, refreshToken } = loginRes.body;
-        
+
+        const token = loginRes.body.token;
         return cy.request({
             method: "GET",
-            url: `${Cypress.env("apiUrl")}/users/profile`,
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "x-load-test": "true"
-            }
+            url: `${apiUrl}/users/profile`,
+            headers: { Authorization: `Bearer ${token}` }
         }).then((profileRes) => {
+            cy.log(`Profile response: ${profileRes.status}`);
             const user = profileRes.body.user;
             
-            // Requerimos que ya se haya visitado el origen (e.g. cy.visit('/')) en el test
-            // para que cy.window() apunte al origin correcto.
             return cy.window().then((win) => {
                 win.localStorage.setItem("authToken", token);
-                win.localStorage.setItem("refreshToken", refreshToken);
                 win.localStorage.setItem("userData", JSON.stringify(user));
                 win.localStorage.setItem("auth_debug_status", "logged_in_by_api");
+                return { token, user };
             });
         });
     });
 });
 
 Cypress.Commands.add("addProductToCart", (productId, quantity = 1, size = "M") => {
+    const apiUrl = Cypress.env("apiUrl") || "http://localhost:4000/api";
+    
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
-        if (token) {
-            return cy.request({
-                method: "POST",
-                url: `${Cypress.env("apiUrl")}/cart/add`,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "x-load-test": "true"
-                },
-                body: {
-                    productId,
-                    quantity,
-                    size
-                }
-            });
-        } else {
-            // Fallback or handle guest cart if applicable
-            cy.log("No auth token found for addProductToCart");
+        const userStr = win.localStorage.getItem("userData");
+        const user = userStr ? JSON.parse(userStr) : null;
+
+        if (!token || !user) {
+            throw new Error("Cannot add to cart: No auth token or user data in localStorage");
         }
+
+        return cy.request({
+            method: "POST",
+            url: `${apiUrl}/cart/add`,
+            headers: { Authorization: `Bearer ${token}` },
+            body: {
+                userId: user._id,
+                productId,
+                quantity,
+                size
+            }
+        });
     });
 });

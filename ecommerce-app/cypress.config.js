@@ -6,11 +6,17 @@ module.exports = defineConfig({
         viewportWidth: 1280,
         viewportHeight: 800,
         video: false,
+        chromeWebSecurity: false,
         env: {
-            apiUrl: "http://localhost:4000/api",
+            apiUrl: "http://127.0.0.1:4000/api",
         },
         setupNodeEvents(on, config) {
-            // implement node event listeners here
+            on('before:browser:launch', (browser = {}, launchOptions) => {
+                if (browser.family === 'chromium' && browser.name !== 'electron') {
+                    launchOptions.args.push('--disable-web-security');
+                    return launchOptions;
+                }
+            });
         },
     },
 });

@@ -64,13 +64,16 @@ export default function Checkout() {
         if (cartItems?.length > 0) {
             const getPreview = async () => {
                 try {
-                    const products = cartItems.map(item => ({
-                        productId: item._id,
-                        quantity: item.quantity,
-                        size: item.selectedSize || "M"
-                    }));
-                    // const data = await previewOrder(products);
-                    // if (data) setPreview(data);
+                    const products = cartItems.map(item => {
+                        const p = item.product || item;
+                        return {
+                            productId: p._id,
+                            quantity: item.quantity,
+                            size: item.selectedSize || "M"
+                        };
+                    });
+                    const data = await previewOrder(products);
+                    if (data) setPreview(data);
                 } catch (err) {
                     console.error("Checkout: Error loading preview", err);
                 }
@@ -234,12 +237,15 @@ export default function Checkout() {
             setLoadingLocal(true);
             const orderData = {
                 user: user._id,
-                products: cartItems.map(item => ({
-                    productId: item._id,
-                    quantity: item.quantity,
-                    price: item.price,
-                    size: item.selectedSize || "M"
-                })),
+                products: cartItems.map(item => {
+                    const p = item.product || item;
+                    return {
+                        productId: p._id,
+                        quantity: item.quantity,
+                        price: p.price,
+                        size: item.selectedSize || "M"
+                    };
+                }),
                 shippingAddress: selectedAddress._id,
                 paymentMethod: selectedPayment._id,
                 shippingCost: shippingCost,
