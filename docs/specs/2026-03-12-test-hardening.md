@@ -4,7 +4,7 @@
 - **Tipo:** testing
 - **Complejidad:** M
 - **Fecha:** 2026-03-12
-- **Estado:** DRAFT
+- **Estado:** DONE
 
 ## Historia
 Como ingeniero de QA/Seguridad, quiero tener tests de integración robustos que validen tanto la lógica financiera del checkout como la seguridad del proceso de autenticación, para prevenir regresiones y proteger los datos de los usuarios.
@@ -41,6 +41,14 @@ Como ingeniero de QA/Seguridad, quiero tener tests de integración robustos que 
 - No exponer secrets en los tests.
 - Limpiar la DB entre tests para evitar polución de estados.
 
-## Plan de Pruebas
-1. Ejecutar `npm run test tests/integration/order_preview.test.js`.
-2. Ejecutar `npm run test tests/integration/auth.test.js`.
+## Resultados (se completa al cerrar)
+- Fecha de cierre: 2026-03-12
+- CAs cumplidos:
+  - [x] CA-1 a CA-6 (Orders Preview) pasados satisfactoriamente.
+  - [x] CA-7 (Password Strength): Validado mediante `express-validator` y tests de error 422.
+  - [x] CA-8 (Duplicate phone): Refactorizado en el controlador y verificado en tests.
+  - [x] CA-9 (JWT Claims): Verificado `userId`, `displayName`, `role` en el payload.
+  - [x] CA-10 (No hashPassword): Verificado que no se expone en el JSON de respuesta.
+- Deuda técnica: Se recomienda implementar una limpieza automática de la DB vía hooks globales de Vitest si la suite crece mucho.
+- Lecciones aprendidas: El orden de los validadores (`trim` antes que `isEmail`) es crítico para la robustez.
+- Trabajo fuera de alcance: Rotación de llaves JWT y bloqueo de cuenta por IP (solo rate limit temporal).

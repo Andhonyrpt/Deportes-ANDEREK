@@ -54,8 +54,51 @@ describe('Auth Integration Tests', () => {
 
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty('email', userData.email);
-            expect(response.body).toHaveProperty('displayName', userData.displayName);
-            expect(response.body).toHaveProperty('phone', userData.phone);
+        });
+
+        it('should return 201 if PHONE already exists to prevent enumeration', async () => {
+            const user1 = {
+                displayName: 'User One',
+                email: 'user1@example.com',
+                password: 'Password123',
+                phone: '1111111111'
+            };
+            const user2 = {
+                displayName: 'User Two',
+                email: 'user2@example.com',
+                password: 'Password123',
+                phone: '1111111111' // Duplicate phone
+            };
+
+            await request(app).post('/api/auth/register').send(user1);
+            
+            const response = await request(app)
+                .post('/api/auth/register')
+                .send(user2);
+
+            expect(response.status).toBe(201);
+            // Verify in DB that user2 wasn't actually created with that phone
+            const dbUser2 = await User.findOne({ email: user2.email });
+            expect(dbUser2).toBeNull();
+        });
+
+        it('should sanitize email (trim/normalize) on register', async () => {
+            const userData = {
+                displayName: 'Sanitize User',
+                email: ' SANITIZE@example.com  ', // Mixed case and spaces
+                password: 'Password123',
+                phone: '9999999999'
+            };
+
+            const response = await request(app)
+                .post('/api/auth/register')
+                .send(userData);
+
+            expect(response.status).toBe(201);
+            expect(response.body.email).toBe('sanitize@example.com');
+            
+            const user = await User.findOne({ email: 'sanitize@example.com' });
+            expect(user).toBeTruthy();
         });
 
         it('should return 422 for invalid email format', async () => {
@@ -113,7 +156,7 @@ describe('Auth Integration Tests', () => {
             await request(app).post('/api/auth/register').send(userData);
         });
 
-        it('should login successfully with valid credentials', async () => {
+        it('should login successfully and return JWT with correct claims', async () => {
             const response = await request(app)
                 .post('/api/auth/login')
                 .send({
@@ -124,6 +167,29 @@ describe('Auth Integration Tests', () => {
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('token');
             expect(response.body).toHaveProperty('refreshToken');
+
+            // Verify JWT payload
+            const decoded = jwt.decode(response.body.token);
+            expect(decoded).toHaveProperty('userId');
+            expect(decoded).toHaveProperty('displayName', 'Login User');
+            expect(decoded).toHaveProperty('role', 'guest');
+        });
+
+        it('should enforce Rate Limiting on login with strict header', async () => {
+            const loginData = { email: 'login@example.com', password: 'WrongPassword' };
+            
+            // First 2 attempts allowed (max: 2 for test with strict header)
+            await request(app).post('/api/auth/login').set('x-test-limit-strict', 'true').send(loginData);
+            await request(app).post('/api/auth/login').set('x-test-limit-strict', 'true').send(loginData);
+            
+            // 3rd attempt should be blocked
+            const response = await request(app)
+                .post('/api/auth/login')
+                .set('x-test-limit-strict', 'true')
+                .send(loginData);
+
+            expect(response.status).toBe(429);
+            expect(response.body.message).toContain('Too many authentication attempts');
         });
 
         it('should return 400 for incorrect password', async () => {

@@ -25,26 +25,47 @@ export function CartProvider({ children }) {
         return sum + (price * qty);
     }, 0);
 
-    // Actualizar localStorage cuando cambie el carrito
+    // Actualizar localStorage SOLO para invitados (Guest Mode)
     useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(state.items));
-
-    }, [state.items]);
+        if (!isAuth) {
+            localStorage.setItem("cart", JSON.stringify(state.items));
+        }
+    }, [state.items, isAuth]);
 
     useEffect(() => {
         const initializeCart = async () => {
             if (isAuth && user?._id) {
                 try {
                     console.log("DEBUG [CartContext]: Initializing cart for user", user._id);
+                    
+                    // 1. Verificar si hay items huérfanos del modo Guest en el estado actual
+                    const localItems = state.items;
+                    if (localItems.length > 0) {
+                        console.log("DEBUG [CartContext]: Merging guest items...", localItems);
+                        const mergePayload = localItems.map(item => ({
+                            productId: item._id,
+                            quantity: item.quantity,
+                            size: item.selectedSize || "M"
+                        }));
+                        await cartService.mergeCart(mergePayload);
+                        // Una vez fusionado, limpiamos el localStorage para que no se use más
+                        localStorage.removeItem("cart");
+                    }
+
+                    // 2. Obtener el carrito final (ya fusionado) desde el backend
                     const backendCart = await cartService.getCart(user._id);
                     console.log("DEBUG [CartContext]: Backend response", backendCart);
 
                     if (backendCart?.products) {
                         setCartId(backendCart._id);
-                        // El backend devuelve { products: [{ product: {...}, quantity, size }] }
-                        dispatch({ type: CART_ACTIONS.INIT, payload: backendCart.products });
-                    } else {
-                        console.log("DEBUG [CartContext]: No products in backend cart");
+                        // Normalizar para el reducer (el backend usa 'product' y nosotros '_id')
+                        const normalizedItems = backendCart.products.map(p => ({
+                            ...p.product,
+                            _id: p.product._id,
+                            quantity: p.quantity,
+                            selectedSize: p.size
+                        }));
+                        dispatch({ type: CART_ACTIONS.INIT, payload: normalizedItems });
                     }
                 } catch (error) {
                     console.error("DEBUG [CartContext]: Error", error);

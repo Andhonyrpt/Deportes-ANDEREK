@@ -11,10 +11,10 @@ Este repositorio contiene la solución completa de una plataforma e-commerce, di
 
 Para agentes y desarrolladores, los siguientes archivos son la fuente oficial de verdad:
 
-1.  **[AGENTS.md (API)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/ecommerce-api/AGENTS.md)**: Mapa de rutas, modelos de Mongoose y patrones de implementación del backend.
-2.  **[AGENTS.md (App)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/ecommerce-app/AGENTS.md)**: Guía de componentes, contextos y flujos del frontend.
-3.  **[IMPROVEMENTS.md](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/IMPROVEMENTS.md)**: Registro de deuda técnica, mejoras de UI/UX y planes de escalabilidad.
-4.  **[QA_PLAN.md](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/ecommerce-api/QA_PLAN.md)**: Estrategia de pruebas y cobertura actual.
+1.  **[SSDLC Protocol (docs/SSDLC.md)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/docs/SSDLC.md)**: Manual operativo y reglas de seguridad obligatorias.
+2.  **[Project Spec (docs/specs/project_spec.md)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/docs/specs/project_spec.md)**: Alcance actual, objetivo y brechas de arquitectura.
+3.  **[QA Strategy (docs/testing/STRATEGY.md)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/docs/testing/STRATEGY.md)**: Plan maestro de pruebas y matrices de progreso.
+4.  **[Skills Directory (docs/skills/)](file:///c:/Users/Usuario/Documents/Deportes-ANDEREK/docs/skills/)**: Guías de mejores prácticas por tecnología.
 
 ## Cómo Iniciar
 

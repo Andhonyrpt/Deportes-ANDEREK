@@ -16,9 +16,10 @@ const generateRefreshToken = (userId, displayName, role) => {
     );
 };
 
-const checkUserExist = async (email) => {
-    const user = await User.findOne({ email });
-    console.log(user);
+const checkUserExist = async (email, phone = null) => {
+    const query = { $or: [{ email }] };
+    if (phone) query.$or.push({ phone });
+    const user = await User.findOne(query);
     return user;
 };
 
@@ -32,8 +33,11 @@ async function register(req, res, next) {
     try {
         const { displayName, email, password, phone } = req.body;
 
-        const userExist = await checkUserExist(email);
+        const userExist = await checkUserExist(email, phone);
         if (userExist) {
+            // Si el email coincide, pretendemos éxito para evitar enumeración (Privacy by Design)
+            // Si el teléfono coincide pero el mail no, es un conflicto de datos que reportamos genérico o seguimos misma lógica.
+            // Para simplificar y seguir el patrón existente:
             return res.status(201).json({ displayName, email, phone });
         }
 

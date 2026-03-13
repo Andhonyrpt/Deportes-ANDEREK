@@ -63,3 +63,13 @@ export const clearCart = async (userId) => {
         console.error("Error deleting cart", error);
     }
 };
+
+export const mergeCart = async (products) => {
+    try {
+        const response = await http.post("cart/merge", { products });
+        return response.data;
+    } catch (error) {
+        console.error("Error merging cart", error);
+        throw error;
+    }
+};

@@ -1,5 +1,6 @@
 import Order from '../models/order.js';
 import Product from '../models/product.js';
+import { calculateOrderFinancials } from '../utils/orderHelper.js';
 
 async function getOrders(req, res, next) {
   try {
@@ -55,7 +56,7 @@ async function createOrder(req, res, next) {
       products,
       shippingAddress,
       paymentMethod,
-      shippingCost = 0
+      // shippingCost = 0
     } = req.body;
 
     const stockChecks = await Promise.all(products.map(async (item) => {
@@ -144,12 +145,8 @@ async function createOrder(req, res, next) {
       price: check.product.price,
     }));
 
-    // Calcular precio total con precios del servidor
-    const subtotal = normalizedProducts.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-    const totalPrice = subtotal + shippingCost;
+    // Calcular desglose financiero con lógica centralizada del servidor
+    const { subtotal, tax, shippingCost, total: totalPrice } = calculateOrderFinancials(normalizedProducts);
 
     let newOrder;
     try {
@@ -388,6 +385,39 @@ async function deleteOrder(req, res, next) {
   }
 };
 
+async function previewOrder(req, res, next) {
+  try {
+    const { products } = req.body;
+
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ message: "Products array is required" });
+    }
+
+    const priceChecks = await Promise.all(products.map(async (item) => {
+      const product = await Product.findById(item.productId);
+      if (!product) return null;
+      return { 
+        price: product.price, 
+        quantity: item.quantity 
+      };
+    }));
+
+    if (priceChecks.some(p => p === null)) {
+      return res.status(404).json({ message: "One or more products not found" });
+    }
+
+    const financials = calculateOrderFinancials(priceChecks);
+
+    res.json({
+      ...financials,
+      currency: "MXN",
+      taxRate: "16%"
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export {
   getOrders,
   getOrderById,
@@ -397,5 +427,6 @@ export {
   cancelOrder,
   updateOrderStatus,
   updatePaymentStatus,
-  deleteOrder
+  deleteOrder,
+  previewOrder
 };

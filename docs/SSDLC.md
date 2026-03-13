@@ -127,20 +127,39 @@ Crear el documento de especificación en:
 ## Riesgos y Deuda Técnica
 [Qué puede salir mal. Qué queda pendiente conscientemente]
 
+## Pendientes Abiertos y Gaps Detectados
+- Funcionalidades faltantes:
+- Comportamientos inconsistentes detectados:
+- Gaps entre frontend y backend:
+- Persistencia pendiente de migrar:
+- Decisiones aplazadas:
+- Trabajo fuera de alcance en esta iteración:
+- Riesgos que requieren seguimiento:
+- Items que deben convertirse en backlog:
+
 ## Resultados (se completa al cerrar)
 - Fecha de cierre:
 - CAs cumplidos:
 - CAs no cumplidos:
 - Deuda técnica generada:
 - Lecciones aprendidas:
+- Pendientes abiertos confirmados:
+- Gaps no resueltos:
+- Trabajo fuera de alcance confirmado:
+- Backlog derivado creado: sí | no
+- Referencias a historias/tareas creadas:
+
+## Matriz de cierre
+| Item detectado | Estado | Acción |
+|---|---|---|
+| Implementado | Confirmado | Cerrar |
+| Parcial | Requiere seguimiento | Crear backlog |
+| Inconsistente | Riesgo | Crear backlog |
+| Fuera de alcance | Aplazado | Crear backlog o archivar |
+| Obsoleto | No aplica | Archivar o eliminar |
 ```
 
-Hacer commit del spec **antes de crear la rama de trabajo:**
-```bash
-git add docs/specs/
-git commit -m "docs: spec [nombre-corto]"
-git push origin develop
-```
+Hacer commit del spec **antes de crear la rama de trabajo.**
 
 ---
 
@@ -154,238 +173,141 @@ git pull origin develop
 git checkout -b [tipo]/[nombre-en-kebab-case]
 ```
 
-### Convención de nombres
-
-| Tipo | Formato |
-|------|---------|
-| Feature | `feature/descripcion-corta` |
-| Bugfix | `bugfix/descripcion-corta` |
-| Hotfix | `hotfix/descripcion-corta` |
-| Refactor | `refactor/descripcion-corta` |
-| Security patch | `security/descripcion-corta` |
-| Infraestructura | `infra/descripcion-corta` |
-| Documentación | `docs/descripcion-corta` |
-
 ### Reglas absolutas de ramas
 
 - **Nunca trabajar directamente en `main`, `master` o `develop`**
 - **Nunca hacer commits de work-in-progress directamente a develop**
-- Los hotfixes se abren desde `main` y se mergean a `main` Y `develop`
 - Una rama = una unidad de trabajo = un PR
 
 ---
 
 ## FASE 5 — SKILL AUDIT
 
-Antes de escribir código nuevo, auditar el repositorio:
-
-1. ¿Existen utilidades, helpers o módulos que ya resuelvan parte del problema?
-2. ¿Hay patrones establecidos en el proyecto que deba seguir?
-3. ¿Las dependencias necesarias ya están instaladas y en qué versión?
-4. ¿Existen tests similares que sirvan como referencia?
-
-**Si faltan skills reutilizables** (funciones utilitarias, módulos de validación, wrappers de seguridad):
-- Crearlos como código de soporte antes de implementar la funcionalidad principal
-- Documentarlos en `/docs/skills/` con su propósito, API y ejemplos de uso
-- Hacer commit separado: `feat: skill [nombre]`
+Auditar el repositorio antes de implementar para identificar patrones, utilidades y tests de referencia.
 
 ---
 
 ## FASE 6 — IMPLEMENTACIÓN SEGURA
 
-### Reglas de seguridad no negociables
-
-**Manejo de secrets y credenciales:**
-- ❌ Nunca hardcodear secrets, tokens, API keys, passwords o connection strings
-- ✅ Usar variables de entorno, secret managers o archivos `.env` excluidos del repo
-- ✅ Verificar que `.gitignore` excluya archivos de configuración sensibles antes de cualquier commit
-- ✅ Si se detecta un secret en el historial: reportar inmediatamente, no continuar
-
-**Validación y sanitización de inputs:**
-- Todos los inputs externos (usuario, APIs, archivos, variables de entorno) se validan antes de usar
-- Validar tipo, formato, longitud y rango
-- Nunca confiar en datos que vienen de fuera del sistema
-
-**Manejo de errores:**
-- Los errores se capturan explícitamente, nunca se swallowean en silencio
-- Los mensajes de error expuestos al usuario no revelan detalles internos del sistema
-- Los logs internos sí pueden ser detallados, pero nunca deben contener secrets o PII
-
-**Dependencias:**
-- No agregar una librería externa sin revisar si ya existe solución interna
-- Verificar que no tenga CVEs activos conocidos antes de incorporarla
-- Fijar versiones exactas, no rangos abiertos en producción
-
-**Principio de mínimo privilegio:**
-- Los componentes solicitan solo los permisos que necesitan
-- Los tokens y credenciales tienen el alcance más restringido posible
-- Las conexiones a bases de datos usan usuarios con permisos específicos, no root/admin
-
-### Estándar de commits
-
-Seguir Conventional Commits:
-
-```
-feat: [descripción en presente, imperativo]
-fix: [descripción]
-refactor: [descripción]
-test: [descripción]
-docs: [descripción]
-security: [descripción]
-infra: [descripción]
-chore: [descripción]
-```
-
-- Commits atómicos: un commit = un cambio lógico coherente
-- Mensajes en inglés, claros y en presente
-- No commitear código comentado, console.logs de debug, o archivos temporales
+Seguir reglas de seguridad no negociables (Manejo de secrets, Validación de inputs, Manejo de errores, Principio de mínimo privilegio).
 
 ---
 
 ## FASE 7 — VERIFICACIÓN Y QUALITY GATES
 
-Los checks se ejecutan **en orden**. Si alguno falla: **detener, reportar el error con detalle y esperar instrucciones.**
-
-### 7.1 Análisis estático y linting
-- Ejecutar el linter configurado en el proyecto (identificado en los skills)
-- Corregir automáticamente donde sea seguro hacerlo
-- Los errores que requieren decisión de diseño se reportan antes de corregir
-
-### 7.2 Seguridad estática (SAST)
-- Ejecutar la herramienta SAST configurada en el proyecto
-- Revisar dependencias por CVEs conocidos con la herramienta del stack
-- Verificar manualmente que no haya secrets en el diff: `git diff develop..HEAD`
-- Revisar que los archivos sensibles estén en `.gitignore`
-
-### 7.3 Tests unitarios
-- Todos los tests existentes deben pasar
-- Los tests nuevos para la funcionalidad implementada son **obligatorios, no opcionales**
-- Cobertura mínima: cubrir el camino feliz y al menos 2 casos borde por función crítica
-
-### 7.4 Tests de integración
-- Ejecutar si existen en el proyecto
-- Si el cambio afecta contratos entre módulos, verificar que la integración funcione
-
-### 7.5 Revisión de diff
-Antes del PR, revisar manualmente:
-- [ ] No hay secrets ni credenciales en el código
-- [ ] No hay código de debug o console.logs temporales
-- [ ] No hay archivos no relacionados con el cambio
-- [ ] Los cambios son coherentes con el spec
-- [ ] No hay regresiones evidentes en funcionalidad existente
+Checks en orden: Linter -> SAST -> Tests Unitarios -> Tests de Integración -> Revisión de Diff.
 
 ---
 
 ## FASE 8 — PRUEBA FUNCIONAL
 
-Demostrar que el cambio funciona según los criterios de aceptación del spec:
-
-1. Ejecutar el flujo principal descrito en la historia
-2. Verificar cada criterio de aceptación uno por uno
-3. Probar los casos borde identificados en el spec
-4. Documentar el resultado de cada CA: ✅ cumplido | ❌ no cumplido | ⚠️ parcial
-
-Si algún CA falla: **no continuar al PR. Volver a implementación, reportar qué falló y cómo se resolvió.**
+Verificar cada Criterio de Aceptación (CA) del spec.
 
 ---
 
 ## FASE 9 — PULL REQUEST
 
-Solo si **todas las fases anteriores se completaron exitosamente:**
-
-```bash
-git push origin [nombre-rama]
-```
-
-El PR siempre va dirigido a `develop`, excepto hotfixes que van a `main`.
-
-### Estructura del PR
-
-```markdown
-## Descripción
-[Qué se hizo y por qué, en 2-3 oraciones]
-
-## Spec
-`/docs/specs/[YYYY-MM-DD]-[tipo]-[nombre-corto].md`
-
-## Tipo de cambio
-- [ ] Feature
-- [ ] Bugfix
-- [ ] Hotfix
-- [ ] Refactor
-- [ ] Security patch
-- [ ] Infra / Config
-- [ ] Docs
-
-## Cambios principales
-- [cambio 1]
-- [cambio 2]
-
-## Criterios de aceptación
-- [x] CA-1: [descripción] ✅
-- [x] CA-2: [descripción] ✅
-
-## Quality Gates
-- [x] Linting — sin errores
-- [x] SAST — sin hallazgos críticos o altos
-- [x] Dependencias — sin CVEs activos
-- [x] Tests unitarios — todos pasan
-- [x] Tests de integración — todos pasan (si aplica)
-- [x] Diff revisado — sin secrets, sin código debug
-- [x] Prueba funcional — todos los CAs verificados
-
-## Consideraciones de seguridad
-[Amenazas evaluadas y controles aplicados. "N/A" solo si el cambio es puramente documental]
-
-## Breaking changes
-[Ninguno | descripción de qué se rompe y cómo migrar]
-
-## Screenshots / evidencia (si aplica)
-```
+Push de rama y creación de PR hacia `develop` (o `main` para hotfixes).
 
 ---
 
-## FASE 10 — CIERRE DE SPEC Y DOCUMENTACIÓN
+## FASE 10 — CIERRE DOCUMENTAL ESTRICTO Y TRAZABILIDAD
 
-Actualizar el archivo de spec en `/docs/specs/`:
+La fase documental no se considera cerrada hasta que los pendientes abiertos, gaps detectados y trabajo fuera de alcance hayan quedado documentados y convertidos en backlog accionable.
 
-1. Cambiar estado a `DONE` o `REJECTED`
-2. Completar la sección `## Resultados`:
-   - Fecha de cierre
-   - CAs cumplidos y no cumplidos
-   - Deuda técnica generada (si aplica)
-   - Lecciones aprendidas (si aplica)
+Proceder con el cierre del archivo de spec en `/docs/specs/`:
 
-Hacer commit de cierre:
-```bash
-git add docs/specs/
-git commit -m "docs: close spec [nombre-corto] — [DONE|REJECTED]"
-```
+1. **Actualizar Estado**: Cambiar estado a `DONE` o `REJECTED`.
+2. **Registro de Omisiones**: Completar `## Pendientes Abiertos y Gaps Detectados`.
+3. **Conversión a Backlog**: Cada pendiente accionable DEBE convertirse en un item de backlog.
+4. **Completar Resultados**: Llenar todos los campos de la sección `## Resultados`.
+5. **Validación de Cierre**: El spec no puede marcarse como `DONE` si existen CAs fallidos sin tarea de seguimiento.
+
+Hacer commit de cierre con referencias al backlog.
+
+---
+
+## FASE 10.5 — BASELINE CONSOLIDADO DEL PROYECTO
+
+Una vez concluida la etapa exploratoria, de auditoría inicial y limpieza documental, se debe establecer el **Baseline Oficial** del proyecto antes de proceder a la ejecución masiva o multiagente.
+
+1. **Consolidación**: Asegurar que toda la documentación técnica, especificaciones y backlog aprobado estén en la rama `develop`.
+2. **Git Baseline**: Generar un commit de consolidación y, opcionalmente, un Tag de versión.
+   - Ejemplo de commit: `chore: establish project baseline v1.0.0 — documentation and backlog consolidated`
+   - Ejemplo de tag: `git tag -a baseline-v1.0 -m "Official project baseline after audit"`
+3. **Punto de Verdad**: Desde este momento, el código + documentación vigente + backlog aprobado constituyen la única fuente oficial de verdad para el trabajo posterior.
+
+---
+
+## FASE 11 — EJECUCIÓN MULTIAGENTE (ORQUESTACIÓN Y SUBAGENTES)
+
+Tras el establecimiento del baseline, el protocolo habilita la ejecución orquestada mediante subagentes para procesar los pendientes del backlog.
+
+### 11.1 Modelo de Autoridad y Roles
+
+#### Agente Principal (Orquestador)
+- **Responsabilidad**: Guardián de la arquitectura, seguridad y consistencia global.
+- **Autoridad**: Selecciona y prioriza items del backlog, asigna trabajo a subagentes, valida resultados e integra el trabajo final en `develop`.
+- **Decisión**: Es el único facultado para consultar al usuario o cambiar el roadmap.
+
+#### Subagentes (Ejecutores)
+- **Responsabilidad**: Ejecución técnica de una sola unidad de trabajo delimitada.
+- **Autoridad**: Limitada exclusivamente al alcance definido en su entrada.
+- **Restricción**: No pueden redefinir arquitectura, cambiar prioridades globales ni expandir el alcance sin autorización explícita del Principal.
+
+### 11.2 La Unidad Mínima de Trabajo (Regla 1-1-1-1)
+**1 Pendiente = 1 Spec = 1 Rama = 1 PR**
+No se permiten ramas multi-tarea ni specs que agrupen pendientes no relacionados. Cada subagente gestiona una unidad aislada (User Story, Bug, Tarea Técnica, Hardening).
+
+### 11.3 Entradas Obligatorias para el Subagente
+Antes de iniciar, el Agente Principal debe proveer al subagente:
+- ID y Título del pendiente.
+- Criterios de Aceptación (CAs) objetivos.
+- Contexto técnico/funcional y documentación del módulo afectado.
+- Restricciones de seguridad y dependencias conocidas.
+
+### 11.4 Flujo Operativo del Subagente
+1. **Selección**: Recibe el pendiente desde el backlog oficial.
+2. **Spec**: Redacta el spec específico de la tarea siguiendo la plantilla de la Fase 3.
+3. **Aislamiento**: Crea su rama de trabajo desde el `develop` actualizado.
+4. **Implementación**: Sigue las Fases 5, 6 y 7 (Skills, Seguridad, Quality Gates).
+5. **Cierre de Tarea**: Actualiza su spec con Resultados y Matriz de Cierre.
+6. **Entrega**: Devuelve la evidencia (Spec cerrado + Rama lista) al Agente Principal.
+
+### 11.5 Salida Obligatoria del Subagente
+El subagente debe entregar un reporte de cierre que incluya:
+- CAs cumplidos/no cumplidos.
+- Evidencia de pruebas ejecutadas.
+- Riesgos o deuda técnica generada.
+- **Matriz de Cierre** actualizada.
+- Recomendación técnica para la integración.
+
+**IMPORTANTE**: El subagente NO realiza la integración final de forma autónoma hacia la rama de baseline.
+
+### 11.6 Consolidación e Integración (Agente Principal)
+Al recibir el trabajo, el Agente Principal debe:
+1. Revisar la consistencia con el Baseline y el Backlog.
+2. Detectar y resolver conflictos o duplicados entre ramas de subagentes.
+3. Validar Quality Gates globales.
+4. Ejecutar el Merge final hacia `develop`.
+
+### 11.7 Reglas de Escalamiento
+- Los subagentes no deben "adivinar" ante ambigüedades; deben escalar al Principal.
+- El escalamiento debe incluir: Duda + Opciones viables + Recomendación de impacto.
+- Solo el Agente Principal decide si se requiere intervención del usuario.
+
+### 11.8 Restricciones No Negociables del Modo Subagente
+- Prohibido trabajar fuera del backlog aprobado.
+- Prohibido inventar alcance nuevo basándose en hallazgos (deben reportarse como nuevos pendientes).
+- Prohibido saltarse Specs, Tests o Quality Gates.
+- Prohibido modificar documentación base/arquitectónica sin justificación aprobada por el Principal.
 
 ---
 
 ## REGLAS GENERALES DE COMPORTAMIENTO
 
-### Cuándo preguntar antes de actuar
-- La solicitud es ambigua y hay múltiples interpretaciones válidas
-- No hay suficiente contexto para escribir una historia SMART
-- Una decisión de diseño tiene implicaciones de seguridad no triviales
-- El cambio podría afectar contratos o interfaces que otros módulos usan
-
-### Cuándo detener y reportar
-- Un quality gate falla y la corrección requiere decisión de diseño
-- Se detecta un secret en el historial de git o en el código
-- El entorno de desarrollo está en un estado inconsistente
-- Una dependencia tiene un CVE activo relevante para el cambio
-
-### Lo que nunca se omite
-- El spec, sin importar qué tan pequeño sea el cambio
-- Los tests para código nuevo
-- La revisión de diff antes del PR
-- El cierre del spec con resultados documentados
-
-### Política sobre atajos
-No existen atajos en este protocolo. Un bugfix de una línea sigue el mismo proceso que una feature grande. La disciplina es consistente porque los problemas de seguridad no avisan con anticipación.
+### Cuándo preguntar | Cuándo detener | Lo que nunca se omite
+Se mantienen los criterios de seguridad y trazabilidad estricta. Ninguna modalidad (Principal o Subagente) está exenta de la disciplina SSDLC.
 
 ---
 

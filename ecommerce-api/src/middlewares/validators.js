@@ -2,10 +2,10 @@ import { body, param, query } from "express-validator";
 
 export const emailValidation = (optional = false) => {
   const validator = body("email")
-    .isEmail()
-    .withMessage("Valid email is required")
+    .trim()
     .normalizeEmail()
-    .trim();
+    .isEmail()
+    .withMessage("Valid email is required");
 
   return optional ? validator.optional() : validator.notEmpty().withMessage("Email is required");
 };

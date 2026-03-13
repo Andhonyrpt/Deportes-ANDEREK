@@ -21,7 +21,7 @@ import {
     createPaymentMethod,
     deletePaymentMethod
 } from "../services/paymentService.js";
-import { createOrder } from "../services/orderService.js";
+import { createOrder, previewOrder } from "../services/orderService.js";
 import "./Checkout.css";
 
 export default function Checkout() {
@@ -29,15 +29,18 @@ export default function Checkout() {
     const { cartItems, total, clearCart } = useCart();
     const { user } = useAuth();
 
-    // Cálculos financieros simples
-    const subtotal = Number(total) || 0;
-    const TAX_RATE = 0.16; // IVA 16%
-    const SHIPPING_RATE = 350;
-    const FREE_SHIPPING_THRESHOLD = 1000;
+    // Estado para cálculos del servidor
+    const [preview, setPreview] = useState({
+        subtotal: 0,
+        tax: 0,
+        shippingCost: 0,
+        total: 0
+    });
 
-    const taxAmount = Number((subtotal * TAX_RATE).toFixed(2));
-    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_RATE;
-    const grandTotal = Number((subtotal + taxAmount + shippingCost).toFixed(2));
+    const subtotal = preview.subtotal;
+    const taxAmount = preview.tax;
+    const shippingCost = preview.shippingCost;
+    const grandTotal = preview.total;
 
     const formatMoney = (v) =>
         new Intl.NumberFormat("es-MX", {
@@ -55,6 +58,24 @@ export default function Checkout() {
 
         if (!suppressRedirect.current && (!cartItems || cartItems.length === 0)) {
             // navigate("/cart"); // Comentado temporalmente para dump de estado en test
+        }
+
+        // Cargar previsualización desde el servidor
+        if (cartItems?.length > 0) {
+            const getPreview = async () => {
+                try {
+                    const products = cartItems.map(item => ({
+                        productId: item._id,
+                        quantity: item.quantity,
+                        size: item.selectedSize || "M"
+                    }));
+                    // const data = await previewOrder(products);
+                    // if (data) setPreview(data);
+                } catch (err) {
+                    console.error("Checkout: Error loading preview", err);
+                }
+            };
+            getPreview();
         }
     }, [cartItems, navigate]);
 
@@ -324,7 +345,7 @@ export default function Checkout() {
                     <h3>Resumen de la Orden</h3>
                     <div className="order-costs">
                         <p><strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}</p>
-                        <p><strong data-testid="summary-tax">IVA (16%):</strong> {formatMoney(taxAmount)}</p>
+                        <p><strong data-testid="summary-tax">IVA:</strong> {formatMoney(taxAmount)}</p>
                         <p><strong data-testid="summary-shipping">Envío:</strong> {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}</p>
                         <hr />
                         <p><strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}</p>

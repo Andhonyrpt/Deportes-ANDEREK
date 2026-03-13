@@ -10,7 +10,8 @@ import {
   addProductToCart,
   updateCartItem,
   removeCartItem,
-  clearCartItems
+  clearCartItems,
+  mergeCart
 } from '../controllers/cartController.js';
 import validate from '../middlewares/validations.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
@@ -88,5 +89,12 @@ router.delete("/cart/remove-item/:productId", authMiddleware, [
 ], validate, removeCartItem);
 
 router.post("/cart/clear", authMiddleware, [], validate, clearCartItems);
+
+router.post("/cart/merge", authMiddleware, [
+  body("products").isArray().withMessage("Products must be an array"),
+  bodyMongoIdValidation("products.*.productId", "Product ID"),
+  quantityValidation("products.*.quantity", true),
+  sizeValidation("products.*.size", true)
+], validate, mergeCart);
 
 export default router;

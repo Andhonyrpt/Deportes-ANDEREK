@@ -244,6 +244,46 @@ async function clearCartItems(req, res, next) {
   }
 };
 
+async function mergeCart(req, res, next) {
+  try {
+    const { products } = req.body;
+    const userId = req.user.userId;
+
+    if (!products || !Array.isArray(products)) {
+       return res.status(400).json({ message: "Products array is required for merging" });
+    }
+
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      cart = new Cart({ user: userId, products: [] });
+    }
+
+    products.forEach(item => {
+      const productIndex = cart.products.findIndex(
+        p => p.product.toString() === item.productId && p.size === item.size
+      );
+
+      if (productIndex !== -1) {
+        cart.products[productIndex].quantity += (item.quantity || 1);
+      } else {
+        cart.products.push({
+          product: item.productId,
+          quantity: item.quantity || 1,
+          size: item.size
+        });
+      }
+    });
+
+    await cart.save();
+    await cart.populate('user');
+    await cart.populate('products.product');
+
+    res.json({ message: "Cart merged successfully", cart });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   getCarts,
   getCartById,
@@ -254,5 +294,6 @@ export {
   addProductToCart,
   updateCartItem,
   removeCartItem,
-  clearCartItems
+  clearCartItems,
+  mergeCart
 };
