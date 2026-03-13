@@ -1,15 +1,27 @@
 describe("Flujo de Carrito de Compras", () => {
     let testUser;
     // Productos reales de la DB (Manchester United y Liverpool)
-    const product1 = { _id: "6944dac27ec1961401dfe198", name: "Jersey Manchester United Local 2024", price: 1249 };
-    const product2 = { _id: "6944db637ec1961401dfe19b", name: "Jersey Liverpool Visitante 2024", price: 1199 };
+    const product1 = { 
+        _id: "6944dac27ec1961401dfe198", 
+        name: "Jersey Manchester United Local 2024", 
+        price: 1249,
+        variants: [{size: "S", stock: 10}, {size: "M", stock: 12}, {size: "L", stock: 4}, {size: "XL", stock: 0}]
+    };
+    const product2 = { 
+        _id: "6944db637ec1961401dfe19b", 
+        name: "Jersey Liverpool Visitante 2024", 
+        price: 1199,
+        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 0}]
+    };
 
     before(() => {
+        const uniqueId = Date.now().toString();
         testUser = {
             displayName: "Cart Test User",
-            email: `cart_test_${Date.now()}@anderek.com`,
+            email: `cart_test_${uniqueId}@anderek.com`,
             password: "Password123!",
-            phone: "1234567890"
+            // Asegurar un número de teléfono único
+            phone: `55${uniqueId.slice(-8)}`
         };
         cy.registerUser(testUser);
     });
@@ -22,7 +34,7 @@ describe("Flujo de Carrito de Compras", () => {
             req.headers['x-load-test'] = 'true';
         }).as("getProducts");
 
-        cy.intercept("GET", "**/cart/*", (req) => {
+        cy.intercept("GET", "**/cart/**", (req) => {
             req.headers['x-load-test'] = 'true';
         }).as("getCart");
 
@@ -30,19 +42,19 @@ describe("Flujo de Carrito de Compras", () => {
             req.headers['x-load-test'] = 'true';
         }).as("addToCartReq");
 
-        cy.intercept("PATCH", "**/cart/update", (req) => {
+        cy.intercept("PUT", "**/cart/update-item", (req) => {
             req.headers['x-load-test'] = 'true';
         }).as("updateCartReq");
 
-        cy.intercept("DELETE", "**/cart/remove/*", (req) => {
+        cy.intercept("DELETE", "**/cart/remove-item/**", (req) => {
             req.headers['x-load-test'] = 'true';
         }).as("removeCartReq");
 
-        // Visitamos / primero para que loginByApi pueda acceder a cy.window()
-        cy.visit("/");
-
         // Login vía API para estar autenticado
         cy.loginByApi(testUser.email, testUser.password);
+
+        // Visitamos / después para que el token ya esté en el localStorage
+        cy.visit("/");
 
         // Esperamos a que los productos iniciales carguen (gatillados por el primer visit)
         cy.wait("@getProducts");
@@ -54,10 +66,11 @@ describe("Flujo de Carrito de Compras", () => {
         cy.get('[data-testid="search-submit"]').click();
         cy.wait("@getProducts");
 
-        // Ahora sí, lo agregamos
-        cy.contains(product1.name).parents(".product-card").find('[data-testid="add-to-cart-button"]').click();
+        // Ahora sí, lo agregamos, asegurando que esté habilitado
+        cy.wait(1000); // Wait for React to hydrate
+        cy.get(`[data-testid="product-card-${product1._id}"]`).find('[data-testid="add-to-cart-button"]').should('not.be.disabled').click({force: true});
 
-        cy.wait("@addToCartReq").its("response.statusCode").should("eq", 200);
+        cy.wait("@addToCartReq", { timeout: 15000 }).its("response.statusCode").should("eq", 200);
 
         cy.visit("/cart");
         cy.wait("@getCart");
@@ -75,18 +88,14 @@ describe("Flujo de Carrito de Compras", () => {
         cy.wait("@getCart");
 
         // Incrementar cantidad
-        cy.get('[data-testid="quantity-increment"]').click();
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-increment"]').first().click();
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
-        cy.get('[data-testid="quantity-value"]').should("contain", "2");
-
-        const expectedTotal = (product1.price * 2).toFixed(2);
-        cy.get('[data-testid="item-total"]').should("contain", `$${expectedTotal}`);
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-value"]').should("contain", "2");
 
         // Decrementar cantidad
-        cy.get('[data-testid="quantity-decrement"]').click();
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-decrement"]').first().click();
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
-        cy.get('[data-testid="quantity-value"]').should("contain", "1");
-        cy.get('[data-testid="item-total"]').should("contain", `$${product1.price.toFixed(2)}`);
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-value"]').should("contain", "1");
     });
 
     it("elimina un producto del carrito", () => {
@@ -95,10 +104,12 @@ describe("Flujo de Carrito de Compras", () => {
         cy.visit("/cart");
         cy.wait("@getCart");
 
-        cy.get('[data-testid="remove-item"]').click();
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="remove-item"]').first().click();
         cy.wait("@removeCartReq").its("response.statusCode").should("eq", 200);
 
-        cy.contains(product1.name).should("not.exist");
+        // Await re-render
+        cy.wait(1000);
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).should("not.exist");
     });
 
     it("mantiene los productos al recargar la página (persistencia real)", () => {

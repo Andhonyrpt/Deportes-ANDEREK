@@ -16,7 +16,7 @@ const skipTest = (req) => {
 export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: (req) => {
-        if (process.env.NODE_ENV === 'test') {
+        if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
             if (req.headers['x-test-limit-strict'] === 'true') return 2;
             return 1000;
         }

@@ -5,6 +5,7 @@ describe("Flujo de Catálogo y Búsqueda", () => {
         // Interceptor para bypass de rate limit (sin mocks)
         cy.intercept("GET", "**/products*", (req) => {
             req.headers['x-load-test'] = 'true';
+            req.headers['Cache-Control'] = 'no-cache';
         }).as("getProducts");
 
         cy.visit("/");

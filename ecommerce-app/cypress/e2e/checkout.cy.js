@@ -8,14 +8,23 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
     });
 
     before(() => {
-        const uniqueId = Date.now();
+        const uniqueId = Date.now().toString();
         testUser = {
             displayName: "V3 User",
             email: `v3_test_${uniqueId}@anderek.com`,
             password: "Password123!",
-            phone: String(uniqueId).slice(-10)
+            // Asegurar un número de teléfono de 10 dígitos único
+            phone: `55${uniqueId.slice(-8)}`
         };
-        cy.registerUser(testUser);
+        
+        // Registrar sin fallar si ya existe (400)
+        cy.request({
+            method: "POST",
+            url: `${Cypress.env("apiUrl") || "http://localhost:4000/api"}/auth/register`,
+            headers: { 'x-load-test': 'true' },
+            body: testUser,
+            failOnStatusCode: false
+        });
     });
 
     beforeEach(() => {
@@ -26,8 +35,8 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.intercept("GET", "**/payment-methods/user/**").as("getPayments");
         cy.intercept("GET", "**/cart/user/**").as("getCart");
         cy.intercept("POST", "**/shipping-addresses/new-address").as("saveAddress");
-        cy.intercept("POST", "**/payment-methods/new-payment-method").as("savePayment");
-        cy.intercept("POST", "**/orders/new-order").as("placeOrder");
+        cy.intercept("POST", "**/payment-methods").as("savePayment");
+        cy.intercept("POST", "**/orders").as("placeOrder");
 
         cy.visit("/");
         cy.log("Login via API...");
@@ -71,7 +80,7 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         // Fase 2: Pago
         cy.get('[data-testid="add-payment-button"]').click();
         cy.get('[data-testid="payment-cardNumber"]').type("4242424242424242");
-        cy.get('[data-testid="payment-cardHolder"]').type("Juan Pérez");
+        cy.get('[data-testid="payment-cardHolderName"]').type("Juan Pérez");
         cy.get('[data-testid="payment-expiryDate"]').type("12/26");
         cy.get('[data-testid="payment-cvv"]').type("123");
         cy.get('[data-testid="payment-bankName"]').type("BBVA");

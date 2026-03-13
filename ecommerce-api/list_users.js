@@ -15,7 +15,7 @@ async function listUsers() {
             role: String
         }));
 
-        const users = await User.find({ email: 'usuario@anderek.com' }, 'email displayName role');
+        const users = await User.find({ phone: '1234567890' }, 'email displayName role phone');
         console.log('USERS_START');
         console.log(JSON.stringify(users, null, 2));
         console.log('USERS_END');

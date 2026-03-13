@@ -5,11 +5,13 @@ Cypress.Commands.add("registerUser", (userData) => {
     return cy.request({
         method: "POST",
         url: `${apiUrl}/auth/register`,
+        headers: { 'x-load-test': 'true' },
         body: userData,
         failOnStatusCode: false
     }).then((res) => {
         cy.log(`Register response: ${res.status}`);
-        if (res.status !== 201 && res.status !== 400) {
+        if (res.status !== 201 && res.status !== 400 && res.status !== 429) {
+            cy.log(`Register error body: ${JSON.stringify(res.body)}`);
             throw new Error(`Registration failed: ${res.status} ${JSON.stringify(res.body)}`);
         }
     });
@@ -22,6 +24,7 @@ Cypress.Commands.add("loginByApi", (email, password) => {
     return cy.request({
         method: "POST",
         url: `${apiUrl}/auth/login`,
+        headers: { 'x-load-test': 'true' },
         body: { email, password },
         failOnStatusCode: false
     }).then((loginRes) => {

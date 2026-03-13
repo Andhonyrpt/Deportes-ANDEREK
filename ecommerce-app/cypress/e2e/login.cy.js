@@ -4,14 +4,21 @@ describe("Flujo de Login", () => {
     let testUser;
 
     before(() => {
+        const uniqueId = Date.now().toString();
         testUser = {
             displayName: "Login Test User",
-            email: `login_test_${Date.now()}@anderek.com`,
+            email: `login_test_${uniqueId}@anderek.com`,
             password: "Password123!",
-            phone: "1234567890"
+            phone: `55${uniqueId.slice(-8)}`
         };
         // Registramos al usuario real antes de las pruebas de login
-        cy.registerUser(testUser);
+        cy.request({
+            method: "POST",
+            url: `${Cypress.env("apiUrl") || "http://localhost:4000/api"}/auth/register`,
+            headers: { 'x-load-test': 'true' },
+            body: testUser,
+            failOnStatusCode: false
+        });
     });
 
     beforeEach(() => {

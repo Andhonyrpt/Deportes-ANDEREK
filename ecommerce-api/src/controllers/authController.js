@@ -17,10 +17,15 @@ const generateRefreshToken = (userId, displayName, role) => {
 };
 
 const checkUserExist = async (email, phone = null) => {
-    const query = { $or: [{ email }] };
-    if (phone) query.$or.push({ phone });
-    const user = await User.findOne(query);
-    return user;
+    // Buscar específicamente por email primero
+    const emailUser = await User.findOne({ email });
+    if (emailUser) return emailUser;
+    
+    // Si no se encuentra por email, buscar por teléfono
+    if (phone) {
+        return await User.findOne({ phone });
+    }
+    return null;
 };
 
 const generatePassword = async (password) => {
@@ -31,13 +36,14 @@ const generatePassword = async (password) => {
 async function register(req, res, next) {
 
     try {
-        const { displayName, email, password, phone } = req.body;
-
+        const { displayName, email: rawEmail, password, phone } = req.body;
+        const email = rawEmail.trim().toLowerCase();
+        
         const userExist = await checkUserExist(email, phone);
+        console.log("Register: Checking existence for", email, "phone:", phone, userExist ? "Found (User: " + userExist.email + ")" : "Not Found");
+        
         if (userExist) {
-            // Si el email coincide, pretendemos éxito para evitar enumeración (Privacy by Design)
-            // Si el teléfono coincide pero el mail no, es un conflicto de datos que reportamos genérico o seguimos misma lógica.
-            // Para simplificar y seguir el patrón existente:
+            console.log("Register: User already exists, pretending success");
             return res.status(201).json({ displayName, email, phone });
         }
 
@@ -52,6 +58,7 @@ async function register(req, res, next) {
             phone
         });
         await newUser.save();
+        console.log("Register: User saved successfully with email:", email);
 
         res.status(201).json({ displayName, email, phone });
 
@@ -64,9 +71,14 @@ async function register(req, res, next) {
 async function login(req, res, next) {
 
     try {
-        const { email, password } = req.body;
+        const { email: rawEmail, password } = req.body;
+        const email = rawEmail.trim().toLowerCase();
+        
+        console.log("Login: Attempting login for", email);
 
         const userExist = await checkUserExist(email);
+        console.log("Login: User found?", !!userExist);
+        
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
         }

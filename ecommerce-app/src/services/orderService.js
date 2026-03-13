@@ -29,3 +29,15 @@ export const getOrderById = async (orderId) => {
         console.error(error);
     }
 };
+
+// Agrega esto a tu archivo orderService.js
+export const previewOrder = async (products) => {
+    try {
+        // La ruta debe coincidir con el backend: POST /orders/preview
+        const response = await http.post('orders/preview', { products });
+        return response.data; 
+    } catch (error) {
+        console.error("Error en previewOrder service:", error);
+        throw error;
+    }
+};

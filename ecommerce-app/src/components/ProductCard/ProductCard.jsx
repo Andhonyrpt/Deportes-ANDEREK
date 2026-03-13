@@ -65,7 +65,7 @@ export default function ProductCard({ product, orientation }) {
     const cardClass = `product-card product-card--${orientation}`;
 
     return (
-        <div className={cardClass}>
+        <div className={cardClass} data-testid={`product-card-${product._id}`}>
             <Link to={productLink} className="product-card-image-link">
                 <img src={imagesUrl ? imagesUrl[0] : "/img/products/placeholder.svg"}
                     alt={name}

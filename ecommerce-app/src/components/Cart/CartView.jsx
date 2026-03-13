@@ -34,7 +34,7 @@ export default function CartView() {
                 const totalItem = itemPrice * itemQuantity;
 
                 return (
-                    <div className="cart-item" key={currentItemId} data-testid={`cart-item-${p._id}`}>
+                    <div className="cart-item" key={currentItemId} data-testid={`cart-item-${currentItemId}`}>
 
                         <div className="cart-item-image">
                             <img src={p?.imagesUrl?.[0] || 'https://via.placeholder.com/150'} alt={p?.name || 'Producto'} loading="lazy" />

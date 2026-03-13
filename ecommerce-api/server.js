@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(logger);
 
 // Rate limiting global para toda la API
-// app.use("/api", apiLimiter);
+app.use("/api", apiLimiter);
 
 // Health check endpoint
 app.get("/health", async (req, res) => {

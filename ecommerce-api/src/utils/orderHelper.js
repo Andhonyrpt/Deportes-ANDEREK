@@ -5,7 +5,7 @@
  */
 
 export const TAX_RATE = 0.16; // IVA 16%
-export const SHIPPING_RATE = 350;
+export const SHIPPING_RATE = 350; // Costo fijo de envío 
 export const FREE_SHIPPING_THRESHOLD = 1000;
 
 /**

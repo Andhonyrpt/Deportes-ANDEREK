@@ -117,7 +117,7 @@ async function createPaymentMethod(req, res, next) {
       cardHolderName: type === 'credit_card' || type === 'debit_card' ? cardHolderName : undefined,
       expiryDate: type === 'credit_card' || type === 'debit_card' ? expiryDate : undefined,
       paypalEmail: type === 'paypal' ? paypalEmail : undefined,
-      bankName: type === 'bank_transfer' ? bankName : undefined,
+      bankName: bankName,
       accountNumber: type === 'bank_transfer' ? accountNumber : undefined,
       isDefault,
       isActive: true

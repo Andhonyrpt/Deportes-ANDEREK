@@ -14,10 +14,10 @@ export default function PaymentItem({ paymentMethod, isSelected, onSelect, onEdi
         ${paymentMethod.isDefault ? "isDefault" : ""}`}
         >
             <div className="payment-content">
-                <h4>{paymentMethod.alias}</h4>
+                <h4>{paymentMethod.bankName || paymentMethod.type}</h4>
                 <p>{maskCardNumber(paymentMethod.cardNumber)}</p>
                 <p>Vence: {paymentMethod.expiryDate}</p>
-                <p>Titular: {paymentMethod.placeHolder}</p>
+                <p>Titular: {paymentMethod.cardHolderName}</p>
                 {paymentMethod.isDefault && (
                     <span className="isDefault-badge">Predeterminada</span>
                 )}
