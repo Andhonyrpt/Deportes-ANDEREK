@@ -154,7 +154,7 @@ export default function Checkout() {
             await createShippingAddress({ ...formData, isDefault: addresses.length === 0 });
             const updated = await getShippingAddresses();
             console.log("Checkout: Actualización tras dirección", updated);
-            
+
             const addrList = updated?.addresses || (Array.isArray(updated) ? updated : null);
             if (addrList && Array.isArray(addrList) && addrList.length > 0) {
                 setAddresses(addrList);
@@ -162,8 +162,8 @@ export default function Checkout() {
                 setAddressSectionOpen(false);
                 setShowAddressForm(false);
             } else if (addrList && addrList.length === 0) {
-                 // Si explícitamente es 0, lo dejamos así 
-                 setAddresses([]);
+                // Si explícitamente es 0, lo dejamos así 
+                setAddresses([]);
             }
             // Si addrList es null (ej: 304 fallido), NO limpiamos el estado previo
         } catch (err) {
@@ -199,7 +199,7 @@ export default function Checkout() {
             await createPaymentMethod({ ...formData, user: user._id, isDefault: payments.length === 0 });
             const updated = await getPaymentMethods(user._id);
             console.log("Checkout: Actualización tras pago", updated);
-            
+
             const payList = Array.isArray(updated) ? updated : (updated?.paymentMethods || null);
             if (payList && Array.isArray(payList) && payList.length > 0) {
                 setPayments(payList);
@@ -278,7 +278,7 @@ export default function Checkout() {
         <div className="checkout-container">
             {localError && <ErrorMessage message={localError} />}
             <div data-testid="debug-checkout" style={{ display: 'none' }}>
-                Addresses Length: {addresses?.length}, 
+                Addresses Length: {addresses?.length},
                 Selected Address ID: {selectedAddress?._id || 'none'},
                 Address Name: {selectedAddress?.name || 'none'}
             </div>
