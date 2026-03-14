@@ -257,7 +257,12 @@ export default function Checkout() {
             if (response) {
                 suppressRedirect.current = true;
                 await clearCart();
-                navigate("/order-confirmation", { state: { order: response.order || response } });
+
+                // 1. Obtenemos el ID exacto que nos devolvió el servidor
+                const orderId = response.order?._id || response._id;
+
+                // 2. Navegamos enviando el ID por la URL (Ej: /order-confirmation/65abcd1234...)
+                navigate(`/order-confirmation/${orderId}`);
             }
         } catch (err) {
             setLocalError("Error al procesar la orden");
@@ -273,6 +278,20 @@ export default function Checkout() {
             </div>
         );
     }
+
+    const paymentText = () => {
+        if (!selectedPayment) return "No seleccionado";
+
+        const lastFour = selectedPayment.cardNumber?.slice(-4);
+        const type = selectedPayment.type;
+
+        if (type === 'credit_card') return `Tarjeta de Crédito **** ${lastFour}`;
+        if (type === 'debit_card') return `Tarjeta de Débito **** ${lastFour}`;
+        if (type === 'paypal') return `PayPal (${selectedPayment.paypalEmail})`;
+        if (type === 'bank_transfer') return `Transferencia Bancaria (${selectedPayment.bankName})`;
+
+        return type; // Por si es 'paypal' o 'efectivo'
+    };
 
     return (
         <div className="checkout-container">
@@ -349,12 +368,20 @@ export default function Checkout() {
             <div className="checkout-right">
                 <div className="checkout-summary">
                     <h3>Resumen de la Orden</h3>
-                    <div className="order-costs">
-                        <p><strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}</p>
-                        <p><strong data-testid="summary-tax">IVA:</strong> {formatMoney(taxAmount)}</p>
-                        <p><strong data-testid="summary-shipping">Envío:</strong> {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}</p>
-                        <hr />
-                        <p><strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}</p>
+                    <div className="summary-details">
+                        <p>
+                            <strong>Dirección de envío:</strong> {selectedAddress?.address}
+                        </p>
+                        <p>
+                            <strong>Método de pago:</strong> {paymentText()}
+                        </p>
+                        <div className="order-costs">
+                            <p><strong data-testid="summary-subtotal">Subtotal:</strong> {formatMoney(subtotal)}</p>
+                            <p><strong data-testid="summary-tax">IVA:</strong> {formatMoney(taxAmount)}</p>
+                            <p><strong data-testid="summary-shipping">Envío:</strong> {shippingCost === 0 ? "Gratis" : formatMoney(shippingCost)}</p>
+                            <hr />
+                            <p><strong data-testid="summary-total">Total:</strong> {formatMoney(grandTotal)}</p>
+                        </div>
                     </div>
                     <Button
                         className="pay-button"

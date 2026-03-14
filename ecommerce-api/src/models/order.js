@@ -60,6 +60,7 @@ const orderSchema = new mongoose.Schema(
       default: 'pending',
     },
   },
+  { timestamps: true }
 );
 
 const Order = mongoose.model('Order', orderSchema);

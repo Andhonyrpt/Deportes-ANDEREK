@@ -52,7 +52,7 @@ function App() {
               }
             />
             <Route
-              path='/order-confirmation' element={<OrderConfirmation />} />
+              path='/order-confirmation/:id' element={<OrderConfirmation />} />
             <Route path='*' element={<div>Ruta no encontrada</div>} />
           </Routes>
         </Layout>
