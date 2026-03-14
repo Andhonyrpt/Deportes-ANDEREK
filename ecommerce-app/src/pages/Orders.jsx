@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import Button from "../components/common/Button";
 import Icon from "../components/common/Icon";
 import Loading from "../components/common/Loading/Loading";
-import { readLocalJSON, STORAGE_KEYS } from "../utils/storageHelpers";
+import { getMyOrders } from "../services/orderService";
+import { useAuth } from "../context/AuthContext";
 import "./Orders.css";
 
 const formatMoney = (value = 0) =>
@@ -18,7 +19,7 @@ const formDate = (isoString) => {
     try {
         return (
             new Date(isoString).toLocaleDateString("es-MX", {
-                day: "2-digits",
+                day: "2-digit", // <--- ¡Solo le quitamos la 's' aquí!
                 month: "short",
                 year: "numeric"
             })
@@ -29,28 +30,43 @@ const formDate = (isoString) => {
 };
 
 export default function Orders() {
+    const { user } = useAuth(); // Obtenemos el usuario autenticado
     const [orders, setOrders] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadOrders = () => {
-            const storedOrders = readLocalJSON(STORAGE_KEYS.orders) || [];
-            const sortedOrders = [...storedOrders].sort(
-                (a, b) => new Date(b.date) - new Date(a.date)
-            );
+        const loadOrders = async () => {
+            if (!user?._id) {
+                setLoading(false);
+                return;
+            }
 
-            setOrders(sortedOrders);
-            setSelectedOrderId((current) => current ?? sortedOrders[0]?.id ?? null);
-            setLoading(false);
+            try {
+                const data = await getMyOrders(user._id);
+                const fetchedOrders = data?.orders || data || [];
+
+                console.log("ESTO ES LO QUE LLEGA DE MONGO:", fetchedOrders);
+
+                const sortedOrders = [...fetchedOrders].sort(
+                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                );
+
+                setOrders(sortedOrders);
+                setSelectedOrderId((current) => current ?? sortedOrders[0]?._id ?? null);
+            } catch (error) {
+                console.error("Error al cargar pedidos del servidor:", error);
+            } finally {
+                setLoading(false);
+            }
+
         };
 
         loadOrders();
-        window.addEventListener("storage", loadOrders);
-        return () => window.removeEventListener("storage", loadOrders);
-    }, []);
 
-    const selectedOrder = useMemo(() => orders.find((order) => order.id === selectedOrderId) || null, [orders, selectedOrderId]
+    }, [user]);
+
+    const selectedOrder = useMemo(() => orders.find((order) => order._id === selectedOrderId) || null, [orders, selectedOrderId]
     );
 
     const detailsStatusToken = selectedOrder ? (selectedOrder.status || "confirmed").toLowerCase() : "confirmed";
@@ -79,6 +95,27 @@ export default function Orders() {
         );
     }
 
+    const selectedPayment = selectedOrder?.paymentMethod || null;
+
+    const paymentText = () => {
+        if (!selectedPayment) return "No seleccionado";
+
+        const lastFour = selectedPayment.cardNumber?.slice(-4);
+        const type = selectedPayment.type;
+
+        if (type === 'credit_card') return `Tarjeta de Crédito **** ${lastFour}`;
+        if (type === 'debit_card') return `Tarjeta de Débito **** ${lastFour}`;
+        if (type === 'paypal') return `PayPal (${selectedPayment.paypalEmail})`;
+        if (type === 'bank_transfer') return `Transferencia Bancaria (${selectedPayment.bankName})`;
+
+        return type; // Por si es 'paypal' o 'efectivo'
+    };
+
+    const totalOrderPrice = selectedOrder?.totalPrice || 0;
+    const shippingPrice = selectedOrder?.shippingCost || 0;
+    const calculatedSubtotal = selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
+    const calculatedTax = selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
+
     return (
         <div className="orders-page">
             <div className="orders-header">
@@ -86,13 +123,13 @@ export default function Orders() {
                     <p className="eyebrow">Historial de compras</p>
                     <h1>Mis pedidos</h1>
                     <p className="muted">
-                        {orders.length === 1 ? "Tienes 1 pedido guardado en este dispositivo" : `Tienes ${orders.length} pedidos guardados en este dispositivo`
+                        {orders.length === 1 ? "Tienes 1 pedido registrado" : `Tienes ${orders.length} pedidos registrados `
                         }
                     </p>
                 </div>
                 <Button
                     variant="secondary"
-                    onClick={() => setSelectedOrderId(orders[0]?.id ?? null)}
+                    onClick={() => setSelectedOrderId(orders[0]?._id ?? null)}
                 >
                     Ver más reciente
                 </Button>
@@ -107,18 +144,18 @@ export default function Orders() {
 
                     <div className="orders-list-body">
                         {orders.map((order) => {
-                            const itemCount = order.items?.length || 0;
+                            const itemCount = order.products?.length || 0;
                             const statusToken = (order.status || "confirmed").toLowerCase();
-                            const isActive = selectedOrderId === order.id;
+                            const isActive = selectedOrderId === order._id;
                             return (
                                 <button
-                                    key={order.id}
+                                    key={order._id}
                                     className={`order-card${isActive ? "-active" : ""}`}
-                                    onClick={() => setSelectedOrderId(order.id)}
-                                    data-testid={`order-card-${order.id}`}
+                                    onClick={() => setSelectedOrderId(order._id)}
+                                    data-testid={`order-card-${order._id}`}
                                 >
                                     <div className="order-card-head">
-                                        <span className="order-id">#{order.id}</span>
+                                        <span className="order-id">#{order._id}</span>
                                         <span className={`order-status order-status-${statusToken}`}
                                         >
                                             {order.status || "Confirmado"}
@@ -126,12 +163,12 @@ export default function Orders() {
                                     </div>
 
                                     <p className="order-date">
-                                        {formDate(order.date)}
+                                        {formDate(order.createdAt || order.date)}
                                     </p>
 
                                     <div className="order-card-meta">
                                         <span>{itemCount} artículos</span>
-                                        <strong>{formatMoney(order.total || 0)}</strong>
+                                        <strong>{formatMoney(order.totalPrice || 0)}</strong>
                                     </div>
                                 </button>
                             );
@@ -144,9 +181,9 @@ export default function Orders() {
                         <div data-testid="order-detail-container">
                             <div className="order-detail-header">
                                 <div>
-                                    <p className="eyebrow">Pedido #{selectedOrder.id}</p>
-                                    <h2>{formatMoney(selectedOrder.total || 0)}</h2>
-                                    <p className="muted">{formDate(selectedOrder.date)}</p>
+                                    <p className="eyebrow"><strong>Pedido: </strong> #{selectedOrder._id}</p>
+                                    <h2>{formatMoney(selectedOrder.totalPrice || 0)}</h2>
+                                    <p className="muted">{formDate(selectedOrder?.createdAt || selectedOrder.date)}</p>
                                 </div>
                                 <span className={`order-status order-status-${detailsStatusToken}`}
                                 >
@@ -159,23 +196,23 @@ export default function Orders() {
                                 <ul className="order-summary-list">
                                     <li>
                                         <span>Subtotal</span>
-                                        <strong>{formatMoney(selectedOrder.subtotal || 0)}</strong>
+                                        <strong>{formatMoney(calculatedSubtotal)}</strong>
                                     </li>
                                     <li>
                                         <span>IVA</span>
-                                        <strong>{formatMoney(selectedOrder.tax || 0)}</strong>
+                                        <strong>{formatMoney(calculatedTax)}</strong>
                                     </li>
                                     <li>
                                         <span>Envío</span>
                                         <strong>
-                                            {selectedOrder.shipping === 0
+                                            {selectedOrder.shippingCost === 0 || selectedOrder.shipping === 0
                                                 ? "Gratis"
-                                                : formatMoney(selectedOrder.shipping || 0)}
+                                                : formatMoney(shippingPrice)}
                                         </strong>
                                     </li>
                                     <li className="order-summary-total" data-testid="order-summary-total">
                                         <span>Total</span>
-                                        <strong>{formatMoney(selectedOrder.total || 0)}</strong>
+                                        <strong>{formatMoney(totalOrderPrice)}</strong>
                                     </li>
                                 </ul>
                             </div>
@@ -184,16 +221,15 @@ export default function Orders() {
                                 <h3>Dirección de envío</h3>
                                 {selectedOrder?.shippingAddress ? (
                                     <address className="order-address">
-                                        <strong>{selectedOrder.shippingAddress.name}</strong>
-                                        <p>{selectedOrder.shippingAddress.address1}</p>
-                                        {selectedOrder.shippingAddress.address2 && (
-                                            <p>{selectedOrder.shippingAddress.address2}</p>
-                                        )}
+                                        <strong>{selectedOrder.shippingAddress.address}</strong>
                                         <p>
                                             {selectedOrder.shippingAddress.city},{" "}
                                             {selectedOrder.shippingAddress.postalCode}
                                         </p>
-                                        <p>{selectedOrder.shippingAddress.country}</p>
+                                        <p>
+                                            {selectedOrder.shippingAddress.state},{" "}
+                                            {selectedOrder.shippingAddress.country}
+                                        </p>
                                     </address>
                                 ) : (
                                     <p className="muted">Sin dirección registrada.</p>
@@ -204,12 +240,7 @@ export default function Orders() {
                                 <h3>Método de pago</h3>
                                 {selectedOrder?.paymentMethod ? (
                                     <div>
-                                        <p>{selectedOrder.paymentMethod.alias}</p>
-                                        <p>
-                                            ****{" "}
-                                            {selectedOrder.paymentMethod.cardNumber?.slice(-4) ||
-                                                "----"}
-                                        </p>
+                                        <p>{paymentText()}</p>
                                     </div>
                                 ) : (
                                     <p className="muted">Sin método de pago registrado.</p>
@@ -219,7 +250,7 @@ export default function Orders() {
                             <div className="order-section">
                                 <h3>Productos</h3>
                                 <ul className="order-items">
-                                    {selectedOrder.items?.map((item, index) => (
+                                    {selectedOrder.products?.map((item, index) => (
                                         <li key={`${selectedOrder.id}-${item.id || index}`}>
                                             <div>
                                                 <p>{item.name || item.title || "Producto"}</p>

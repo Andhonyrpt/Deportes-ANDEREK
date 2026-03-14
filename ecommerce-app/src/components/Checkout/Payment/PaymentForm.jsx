@@ -98,7 +98,7 @@ export default function PaymentForm({
                 <h3>{isEdit ? "Editar Método de Pago" : "Nuevo Método de Pago"}</h3>
 
                 <div className="payment-form-group">
-                    <label htmlFor="type">Método de Pago:</label>
+                    <label htmlFor="type">Método de Pago: </label>
                     <select
                         id="type"
                         name="type"

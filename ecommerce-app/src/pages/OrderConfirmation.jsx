@@ -84,7 +84,7 @@ export default function OrderConfirmation() {
                 <div className="confirmation-details">
                     <h2>Detalles de tu pedido</h2>
                     <div className="order-info">
-                        <p><strong>Fecha:</strong>{orderDate}</p>
+                        <p><strong>Fecha: </strong>{orderDate}</p>
 
                         <h3>Productos</h3>
                         <ul className="order-items">

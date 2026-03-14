@@ -108,7 +108,7 @@ console.log("Hice clic en el botón"); // Paso 1
                 ))}
 
                 <div className="address-form-group">
-                    <label htmlFor="addressType">Tipo de dirección:</label>
+                    <label htmlFor="addressType">Tipo de dirección: </label>
                     <select
                         id="addressType"
                         name="addressType"

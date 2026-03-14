@@ -25,6 +25,45 @@
   min-width: 0;
 }
 
+
+.payment-form-group {
+  margin-top: 10px;
+  color: var(--color-primary-600);
+}
+
+.payment-form-group label {
+  font-weight: 515;
+  font-size: 0.9rem;
+  color: var(--color-primary-600);
+}
+
+.payment-form select {
+  width: 36%;
+  padding: 5px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #2d3748;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 4. Efecto cuando el usuario le hace clic (Focus) */
+.payment-form-select:focus {
+  border-color: var(--color-primary-600);
+  /* Color de tu marca (cambia este azul por tu verde si lo prefieres) */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  /* Sombreado de resplandor */
+}
+
+/* 5. Al pasar el mouse por encima (Hover) */
+.payment-form-select:hover {
+  border-color: var(--color-primary-600);
+}
+
 .payment-form-checkbox {
   margin: 16px 0;
   display: flex;
