@@ -28,17 +28,6 @@ import {
 
 const router = express.Router();
 
-// Previsualizar orden (Cálculos de servidor)
-router.post('/orders/preview', authMiddleware, [
-  body('products').notEmpty()
-    .withMessage('Products are required')
-    .isArray({ min: 1 })
-    .withMessage("Products must be a non-empty array"),
-  bodyMongoIdValidation('products.*.productId', 'Product ID'),
-  sizeValidation('products.*.size'),
-  quantityValidation('products.*.quantity'),
-], validate, previewOrder);
-
 // Obtener todas las órdenes (admin)
 router.get('/orders', authMiddleware, isAdmin, getOrders);
 
@@ -98,5 +87,15 @@ router.delete('/orders/:id', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID')
 ], validate, deleteOrder);
 
+// Previsualizar orden (Cálculos de servidor)
+router.post('/orders/preview', authMiddleware, [
+  body('products').notEmpty()
+    .withMessage('Products are required')
+    .isArray({ min: 1 })
+    .withMessage("Products must be a non-empty array"),
+  bodyMongoIdValidation('products.*.productId', 'Product ID'),
+  sizeValidation('products.*.size'),
+  quantityValidation('products.*.quantity'),
+], validate, previewOrder);
 
 export default router;
