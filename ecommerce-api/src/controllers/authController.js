@@ -17,13 +17,18 @@ const generateRefreshToken = (userId, displayName, role) => {
 };
 
 const checkUserExist = async (email, phone = null) => {
+    console.log("Checking database for email:", email);
     // Buscar específicamente por email primero
     const emailUser = await User.findOne({ email });
+    console.log("Email user found:", !!emailUser);
     if (emailUser) return emailUser;
     
     // Si no se encuentra por email, buscar por teléfono
     if (phone) {
-        return await User.findOne({ phone });
+        console.log("Checking database for phone:", phone);
+        const phoneUser = await User.findOne({ phone });
+        console.log("Phone user found:", !!phoneUser);
+        return phoneUser;
     }
     return null;
 };
@@ -72,12 +77,15 @@ async function login(req, res, next) {
 
     try {
         const { email: rawEmail, password } = req.body;
-        const email = rawEmail.trim().toLowerCase();
+        const email = rawEmail ? rawEmail.trim().toLowerCase() : "";
         
-        console.log("Login: Attempting login for", email);
+        console.log("Login: Attempting login for", JSON.stringify(email));
 
         const userExist = await checkUserExist(email);
         console.log("Login: User found?", !!userExist);
+        if (userExist) {
+            console.log("Login: User object found email:", userExist.email);
+        }
         
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });

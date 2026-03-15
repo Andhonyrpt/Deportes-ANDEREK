@@ -7,7 +7,8 @@ Cypress.Commands.add("registerUser", (userData) => {
         url: `${apiUrl}/auth/register`,
         headers: { 'x-load-test': 'true' },
         body: userData,
-        failOnStatusCode: false
+        failOnStatusCode: false,
+        timeout: 60000
     }).then((res) => {
         cy.log(`Register response: ${res.status}`);
         if (res.status !== 201 && res.status !== 400 && res.status !== 429) {
@@ -26,7 +27,8 @@ Cypress.Commands.add("loginByApi", (email, password) => {
         url: `${apiUrl}/auth/login`,
         headers: { 'x-load-test': 'true' },
         body: { email, password },
-        failOnStatusCode: false
+        failOnStatusCode: false,
+        timeout: 60000 // Aumentado para soportar cold-start en Render
     }).then((loginRes) => {
         cy.log(`Login response: ${loginRes.status}`);
         if (loginRes.status !== 200) {

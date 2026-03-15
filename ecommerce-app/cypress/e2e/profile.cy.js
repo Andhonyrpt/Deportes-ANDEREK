@@ -1,24 +1,9 @@
 describe("Flujo de Perfil y Pedidos", () => {
-    let testUser;
-
-    before(() => {
-        const uniqueId = Date.now().toString();
-        testUser = {
-            displayName: "Profile Test User",
-            email: `profile_test_${uniqueId}@anderek.com`,
-            password: "Password123!",
-            // Asegurar un número de teléfono único
-            phone: `55${uniqueId.slice(-8)}`
-        };
-        // Registramos al usuario real antes de las pruebas de perfil
-        cy.request({
-            method: "POST",
-            url: `${Cypress.env("apiUrl") || "http://localhost:4000/api"}/auth/register`,
-            headers: { 'x-load-test': 'true' },
-            body: testUser,
-            failOnStatusCode: false
-        });
-    });
+    const testUser = {
+        displayName: "customer User",
+        email: "customer@test.com",
+        password: "Password123!"
+    };
 
     beforeEach(() => {
         cy.clearLocalStorage();

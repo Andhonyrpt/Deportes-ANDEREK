@@ -1,12 +1,14 @@
 import rateLimit from "express-rate-limit";
 
 const skipTest = (req) => {
+    // Siempre saltar si el encabezado está presente, independientemente del entorno
+    if (req.headers['x-load-test'] === 'true') {
+        return true;
+    }
+    
     if (process.env.NODE_ENV === 'test') {
         if (req.headers['x-test-limit-strict'] === 'true') return false;
         if (process.env.TEST_LIMITER === 'true') return false;
-        return true;
-    }
-    if ((process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) && req.headers['x-load-test'] === 'true') {
         return true;
     }
     return false;

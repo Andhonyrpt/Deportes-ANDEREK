@@ -3,7 +3,7 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         email: "customer@test.com",
         password: "Password123!"
     };
-    const product = { _id: "6944dac27ec1961401dfe198", name: "Jersey Manchester United Local 2024", price: 1249 };
+    const product = { _id: "69b1183fd947069ecb02061b", name: "Jersey Manchester United Local 2024", price: 1249 };
 
     beforeEach(() => {
         cy.clearLocalStorage();

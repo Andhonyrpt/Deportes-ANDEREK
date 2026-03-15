@@ -8,7 +8,7 @@ module.exports = defineConfig({
         video: false,
         chromeWebSecurity: false,
         env: {
-            apiUrl: "http://127.0.0.1:4000/api",
+            apiUrl: "https://deportes-anderek.onrender.com/api",
         },
         setupNodeEvents(on, config) {
             on('before:browser:launch', (browser = {}, launchOptions) => {

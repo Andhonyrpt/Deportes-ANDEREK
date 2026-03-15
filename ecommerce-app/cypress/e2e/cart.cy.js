@@ -1,33 +1,22 @@
 describe("Flujo de Carrito de Compras", () => {
-    let testUser;
-    // Productos reales de la DB (Manchester United y Liverpool)
+    // Productos reales de la DB (Render API)
     const product1 = { 
-        _id: "6944dac27ec1961401dfe198", 
+        _id: "69b1183fd947069ecb02061b", 
         name: "Jersey Manchester United Local 2024", 
         price: 1249,
-        variants: [{size: "S", stock: 10}, {size: "M", stock: 12}, {size: "L", stock: 4}, {size: "XL", stock: 0}]
+        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 2}]
     };
     const product2 = { 
-        _id: "6944db637ec1961401dfe19b", 
+        _id: "69b1183fd947069ecb02061d", 
         name: "Jersey Liverpool Visitante 2024", 
         price: 1199,
-        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 0}]
+        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 2}]
     };
-
-    before(() => {
-        const uniqueId = Date.now().toString();
-        testUser = {
-            displayName: "Cart Test User",
-            email: `cart_test_${uniqueId}@anderek.com`,
-            password: "Password123!",
-            // Asegurar un número de teléfono único
-            phone: `55${uniqueId.slice(-8)}`
-        };
-        cy.registerUser(testUser);
-    });
 
     beforeEach(() => {
         cy.clearLocalStorage();
+        // Login con usuario existente
+        cy.loginByApi("customer@test.com", "Password123!");
 
         // Interceptores para bypass de rate limit y debug
         cy.intercept("GET", "**/products*", (req) => {
@@ -50,15 +39,13 @@ describe("Flujo de Carrito de Compras", () => {
             req.headers['x-load-test'] = 'true';
         }).as("removeCartReq");
 
-        // Login vía API para estar autenticado
-        cy.loginByApi(testUser.email, testUser.password);
-
         // Visitamos / después para que el token ya esté en el localStorage
         cy.visit("/");
 
         // Esperamos a que los productos iniciales carguen (gatillados por el primer visit)
         cy.wait("@getProducts");
     });
+
 
     it("agrega un producto al carrito correctamente", () => {
         // Buscamos el producto para asegurar que está visible
