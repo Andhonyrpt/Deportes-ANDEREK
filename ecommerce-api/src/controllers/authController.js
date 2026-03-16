@@ -16,70 +16,21 @@ const generateRefreshToken = (userId, displayName, role) => {
     );
 };
 
-const checkUserExist = async (email, phone = null) => {
-    // Buscar específicamente por email primero
-    const emailUser = await User.findOne({ email });
-    if (emailUser) return emailUser;
-    
-    // Si no se encuentra por email, buscar por teléfono
-    if (phone) {
-        return await User.findOne({ phone });
-    }
-    return null;
-};
-
-// ...
-
-async function register(req, res, next) {
-    try {
-        const { displayName, email: rawEmail, password, phone } = req.body;
-        const email = rawEmail.trim().toLowerCase();
-        
-        // Solo bloquear si el email YA existe
-        const emailExists = await User.findOne({ email });
-        
-        if (emailExists) {
-            console.log("Register: Email already exists, pretending success");
-            return res.status(201).json({ displayName, email, phone });
-        }
-        
-        // El teléfono puede estar repetido, pero eso no impide registrar un nuevo email
-        
-        let role = 'guest';
-        const hashPassword = await generatePassword(password);
-
-        const newUser = new User({
-            displayName,
-            email,
-            hashPassword,
-            role,
-            phone
-        });
-        await newUser.save();
-        console.log("Register: User saved successfully with email:", email);
-
-        res.status(201).json({ displayName, email, phone });
-    } catch (err) {
-        next(err);
-    }
-};
-
 const generatePassword = async (password) => {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
 };
 
 async function register(req, res, next) {
-
     try {
         const { displayName, email: rawEmail, password, phone } = req.body;
         const email = rawEmail.trim().toLowerCase();
-        
-        const userExist = await checkUserExist(email, phone);
-        console.log("Register: Checking existence for", email, "phone:", phone, userExist ? "Found (User: " + userExist.email + ")" : "Not Found");
-        
-        if (userExist) {
-            console.log("Register: User already exists, pretending success");
+
+        // Solo bloquear si el email YA existe
+        const emailExists = await User.findOne({ email });
+
+        if (emailExists) {
+            console.log("Register: Email already exists, pretending success");
             return res.status(201).json({ displayName, email, phone });
         }
 
@@ -97,27 +48,21 @@ async function register(req, res, next) {
         console.log("Register: User saved successfully with email:", email);
 
         res.status(201).json({ displayName, email, phone });
-
     } catch (err) {
         next(err);
     }
-
 };
 
 async function login(req, res, next) {
-
     try {
         const { email: rawEmail, password } = req.body;
         const email = rawEmail ? rawEmail.trim().toLowerCase() : "";
-        
+
         console.log("Login: Attempting login for", JSON.stringify(email));
 
-        const userExist = await checkUserExist(email);
+        const userExist = await User.findOne({ email });
         console.log("Login: User found?", !!userExist);
-        if (userExist) {
-            console.log("Login: User object found email:", userExist.email);
-        }
-        
+
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
         }
@@ -143,7 +88,6 @@ async function login(req, res, next) {
     } catch (err) {
         next(err);
     }
-
 };
 
 async function checkEmail(req, res, next) {
