@@ -1,6 +1,6 @@
 describe("Flujo de Perfil y Pedidos", () => {
     const testUser = {
-        displayName: "customer User",
+        displayName: "Customer User",
         email: "customer@test.com",
         password: "Password123!"
     };
