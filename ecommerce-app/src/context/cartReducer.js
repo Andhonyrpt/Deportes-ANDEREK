@@ -67,6 +67,7 @@ export function cartReducer(state, action) {
         case CART_ACTIONS.SET_QTY: {
             const { _id, selectedSize, quantity } = action.payload;
             const q = Math.max(1, quantity);
+            console.log("DEBUG [CartReducer]: SET_QTY", { _id, selectedSize, q });
             return {
                 ...state,
                 items: state.items.map((i) => (i._id === _id && i.selectedSize === selectedSize

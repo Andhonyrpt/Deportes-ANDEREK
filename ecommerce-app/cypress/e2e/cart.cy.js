@@ -78,25 +78,27 @@ describe("Flujo de Carrito de Compras", () => {
         cy.wait("@getCart");
 
         // Incrementar cantidad
-        cy.wait(500); 
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-increment"]').first().click({ force: true });
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`)
+          .find('[data-testid="quantity-increment"]')
+          .click({ force: true });
+        
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
         
-        // Assert con reintento más largo y texto preciso
+        // Assert con reintento y tiempo suficiente para re-render
         cy.get(`[data-testid="cart-item-${product1._id}-M"]`, { timeout: 10000 })
           .find('[data-testid="quantity-value"]')
-          .should("not.have.text", "1")
           .should("have.text", "2");
 
         // Decrementar cantidad
-        cy.wait(500); 
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-decrement"]').first().click({ force: true });
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`)
+          .find('[data-testid="quantity-decrement"]')
+          .click({ force: true });
+        
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
         
-        // Assert con reintento más largo y texto preciso
+        // Assert con reintento y tiempo suficiente
         cy.get(`[data-testid="cart-item-${product1._id}-M"]`, { timeout: 10000 })
           .find('[data-testid="quantity-value"]')
-          .should("not.have.text", "2")
           .should("have.text", "1");
     });
 

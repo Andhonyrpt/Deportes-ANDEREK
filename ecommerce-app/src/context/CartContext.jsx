@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer, useState, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import * as cartService from "../services/cartService";
 import { CART_ACTIONS, cartInitialState, cartReducer } from "./cartReducer";
@@ -16,6 +16,7 @@ export function CartProvider({ children }) {
 
     const { user, isAuth } = useAuth();
     const [cartId, setCartId] = useState(null);
+    const initializedRef = useRef(false); // Flag para evitar re-fetch usando ref
 
     // Funciones auxiliares
     const getTotalItems = () => state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
@@ -34,56 +35,52 @@ export function CartProvider({ children }) {
 
     useEffect(() => {
         const initializeCart = async () => {
-            if (isAuth && user?._id) {
+            // Solo inicializar si está autenticado, tenemos ID, y no ha sido inicializado aún
+            if (isAuth && user?._id && !initializedRef.current) {
                 try {
                     console.log("DEBUG [CartContext]: Initializing cart for user", user._id);
+                    initializedRef.current = true; // Bloquear re-inicialización
                     
-                    // 1. Verificar si hay items huérfanos del modo Guest en el estado actual
-                    const localItems = state.items;
-                    if (localItems.length > 0) {
-                        console.log("DEBUG [CartContext]: Merging guest items...", localItems);
-                        const mergePayload = localItems.map(item => ({
-                            productId: item._id,
-                            quantity: item.quantity,
-                            size: item.selectedSize || "M"
-                        }));
-                        await cartService.mergeCart(mergePayload);
-                        // Una vez fusionado, limpiamos el localStorage para que no se use más
-                        localStorage.removeItem("cart");
-                    }
-
-                    // 2. Obtener el carrito final (ya fusionado) desde el backend
+                    // 1. Obtener el carrito desde el backend
                     const backendCart = await cartService.getCart(user._id);
                     console.log("DEBUG [CartContext]: Backend response", backendCart);
 
                     if (backendCart?.products) {
                         setCartId(backendCart._id);
-                        // Normalizar para el reducer (el backend usa 'product' y nosotros '_id')
-                        const normalizedItems = backendCart.products.map(p => ({
-                            ...p.product,
-                            _id: p.product._id,
-                            quantity: p.quantity,
-                            selectedSize: p.size
-                        }));
+                        // Normalizar y sumar duplicados
+                        const normalizedItemsMap = new Map();
+                        backendCart.products.forEach(p => {
+                            const key = `${p.product._id}-${p.size}`;
+                            if (!normalizedItemsMap.has(key)) {
+                                normalizedItemsMap.set(key, {
+                                    ...p.product,
+                                    _id: p.product._id,
+                                    quantity: p.quantity,
+                                    selectedSize: p.size
+                                });
+                            } else {
+                                const existing = normalizedItemsMap.get(key);
+                                existing.quantity += p.quantity;
+                                normalizedItemsMap.set(key, existing);
+                            }
+                        });
+                        const normalizedItems = Array.from(normalizedItemsMap.values());
                         dispatch({ type: CART_ACTIONS.INIT, payload: normalizedItems });
                     }
                 } catch (error) {
                     console.error("DEBUG [CartContext]: Error", error);
+                    initializedRef.current = false; // Permitir reintento si falló
                 }
             } else if (!isAuth) {
-                // Si no hay sesión, "reseteamos" el cartId pero dejamos que el reducer
-                // use lo que hay en localStorage para el carrito de invitado
                 setCartId(null);
+                initializedRef.current = false;
             }
         }
         initializeCart();
-    }, [isAuth, user?._id]);
+    }, [isAuth, user?._id]); // Ya no depende de 'initialized' porque es un ref mutable
 
     const syncToBackend = async (syncFn) => {
         if (!isAuth) return;
-        // Revision aqui porque esto me esta dando false 
-        // y no me deja hacer la sincronizacion
-
 
         setSyncState({
             syncing: true,
@@ -114,6 +111,7 @@ export function CartProvider({ children }) {
     };
 
     const updateQuantity = (productId, size, newQuantity) => {
+        console.log("DEBUG [CartContext]: Updating quantity", { productId, size, newQuantity });
         dispatch({ type: CART_ACTIONS.SET_QTY, payload: { _id: productId, selectedSize: size, quantity: newQuantity } });
 
         syncToBackend(async () => {
@@ -122,12 +120,10 @@ export function CartProvider({ children }) {
     };
 
     const addToCart = (product, quantity = 1, size = 'M') => {
-
         dispatch({ type: CART_ACTIONS.ADD, payload: { ...product, quantity, selectedSize: size } });
 
         syncToBackend(async () => {
             await cartService.addToCart(user._id, product._id, quantity, size);
-
         });
     };
 
