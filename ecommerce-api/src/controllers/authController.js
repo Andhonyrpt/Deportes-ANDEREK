@@ -17,20 +17,51 @@ const generateRefreshToken = (userId, displayName, role) => {
 };
 
 const checkUserExist = async (email, phone = null) => {
-    console.log("Checking database for email:", email);
     // Buscar específicamente por email primero
     const emailUser = await User.findOne({ email });
-    console.log("Email user found:", !!emailUser);
     if (emailUser) return emailUser;
     
     // Si no se encuentra por email, buscar por teléfono
     if (phone) {
-        console.log("Checking database for phone:", phone);
-        const phoneUser = await User.findOne({ phone });
-        console.log("Phone user found:", !!phoneUser);
-        return phoneUser;
+        return await User.findOne({ phone });
     }
     return null;
+};
+
+// ...
+
+async function register(req, res, next) {
+    try {
+        const { displayName, email: rawEmail, password, phone } = req.body;
+        const email = rawEmail.trim().toLowerCase();
+        
+        // Solo bloquear si el email YA existe
+        const emailExists = await User.findOne({ email });
+        
+        if (emailExists) {
+            console.log("Register: Email already exists, pretending success");
+            return res.status(201).json({ displayName, email, phone });
+        }
+        
+        // El teléfono puede estar repetido, pero eso no impide registrar un nuevo email
+        
+        let role = 'guest';
+        const hashPassword = await generatePassword(password);
+
+        const newUser = new User({
+            displayName,
+            email,
+            hashPassword,
+            role,
+            phone
+        });
+        await newUser.save();
+        console.log("Register: User saved successfully with email:", email);
+
+        res.status(201).json({ displayName, email, phone });
+    } catch (err) {
+        next(err);
+    }
 };
 
 const generatePassword = async (password) => {
