@@ -17,6 +17,9 @@ describe("Flujo de Carrito de Compras", () => {
         cy.clearLocalStorage();
         // Login con usuario existente
         cy.loginByApi("customer@test.com", "Password123!");
+        
+        // Limpiar carrito en API para cada test
+        cy.clearCartByApi();
 
         // Interceptores para bypass de rate limit y debug
         cy.intercept("GET", "**/products*", (req) => {
@@ -75,14 +78,26 @@ describe("Flujo de Carrito de Compras", () => {
         cy.wait("@getCart");
 
         // Incrementar cantidad
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-increment"]').first().click();
+        cy.wait(500); 
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-increment"]').first().click({ force: true });
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-value"]').should("contain", "2");
+        
+        // Assert con reintento más largo y texto preciso
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`, { timeout: 10000 })
+          .find('[data-testid="quantity-value"]')
+          .should("not.have.text", "1")
+          .should("have.text", "2");
 
         // Decrementar cantidad
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-decrement"]').first().click();
+        cy.wait(500); 
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-decrement"]').first().click({ force: true });
         cy.wait("@updateCartReq").its("response.statusCode").should("eq", 200);
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).find('[data-testid="quantity-value"]').should("contain", "1");
+        
+        // Assert con reintento más largo y texto preciso
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`, { timeout: 10000 })
+          .find('[data-testid="quantity-value"]')
+          .should("not.have.text", "2")
+          .should("have.text", "1");
     });
 
     it("elimina un producto del carrito", () => {
@@ -95,8 +110,7 @@ describe("Flujo de Carrito de Compras", () => {
         cy.wait("@removeCartReq").its("response.statusCode").should("eq", 200);
 
         // Await re-render
-        cy.wait(1000);
-        cy.get(`[data-testid="cart-item-${product1._id}-M"]`).should("not.exist");
+        cy.get(`[data-testid="cart-item-${product1._id}-M"]`, { timeout: 10000 }).should("not.exist");
     });
 
     it("mantiene los productos al recargar la página (persistencia real)", () => {

@@ -28,7 +28,7 @@ Cypress.Commands.add("loginByApi", (email, password) => {
         headers: { 'x-load-test': 'true' },
         body: { email, password },
         failOnStatusCode: false,
-        timeout: 60000 // Aumentado para soportar cold-start en Render
+        timeout: 60000
     }).then((loginRes) => {
         cy.log(`Login response: ${loginRes.status}`);
         if (loginRes.status !== 200) {
@@ -54,8 +54,27 @@ Cypress.Commands.add("loginByApi", (email, password) => {
     });
 });
 
+Cypress.Commands.add("clearCartByApi", () => {
+    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
+    
+    return cy.window().then((win) => {
+        const token = win.localStorage.getItem("authToken");
+        const userStr = win.localStorage.getItem("userData");
+        const user = userStr ? JSON.parse(userStr) : null;
+
+        if (!token || !user) return;
+
+        return cy.request({
+            method: "POST",
+            url: `${apiUrl}/cart/clear`,
+            headers: { Authorization: `Bearer ${token}` },
+            body: { userId: user._id }
+        });
+    });
+});
+
 Cypress.Commands.add("addProductToCart", (productId, quantity = 1, size = "M") => {
-    const apiUrl = Cypress.env("apiUrl") || "http://localhost:4000/api";
+    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
     
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
