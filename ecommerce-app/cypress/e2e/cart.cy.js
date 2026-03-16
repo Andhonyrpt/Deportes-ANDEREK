@@ -19,7 +19,7 @@ describe("Flujo de Carrito de Compras", () => {
         cy.loginByApi("customer@test.com", "Password123!");
         
         // Limpiar carrito en API para cada test
-        cy.clearCartByApi();
+        cy.clearDataByApi();
 
         // Interceptores para bypass de rate limit y debug
         cy.intercept("GET", "**/products*", (req) => {
