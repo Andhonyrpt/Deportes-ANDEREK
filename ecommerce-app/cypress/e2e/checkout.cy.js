@@ -7,6 +7,10 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
 
     beforeEach(() => {
         cy.clearLocalStorage();
+        cy.loginByApi(testUser.email, testUser.password);
+        
+        // Limpiar direcciones, pagos y carrito en API para cada test
+        cy.clearDataByApi();
 
         cy.intercept("GET", "**/users/profile", (req) => { req.headers['x-load-test'] = 'true'; }).as("getUserProfile");
         cy.intercept("GET", "**/shipping-addresses/user-addresses*", (req) => { req.headers['x-load-test'] = 'true'; }).as("getAddresses");
@@ -16,7 +20,6 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.intercept("POST", "**/payment-methods", (req) => { req.headers['x-load-test'] = 'true'; }).as("savePayment");
         cy.intercept("POST", "**/orders", (req) => { req.headers['x-load-test'] = 'true'; }).as("placeOrder");
 
-        cy.loginByApi(testUser.email, testUser.password);
         cy.visit("/");
 
         cy.log("Agregando al carrito y visitando Checkout...");
@@ -33,6 +36,11 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.get(".cart-view", { timeout: 10000 }).should("contain", "Manchester United");
         
         // Fase 1: Dirección
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="add-address-button"]').length === 0) {
+                cy.contains("1. Dirección de envío").click();
+            }
+        });
         cy.get('[data-testid="add-address-button"]').click();
         cy.get('[data-testid="address-name"]').type("Juan Pérez");
         cy.get('[data-testid="address-address"]').type("Calle Falsa 123");

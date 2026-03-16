@@ -54,7 +54,7 @@ Cypress.Commands.add("loginByApi", (email, password) => {
     });
 });
 
-Cypress.Commands.add("clearCartByApi", () => {
+Cypress.Commands.add("clearDataByApi", () => {
     const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
     
     return cy.window().then((win) => {
@@ -64,11 +64,49 @@ Cypress.Commands.add("clearCartByApi", () => {
 
         if (!token || !user) return;
 
-        return cy.request({
+        // Limpiar carrito
+        cy.request({
             method: "POST",
             url: `${apiUrl}/cart/clear`,
             headers: { Authorization: `Bearer ${token}` },
-            body: { userId: user._id }
+            body: { userId: user._id },
+            failOnStatusCode: false
+        });
+
+        // Limpiar direcciones
+        cy.request({
+            method: "GET",
+            url: `${apiUrl}/shipping-addresses/user-addresses`, // Corrected route
+            headers: { Authorization: `Bearer ${token}` },
+            failOnStatusCode: false
+        }).then((res) => {
+            if (res.status === 200 && res.body.addresses) {
+                res.body.addresses.forEach(addr => {
+                    cy.request({
+                        method: "DELETE",
+                        url: `${apiUrl}/shipping-addresses/delete-address/${addr._id}`, // Corrected route
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                });
+            }
+        });
+
+        // Limpiar pagos
+        cy.request({
+            method: "GET",
+            url: `${apiUrl}/payment-methods/user/${user._id}`, // Corrected route
+            headers: { Authorization: `Bearer ${token}` },
+            failOnStatusCode: false
+        }).then((res) => {
+            if (res.status === 200 && Array.isArray(res.body)) {
+                res.body.forEach(pay => {
+                    cy.request({
+                        method: "DELETE",
+                        url: `${apiUrl}/payment-methods/${pay._id}`,
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                });
+            }
         });
     });
 });

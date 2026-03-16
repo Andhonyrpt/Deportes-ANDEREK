@@ -11,6 +11,7 @@ export default function AddressList({
     onDelete,
     onAdd
 }) {
+    console.log("DEBUG [AddressList]: Rendering, addresses length:", addresses?.length);
 
     return (
         <div className="address-list">

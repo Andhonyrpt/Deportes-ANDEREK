@@ -117,6 +117,9 @@ export default function Checkout() {
 
                 console.log("Checkout: Direcciones recibidas", addrList);
                 console.log("Checkout: Pagos recibidos", payList);
+                
+                // DEBUG: log variables de estado
+                console.log("DEBUG [Checkout]: addresses.length:", addrList.length);
 
                 setAddresses(addrList);
                 setPayments(payList);
