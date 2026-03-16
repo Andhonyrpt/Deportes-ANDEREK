@@ -25,15 +25,15 @@ async function register(req, res, next) {
     try {
         const { displayName, email: rawEmail, password, phone } = req.body;
         const email = rawEmail.trim().toLowerCase();
-        
+
         // Solo bloquear si el email YA existe
         const emailExists = await User.findOne({ email });
-        
+
         if (emailExists) {
             console.log("Register: Email already exists, pretending success");
             return res.status(201).json({ displayName, email, phone });
         }
-        
+
         let role = 'guest';
         const hashPassword = await generatePassword(password);
 
@@ -66,7 +66,7 @@ async function login(req, res, next) {
 
         const userExist = await User.findOne({ email });
         console.log("Login: User found?", !!userExist);
-        
+
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
         }
@@ -121,8 +121,16 @@ async function refreshToken(req, res, next) {
                 decoded.displayName,
                 decoded.role
             );
+            // // OPCIONAL.
+            // //Esto sirve como en las redes sociales para nunca pedir el inicio de sesion y sea un refresh infinito 
+            // const newRefreshToken = generateRefreshToken(
+            //   decoded.userId,
+            //   decoded.displayName,
+            //   decoded.role,
+            // );
 
             res.status(200).json({ token: newAccessToken, refreshToken: token });
+            // .json({ token: newAccessToken, refreshToken: newRefreshToken });
         });
     } catch (error) {
         next(error);
