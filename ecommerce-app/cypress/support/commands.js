@@ -11,8 +11,8 @@ Cypress.Commands.add("registerUser", (userData) => {
         timeout: 60000
     }).then((res) => {
         cy.log(`Register response: ${res.status}`);
+        cy.log(`Register body: ${JSON.stringify(res.body)}`);
         if (res.status !== 201 && res.status !== 400 && res.status !== 429) {
-            cy.log(`Register error body: ${JSON.stringify(res.body)}`);
             throw new Error(`Registration failed: ${res.status} ${JSON.stringify(res.body)}`);
         }
     });
