@@ -1,9 +1,27 @@
 import { http } from "./http";
 
+// 🛡️ HELPER NIVEL DIOS: Extrae el ID sin importar si el backend manda un Objeto o un String
+const extractId = (campo) => {
+    if (!campo) return null;
+
+    const id = campo._id || campo; // Si tiene _id lo usa, si no, asume que el campo en sí es el texto del ID
+    return id.toString().trim();
+};
+
 export const fetchCategories = async () => {
     try {
-        const response = await http.get("categories");
-        return response.data || [];
+        // 1. Vamos por las Ligas (Categorías Padre)
+        const catResponse = await http.get("categories");
+        const categorias = catResponse.data?.categories || catResponse.data || [];
+
+        // 2. Vamos por los Equipos (SubCategorías Hijas)
+        const subCatResponse = await http.get("subcategories");
+        const subCategorias = subCatResponse.data?.subcategories || subCatResponse.data || [];
+
+        // 3. ¡Fusión! Juntamos ambos arreglos en uno solo para que el frontend sea feliz
+        const combinadas = [...categorias, ...subCategorias];
+        console.log("🕵️‍♂️ TODAS las categorías fusionadas (Ligas + Equipos):", combinadas);
+        return combinadas;
     } catch (error) {
         console.error("Error fetching categories", error);
         return [];
@@ -13,7 +31,9 @@ export const fetchCategories = async () => {
 export const fetchProducts = async () => {
     try {
         const response = await http.get("products");
-        return response.data?.products || response.data || [];
+        const data = response.data?.products || response.data || [];
+        console.log("🕵️‍♂️ Productos reales recibidos:", data);
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         console.error("Error fetching products", error);
         return [];
@@ -36,12 +56,12 @@ export const getCategoryById = async (categoryId) => {
         const trimmedId = categoryId.toString().trim();
 
         // 1. INTENTO ORIGINAL: Buscar la categoría por su _id principal (funciona para equipos/hijos)
-        let category = data.find((cat) => cat._id.toString().trim() === trimmedId);
+        let category = data.find((cat) => extractId(cat) === trimmedId);
         if (category) return category;
 
         // 2. SOLUCIÓN para IDs de ligas (padres): Si no se encuentra, buscar si existe como CATEGORÍA PADRE anidada
         const parentAsChild = data.find(
-            (cat) => cat.parentCategory && cat.parentCategory._id.toString().trim() === trimmedId
+            (cat) => cat.parentCategory && extractId(cat.parentCategory) === trimmedId
         );
 
         // 3. Si se encuentra un padre anidado, CONSTRUIR y devolver el objeto de la categoría padre
@@ -56,16 +76,18 @@ export const getCategoryById = async (categoryId) => {
 // Obtener todas las categorías hijas de una categoría padre
 export const getChildCategories = async (parentCategoryId) => {
     const trimmedId = parentCategoryId.toString().trim();
+
     return fetchCategories().then((data) =>
-        data.filter((cat) => cat.parentCategory?._id.toString() === trimmedId)
+        data.filter((cat) => extractId(cat.parentCategory) === trimmedId)
     );
 };
 
 // Obtener productos por categoría específica
 export const getProductsByCategory = async (categoryId) => {
     const trimmedId = categoryId.toString().trim();
+
     return fetchProducts().then((data) =>
-        data.filter((product) => product.category._id.toString() === trimmedId)
+        data.filter((product) => extractId(product.category) === trimmedId)
     );
 };
 
@@ -84,21 +106,22 @@ export const getProductsByCategoryAndChildren = async (categoryId) => {
     if (!category.parentCategory) {
         // Obtener IDs de todas las categorías hijas
         const childCategoryIds = allCategories
-            .filter((cat) => cat.parentCategory && cat.parentCategory?._id.toString().trim() === trimmedId)
-            .map((cat) => cat._id.toString().trim());
+            .filter((cat) => cat.parentCategory && extractId(cat.parentCategory) === trimmedId)
+            .map((cat) => extractId(cat));
 
         // Incluir el ID de la categoría padre también
-        const allCategoryIds = [categoryId, ...childCategoryIds];
+        const allCategoryIds = [trimmedId, ...childCategoryIds];
 
         // Retornar productos de la categoría padre y sus hijas
         return allProducts.filter((product) =>
-            product.category && allCategoryIds.includes(product.category._id.toString().trim())
+            product.category && allCategoryIds.includes(extractId(product.category))
         );
     }
 
     // Si es una categoría hija, solo retornar sus productos
-    return allProducts.filter((product) => product.category && product.category._id.toString().trim() === trimmedId
+    return allProducts.filter((product) => product.category && extractId(product.category) === trimmedId
     );
+
 };
 
 // Obtener categorías principales (sin padre)
