@@ -10,7 +10,7 @@ describe("Flujo de Login", () => {
         // Asegurar que el usuario existe
         cy.request({
             method: "POST",
-            url: `${Cypress.env("apiUrl") || "https://deportes-anderek.onrender.com/api"}/auth/register`,
+            url: `${Cypress.env("apiUrl")}/auth/register`,
             headers: { 'x-load-test': 'true' },
             body: testUser,
             failOnStatusCode: false

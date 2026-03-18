@@ -1,5 +1,5 @@
 Cypress.Commands.add("registerUser", (userData) => {
-    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
+    const apiUrl = Cypress.env("apiUrl");
     cy.log(`Registering: ${userData.email} at ${apiUrl}`);
     
     return cy.request({
@@ -19,7 +19,7 @@ Cypress.Commands.add("registerUser", (userData) => {
 });
 
 Cypress.Commands.add("loginByApi", (email, password) => {
-    const apiUrl = Cypress.env("apiUrl") || "http://localhost:4000/api";
+    const apiUrl = Cypress.env("apiUrl");
     cy.log(`Logging in: ${email} at ${apiUrl}`);
 
     return cy.request({
@@ -55,7 +55,7 @@ Cypress.Commands.add("loginByApi", (email, password) => {
 });
 
 Cypress.Commands.add("clearDataByApi", () => {
-    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
+    const apiUrl = Cypress.env("apiUrl");
     
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
@@ -112,7 +112,7 @@ Cypress.Commands.add("clearDataByApi", () => {
 });
 
 Cypress.Commands.add("addProductToCart", (productId, quantity = 1, size = "M") => {
-    const apiUrl = Cypress.env("apiUrl") || "http://127.0.0.1:4000/api";
+    const apiUrl = Cypress.env("apiUrl");
     
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
