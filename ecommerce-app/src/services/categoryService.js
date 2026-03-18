@@ -1,20 +1,23 @@
-import categories from "../data/categories.json";
-import products from "../data/products.json";
+import { http } from "./http";
 
 export const fetchCategories = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(categories);
-        }, 1200); // 1.2 segundos de delay
-    });
+    try {
+        const response = await http.get("categories");
+        return response.data || [];
+    } catch (error) {
+        console.error("Error fetching categories", error);
+        return [];
+    }
 };
 
 export const fetchProducts = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(products);
-        }, 800);
-    });
+    try {
+        const response = await http.get("products");
+        return response.data?.products || response.data || [];
+    } catch (error) {
+        console.error("Error fetching products", error);
+        return [];
+    }
 };
 
 export const searchCategories = async (query) => {

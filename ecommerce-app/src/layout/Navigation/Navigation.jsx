@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getParentCategories } from '../../services/categoryService';
 import Icon from '../../components/common/Icon';
-import categoriesData from '../../data/categories.json';
 import './Navigation.css';
 
 export default function Navigation({ activeCategory, activeSubcategory, onSubcategoryClick, availableSubcategories }) {
@@ -10,17 +10,17 @@ export default function Navigation({ activeCategory, activeSubcategory, onSubcat
     const [isSubcategoriesMenuOpen, setIsSubcategoriesMenuOpen] = useState(false);
 
     useEffect(() => {
+        // <--- NUEVO: Llamamos a la base de datos en lugar del JSON
+        const loadNavCategories = async () => {
+            try {
+                const parentCategories = await getParentCategories();
+                setCategories(parentCategories);
+            } catch (error) {
+                console.error("Error al cargar categorías del menú:", error);
+            }
+        };
 
-        const mainCategories = categoriesData.map((category) =>
-            category.parentCategory)
-            .filter((parent) => parent && parent._id);
-
-        const parentCategories = mainCategories.filter((category, index, self) =>
-            index === self.findIndex((c) =>
-                c._id === category._id));
-
-        setCategories(parentCategories);
-
+        loadNavCategories();
     }, [activeCategory]);
 
     const isSubcategoryButtonDisabled = !availableSubcategories || availableSubcategories.length === 0;

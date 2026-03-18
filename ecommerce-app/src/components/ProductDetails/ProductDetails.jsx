@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
-import categoriesData from '../../data/categories.json';
 import { getProductById } from '../../services/productService';
 import Badge from "../common/Badge";
 import Button from "../common/Button";
@@ -50,9 +49,10 @@ export default function ProductDetails({ productId }) {
         if (!product?.category) return null;
 
         return (
-            categoriesData.find((cat) => cat._id === product.category._id) ||
-            categoriesData.find((cat) => cat.name.toLocaleLowerCase() === product.category.name?.toLocaleLowerCase()) ||
-            null
+            product.category
+            // categoriesData.find((cat) => cat._id === product.category._id) ||
+            // categoriesData.find((cat) => cat.name.toLocaleLowerCase() === product.category.name?.toLocaleLowerCase()) ||
+            // null
         );
     }, [product]);
 

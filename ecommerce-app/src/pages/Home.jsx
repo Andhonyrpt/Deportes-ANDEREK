@@ -23,6 +23,9 @@ export default function Home() {
         setLoading(true);
         setError(null);
         const productsData = await fetchProducts();
+
+        console.log("ESTO ES LO QUE LLEGA DE MONGO:", productsData);
+
         setProducts(productsData?.products || []);
     };
 
