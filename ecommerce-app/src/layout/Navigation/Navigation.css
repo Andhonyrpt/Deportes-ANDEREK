@@ -81,3 +81,41 @@
 .subcategories-dropdown-menu {
     width: 100%;
 }
+
+
+/* responsivo */
+@media (max-width: 480px) {
+
+    /* Aquí van tus estilos para móvil */
+    .navigation-content {
+        flex-direction: column;
+        align-items: stretch;
+        /* Estira los elementos a lo ancho */
+        gap: 15px;
+        /* Reducimos el espacio gigante de 50px */
+        width: 55%;
+    }
+
+    /* 2. Hacemos que los contenedores ocupen el 100% de la pantalla */
+    .categories-dropdown,
+    .subcategories-dropdown {
+        width: 100%;
+        display: block;
+    }
+
+    /* 3. Aseguramos que los botones también sean del 100% y se vean bien */
+    .dropdown-btn,
+    .subcategories-dropdown .dropdown-btn {
+        width: 100%;
+        justify-content: space-between;
+        /* Manda el texto a la izq. y la flecha a la der. */
+    }
+
+    /* 4. Aseguramos que los menús desplegables no se salgan de la pantalla */
+    .categories-dropdown-menu,
+    .subcategories-dropdown-menu {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}

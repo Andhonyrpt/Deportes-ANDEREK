@@ -699,6 +699,10 @@
     .mobile-menu-btn {
         display: flex;
     }
+    
+    .header-actions {
+        margin-right: 16px; 
+    }
 
     /* Adjust search in mobile */
     .search-form {

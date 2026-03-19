@@ -9,6 +9,7 @@
     overflow: hidden;
     gap: 10px;
     transition: all 0.2s;
+    margin-right: 16px;
 }
 
 .search-input {
@@ -31,7 +32,7 @@
     color: var(--text-light);
 }
 
-.clear-btn{
+.clear-btn {
     position: absolute;
     top: 50%;
     right: 5px;
@@ -46,7 +47,7 @@
     outline: none;
 }
 
-.clear-btn:hover{
+.clear-btn:hover {
     color: var(--text-dark);
 }
 
@@ -65,4 +66,13 @@
 .search-btn:hover {
     background: var(--color-light-gray);
     color: var(--color-dark);
+}
+
+
+
+@media(max-width: 768px) {
+    .search-form {
+        margin-right: 16px;
+        width: auto;
+    }
 }
