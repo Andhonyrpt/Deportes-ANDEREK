@@ -34,7 +34,7 @@ async function register(req, res, next) {
             return res.status(201).json({ displayName, email, phone });
         }
         
-        let role = 'guest';
+        let role = 'customer';
         const hashPassword = await generatePassword(password);
 
         const newUser = new User({
