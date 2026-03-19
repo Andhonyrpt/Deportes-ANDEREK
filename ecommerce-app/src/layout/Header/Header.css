@@ -10,7 +10,6 @@
     background: linear-gradient(90deg, var(--color-primary-900), var(--color-primary-600));
     width: 100%;
     color: white;
-    backdrop-filter: 5px;
     min-height: 80px;
 }
 
@@ -637,7 +636,7 @@
 
 
 /* Mobile Logout Section */
-.mobile-logout-section{
+.mobile-logout-section {
     margin-top: auto;
     padding-top: 20px;
     border-top: 2px solid var(--border);
@@ -674,6 +673,13 @@
         padding: 8px 0;
     }
 
+    .header-left {
+        margin-left: -10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
     .search-container {
         order: 3;
         grid-column: 1 / -1;
@@ -699,9 +705,9 @@
     .mobile-menu-btn {
         display: flex;
     }
-    
+
     .header-actions {
-        margin-right: 16px; 
+        margin-right: 16px;
     }
 
     /* Adjust search in mobile */
