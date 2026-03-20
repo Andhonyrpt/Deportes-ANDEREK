@@ -85,9 +85,7 @@ export default function Home() {
 
             <Navigation />
 
-            {loading ? (
-                <Loading>Cargando Productos...</Loading>
-            ) : error ? (
+            {error ? (
                 <ErrorMessage>
                     <span>{error}</span>
                     <Button
@@ -105,11 +103,12 @@ export default function Home() {
                         Volver a cargar
                     </Button>
                 </ErrorMessage>
-            ) : products.length > 0 ? (
+            ) : (products.length > 0 || loading) ? (
                 <List
                     title="Catálogo de jerseys"
                     products={products}
                     layout="grid"
+                    isLoading={loading}
                 ></List>
             ) : (
                 <ErrorMessage>No hay productos en el catálogo</ErrorMessage>

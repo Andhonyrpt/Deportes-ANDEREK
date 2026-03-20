@@ -155,10 +155,12 @@ export default function SearchResultsList() {
                 </header>
 
                 {loading && (
-                    <div className="search-results-message">
-                        <h3>Buscando productos...</h3>
-                        <p>Esto puede tomar unos segundos</p>
-                    </div>
+                    <List
+                        products={[]}
+                        layout="vertical"
+                        title={hasQuery ? `Buscando resultados para ${query}...` : 'Buscando productos...'}
+                        isLoading={true}
+                    />
                 )}
 
                 {!loading && showNoResults && (

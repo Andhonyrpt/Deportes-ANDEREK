@@ -6,8 +6,8 @@ import {
     getChildCategories
 } from "../../services/categoryService";
 import ProductCard from "../ProductCard/ProductCard";
+import ProductCardSkeleton from "../ProductCard/ProductCardSkeleton";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
-import Loading from "../common/Loading/Loading";
 import Navigation from "../../layout/Navigation/Navigation";
 import SearchForm from "../SearchForm/SearchForm";
 import './CategoryProducts.css';
@@ -85,15 +85,7 @@ export default function CategoryProducts({ categoryId }) {
 
     const hasProductsToDisplay = displayedProducts.length > 0;
 
-    if (loading) {
-        return (
-            <div className="category-products-root">
-                <Loading>Cargando categoría y productos...</Loading>
-            </div>
-        );
-    };
-
-    if (error || !category) {
+    if (error) {
         return (
             <div className="category-products-root">
                 <ErrorMessage message={error || "Categoría no encontrada"}>
@@ -138,18 +130,25 @@ export default function CategoryProducts({ categoryId }) {
                     <div className="category-products-header">
                         <div className="category-products-title">
                             <h1 className="category-products-h1">
-                                {activeSubcategoryProp
-                                    ? `${activeCategoryProp.name}: ${activeSubcategoryProp.name}`
-                                    : activeCategoryProp.name
-                                }
+                                {loading ? "Cargando..." : (
+                                    activeSubcategoryProp
+                                        ? `${activeCategoryProp.name}: ${activeSubcategoryProp.name}`
+                                        : activeCategoryProp.name
+                                )}
                             </h1>
-                            {category.description && (
+                            {!loading && category?.description && (
                                 <p className="category-products-muted">{category.description}</p>
                             )}
                         </div>
                     </div>
 
-                    {hasProductsToDisplay ? (
+                    {loading ? (
+                        <div className="category-products-grid">
+                            {Array(6).fill(0).map((_, index) => (
+                                <ProductCardSkeleton key={index} orientation="vertical" />
+                            ))}
+                        </div>
+                    ) : hasProductsToDisplay ? (
                         <div className="category-products-grid">
                             {displayedProducts.map((product) => (
                                 <ProductCard
