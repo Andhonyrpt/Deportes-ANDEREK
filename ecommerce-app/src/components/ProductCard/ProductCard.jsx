@@ -5,7 +5,7 @@ import Button from "../common/Button";
 import Badge from "../common/Badge";
 import './ProductCard.css';
 
-const ProductCard = memo(({ product, orientation }) => {
+const ProductCard = memo(({ product, orientation, priority = false }) => {
 
     const { addToCart } = useCart();
     const { name, price, variants, imagesUrl, description } = product;
@@ -70,7 +70,8 @@ const ProductCard = memo(({ product, orientation }) => {
                 <img src={imagesUrl ? imagesUrl[0] : "/img/products/placeholder.svg"}
                     alt={name}
                     className="product-card-image"
-                    loading="lazy"
+                    loading={priority ? "eager" : "lazy"}
+                    fetchpriority={priority ? "high" : "auto"}
                     decoding="async"
                     onError={(e) => {
                         e.target.src = "/img/products/placeholder.svg";
