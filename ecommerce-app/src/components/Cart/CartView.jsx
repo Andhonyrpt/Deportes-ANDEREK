@@ -44,7 +44,7 @@ export default function CartView() {
                     <div className="cart-item" key={currentItemId} data-testid={`cart-item-${currentItemId}`}>
 
                         <div className="cart-item-image">
-                            <img src={p?.imagesUrl?.[0] || 'https://via.placeholder.com/150'} alt={p?.name || 'Producto'} loading="lazy" />
+                            <img src={p?.imagesUrl?.[0]?.replace(/\.(jpg|jpeg|png)$/i, '.webp') || 'https://via.placeholder.com/150'} alt={p?.name || 'Producto'} loading="lazy" />
                         </div>
 
                         <div className="cart-item-info">
