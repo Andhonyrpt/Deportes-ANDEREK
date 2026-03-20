@@ -64,10 +64,14 @@ const ProductCard = memo(({ product, orientation, priority = false }) => {
     const productLink = `/product/${product._id}`;
     const cardClass = `product-card product-card--${orientation}`;
 
+    const optimizedImageUrl = (imagesUrl && imagesUrl.length > 0)
+        ? imagesUrl[0].replace(/\.(jpg|jpeg|png)$/i, '.webp')
+        : "/img/products/placeholder.svg";
+
     return (
         <div className={cardClass} data-testid={`product-card-${product._id}`}>
             <Link to={productLink} className="product-card-image-link">
-                <img src={imagesUrl ? imagesUrl[0] : "/img/products/placeholder.svg"}
+                <img src={optimizedImageUrl}
                     alt={name}
                     className="product-card-image"
                     loading={priority ? "eager" : "lazy"}

@@ -103,7 +103,7 @@ export default function ProductDetails({ productId }) {
                 <div className="product-details-image">
                     <div className="product-details-image-wrapper">
                         <img
-                            src={imagesUrl?.[mainImage] || "/img/products/placeholder.svg"}
+                            src={imagesUrl?.[mainImage]?.replace(/\.(jpg|jpeg|png)$/i, '.webp') || "/img/products/placeholder.svg"}
                             alt={name}
                             onError={(e) => {
                                 e.target.src = "/img/products/placeholder.svg";
@@ -115,7 +115,7 @@ export default function ProductDetails({ productId }) {
                                 {imagesUrl.map((url, index) => (
                                     <img
                                         key={index}
-                                        src={url}
+                                        src={url.replace(/\.(jpg|jpeg|png)$/i, '.webp')}
                                         alt={`${name} ${index}`}
                                         className={`product-details-thumbnail ${mainImage === index ? 'active' : ''}`}
                                         onClick={() => setMainImage(index)}
