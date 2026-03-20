@@ -9,8 +9,6 @@
     transition: all 0.3s ease;
     overflow: hidden;
     min-height: 300px;
-    content-visibility: auto;
-    contain-intrinsic-size: 350px;
 }
 
 .product-card:hover {

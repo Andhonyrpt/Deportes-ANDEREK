@@ -24,7 +24,7 @@ export default function List({
                                 product={product}
                                 orientation="vertical"
                                 className="list-item"
-                                priority={index < 4}
+                                priority={index < 2}
                             />
                         );
                     })}
@@ -38,7 +38,7 @@ export default function List({
                                 product={product}
                                 orientation="horizontal"
                                 className="list-item"
-                                priority={index < 4}
+                                priority={index < 2}
                             />
                         );
                     })}
