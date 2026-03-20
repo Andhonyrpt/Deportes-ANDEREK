@@ -1,8 +1,18 @@
 import { http } from "./http";
 
 export const fetchProducts = async (page = 1, limit = 10) => {
+    const cacheKey = `products_page_${page}_limit_${limit}`;
+    const cachedData = sessionStorage.getItem(cacheKey);
+
+    if (cachedData) {
+        return JSON.parse(cachedData);
+    }
+
     const data = await http.get(`products?page=${page}&limit=${limit}`);
-    return data.data || { products: [], pagination: {} };
+    const result = data.data || { products: [], pagination: {} };
+    
+    sessionStorage.setItem(cacheKey, JSON.stringify(result));
+    return result;
 };
 
 export const searchProducts = async (

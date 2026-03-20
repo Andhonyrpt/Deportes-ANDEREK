@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useCart } from "../../context/CartContext";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
 import './ProductCard.css';
 
-export default function ProductCard({ product, orientation }) {
+const ProductCard = memo(({ product, orientation }) => {
 
     const { addToCart } = useCart();
     const { name, price, variants, imagesUrl, description } = product;
@@ -70,6 +70,8 @@ export default function ProductCard({ product, orientation }) {
                 <img src={imagesUrl ? imagesUrl[0] : "/img/products/placeholder.svg"}
                     alt={name}
                     className="product-card-image"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                         e.target.src = "/img/products/placeholder.svg";
                     }}
@@ -144,4 +146,6 @@ export default function ProductCard({ product, orientation }) {
             </div>
         </div>
     );
-};
+});
+
+export default ProductCard;

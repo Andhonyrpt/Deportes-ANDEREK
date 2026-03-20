@@ -113,8 +113,13 @@ export default function Orders() {
 
     const totalOrderPrice = selectedOrder?.totalPrice || 0;
     const shippingPrice = selectedOrder?.shippingCost || 0;
-    const calculatedSubtotal = selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
-    const calculatedTax = selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
+    const calculatedSubtotal = useMemo(() => {
+        return selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
+    }, [selectedOrder, totalOrderPrice, shippingPrice]);
+
+    const calculatedTax = useMemo(() => {
+        return selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
+    }, [selectedOrder, totalOrderPrice, shippingPrice, calculatedSubtotal]);
 
     return (
         <div className="orders-page">
