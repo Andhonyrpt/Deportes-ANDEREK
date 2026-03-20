@@ -72,6 +72,16 @@ export default function Orders() {
     const detailsStatusToken = selectedOrder ? (selectedOrder.status || "confirmed").toLowerCase() : "confirmed";
     const detailsStatusLabel = selectedOrder?.status || "Confirmado";
 
+    const totalOrderPrice = selectedOrder?.totalPrice || 0;
+    const shippingPrice = selectedOrder?.shippingCost || 0;
+    const calculatedSubtotal = useMemo(() => {
+        return selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
+    }, [selectedOrder, totalOrderPrice, shippingPrice]);
+
+    const calculatedTax = useMemo(() => {
+        return selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
+    }, [selectedOrder, totalOrderPrice, shippingPrice, calculatedSubtotal]);
+
     if (loading) {
         return (
             <div className="orders-page">
@@ -111,15 +121,7 @@ export default function Orders() {
         return type; // Por si es 'paypal' o 'efectivo'
     };
 
-    const totalOrderPrice = selectedOrder?.totalPrice || 0;
-    const shippingPrice = selectedOrder?.shippingCost || 0;
-    const calculatedSubtotal = useMemo(() => {
-        return selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
-    }, [selectedOrder, totalOrderPrice, shippingPrice]);
 
-    const calculatedTax = useMemo(() => {
-        return selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
-    }, [selectedOrder, totalOrderPrice, shippingPrice, calculatedSubtotal]);
 
     return (
         <div className="orders-page">
