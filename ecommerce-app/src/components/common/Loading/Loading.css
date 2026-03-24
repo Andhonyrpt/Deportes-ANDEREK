@@ -39,7 +39,12 @@
 }
 
 /* Responsivo */
-
+@media (max-width: 1024px) {
+    .loading-container {
+        width: 90%;
+        /* Para que no pegue a los lados de la pantalla */
+    }
+}
 
 @media (max-width: 768px) {
     .loading-container {
