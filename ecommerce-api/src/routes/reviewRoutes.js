@@ -18,29 +18,99 @@ import {
 
 const router = express.Router();
 
-// Crear una nueva review
+/**
+ * @openapi
+ * /review:
+ *   post:
+ *     summary: Crear una nueva review
+ *     tags: [Reviews]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [product, rating]
+ *             properties:
+ *               product: { type: string }
+ *               rating: { type: integer, min: 1, max: 5 }
+ *               comment: { type: string }
+ *     responses:
+ *       201: { description: Review creada }
+ */
 router.post('/review', authMiddleware, [
     bodyMongoIdValidation('product', 'Product ID'),
     ratingValidation('rating'),
     commentValidation('comment')
 ], validate, createReview);
 
-// Obtener reviews de un producto específico
+/**
+ * @openapi
+ * /review-product/{productId}:
+ *   get:
+ *     summary: Obtener reviews de un producto
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Lista de reviews }
+ */
 router.get('/review-product/:productId', [
     mongoIdValidation('productId', 'Product ID')
 ], validate, getProductReviews);
 
-// Obtener reviews del usuario autenticado
+/**
+ * @openapi
+ * /my-reviews:
+ *   get:
+ *     summary: Obtener reviews del usuario autenticado
+ *     tags: [Reviews]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de reviews }
+ */
 router.get('/my-reviews', authMiddleware, getUserReviews);
 
-// Actualizar una review
+/**
+ * @openapi
+ * /my-reviews/{reviewId}:
+ *   put:
+ *     summary: Actualizar una review
+ *     tags: [Reviews]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Review actualizada }
+ */
 router.put('/my-reviews/:reviewId', authMiddleware, [
     mongoIdValidation('reviewId', 'Review ID'),
     ratingValidation(true),
     commentValidation()
 ], validate, updateReview);
 
-// Eliminar una review
+/**
+ * @openapi
+ * /my-reviews/{reviewId}:
+ *   delete:
+ *     summary: Eliminar una review
+ *     tags: [Reviews]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Eliminada }
+ */
 router.delete('/my-reviews/:reviewId', authMiddleware, [
     mongoIdValidation('reviewId', 'Review ID')
 ], validate, deleteReview);

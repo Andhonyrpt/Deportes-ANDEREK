@@ -5,19 +5,26 @@ import Icon from '../../components/common/Icon';
 // import { isAuthenticated } from '../../services/userService';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useWishlist } from '../../context/WishlistContext';
+import { useNotification } from '../../context/NotificationContext';
 import './Header.css';
 
 export default function Header() {
 
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
     const { getTotalItems } = useCart();
     const totalItems = getTotalItems();
+    const { wishlistItems } = useWishlist();
+    const wishlistCount = wishlistItems ? wishlistItems.length : 0;
     const navigate = useNavigate();
     const { user, isAuth, logout } = useAuth();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotification();
 
     // Referencias para manejo de clicks fuera
     const userMenuRef = useRef(null);
+    const notifMenuRef = useRef(null);
     const mobileMenuRef = useRef(null);
 
 
@@ -26,13 +33,17 @@ export default function Header() {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
                 setIsUserMenuOpen(false);
+                setIsNotifMenuOpen(false);
                 setIsMobileMenuOpen(false);
             }
         };
 
         const handleClickOutside = (e) => {
-            if (userMenuRef && !userMenuRef.current.contains(e.target)) {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
                 setIsUserMenuOpen(false);
+            }
+            if (notifMenuRef.current && !notifMenuRef.current.contains(e.target)) {
+                setIsNotifMenuOpen(false);
             }
 
             if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
@@ -142,6 +153,71 @@ export default function Header() {
 
                         {/* Right Actions */}
                         <div className='header-actions'>
+
+                            {/* Notifications Button */}
+                            {isAuth && (
+                                <div className="notifications-container desktop-only" ref={notifMenuRef}>
+                                    <button 
+                                        className='notif-btn'
+                                        onClick={() => setIsNotifMenuOpen(!isNotifMenuOpen)}
+                                        aria-label='Ver notificaciones'
+                                    >
+                                        <Icon name="bell" size={24} />
+                                        {unreadCount > 0 && (
+                                            <span className="cart-badge">{unreadCount}</span>
+                                        )}
+                                    </button>
+
+                                    {isNotifMenuOpen && (
+                                        <div className="notif-dropdown">
+                                            <div className="notif-dropdown-header">
+                                                <h3 className="notif-dropdown-title">Notificaciones</h3>
+                                                {unreadCount > 0 && (
+                                                    <button onClick={markAllAsRead} className="notif-mark-read-btn">
+                                                        Marcar leídas
+                                                    </button>
+                                                )}
+                                            </div>
+                                            
+                                            {notifications.length === 0 ? (
+                                                <p className="notif-empty-msg">No tienes notificaciones.</p>
+                                            ) : (
+                                                <div className="notif-list">
+                                                    {notifications.map(n => (
+                                                        <div key={n._id} className={`notif-item ${!n.isRead ? 'unread' : ''}`}>
+                                                            <div className="notif-item-header">
+                                                                <strong className="notif-item-title">{n.title}</strong>
+                                                                <button onClick={() => removeNotification(n._id)} className="notif-remove-btn">
+                                                                    <Icon name="x" size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <p className="notif-message">{n.message}</p>
+                                                            {!n.isRead && (
+                                                                <button onClick={() => markAsRead(n._id)} className="notif-mark-item-read-btn">
+                                                                    Marcar leída
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Wishlist Button */}
+                            {isAuth && (
+                                <Link to="/wishlist"
+                                    className='cart-btn wishlist-nav-btn'
+                                    aria-label='Ver lista de deseos'
+                                >
+                                    <Icon name="heartOutline" size={24} />
+                                    {wishlistCount > 0 && (
+                                        <span className="cart-badge">{wishlistCount}</span>
+                                    )}
+                                </Link>
+                            )}
 
                             {/* Cart Button */}
                             <Link to="/cart"

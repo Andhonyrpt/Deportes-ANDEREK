@@ -26,26 +26,23 @@ import {
 
 const router = express.Router();
 
-const validateCategory = [
-    body('name')
-        .notEmpty().withMessage('El nombre es obligatorio')
-        .isString().withMessage('El nombre debe ser una cadena de texto')
-        .trim(),
-
-    body('description')
-        .notEmpty().withMessage('La descripción es obligatoria')
-        .isString().withMessage('La descripción debe ser una cadena de texto')
-        .trim(),
-
-    body('imageUrl')
-        .optional()
-        .isURL().withMessage('La URL de la imagen no es válida'),
-
-    body('parentCategory')
-        .optional()
-        .isMongoId().withMessage('Address ID must be a valid MongoDB ObjectId')
-];
-
+/**
+ * @openapi
+ * /categories/search:
+ *   get:
+ *     summary: Buscar categorías
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *       - in: query
+ *         name: parentCategory
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Resultados de búsqueda
+ */
 router.get('/categories/search', [
     searchQueryValidation(),
     queryMongoIdValidation('parentCategory', 'parent category ID'),
@@ -54,12 +51,71 @@ router.get('/categories/search', [
     ...paginationValidation()
 ], validate, searchCategories);
 
+/**
+ * @openapi
+ * /categories:
+ *   get:
+ *     summary: Obtener todas las categorías
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Lista de categorías
+ */
+/**
+ * @openapi
+ * /categories:
+ *   get:
+ *     summary: Obtener todas las categorías
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Lista de categorías
+ */
 router.get('/categories', getCategories);
 
+/**
+ * @openapi
+ * /categories/{id}:
+ *   get:
+ *     summary: Obtener categoría por ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Detalle de la categoría
+ */
 router.get('/categories/:id', [
     mongoIdValidation('id', 'Category ID')
 ], validate, getCategoryById);
 
+/**
+ * @openapi
+ * /categories:
+ *   post:
+ *     summary: Crear categoría (Admin)
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, description]
+ *             properties:
+ *               name: { type: string }
+ *               description: { type: string }
+ *               imageUrl: { type: string }
+ *               parentCategory: { type: string }
+ *     responses:
+ *       201:
+ *         description: Creada
+ */
 router.post('/categories', authMiddleware, isAdmin, [
     generalNameValidation('name', true, 100),
     descriptionValidation('description'),
@@ -67,6 +123,23 @@ router.post('/categories', authMiddleware, isAdmin, [
     bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
 ], validate, createCategory);
 
+/**
+ * @openapi
+ * /categories/{id}:
+ *   put:
+ *     summary: Actualizar categoría (Admin)
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Actualizada
+ */
 router.put('/categories/:id', authMiddleware, isAdmin, [
     mongoIdValidation('id', 'Category ID'),
     generalNameValidation('name', false, 100),
@@ -75,6 +148,23 @@ router.put('/categories/:id', authMiddleware, isAdmin, [
     bodyMongoIdValidation('parentCategory', 'Parent category ID', true)
 ], validate, updateCategory);
 
+/**
+ * @openapi
+ * /categories/{id}:
+ *   delete:
+ *     summary: Eliminar categoría (Admin)
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       204:
+ *         description: Eliminada
+ */
 router.delete('/categories/:id', authMiddleware, isAdmin, [
     mongoIdValidation('id', 'Category ID')
 ], validate, deleteCategory);

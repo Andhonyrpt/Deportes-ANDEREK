@@ -33,16 +33,65 @@ import {
     stockOptionalValidation,
     stockValidation
 } from '../middlewares/validators.js';
-import { mongo } from 'mongoose';
 
 const router = express.Router();
 
-// Obtener todos los productos con paginación
+/**
+ * @openapi
+ * /products:
+ *   get:
+ *     summary: Obtener todos los productos con paginación
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Lista de productos devuelta exitosamente
+ */
 router.get('/products', [
     ...paginationValidation()
 ], getProducts);
 
-// Buscar productos con filtros
+/**
+ * @openapi
+ * /products/search:
+ *   get:
+ *     summary: Buscar productos con filtros
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: inStock
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Resultados de búsqueda
+ */
 router.get('/products/search', [
     searchQueryValidation(),
     queryMongoIdValidation('category', 'Category ID'),
@@ -54,14 +103,86 @@ router.get('/products/search', [
     ...paginationValidation()
 ], validate, searchProducts);
 
+/**
+ * @openapi
+ * /products/category/{idCategory}:
+ *   get:
+ *     summary: Obtener productos por categoría
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: idCategory
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Productos de la categoría
+ */
 router.get('/products/category/:idCategory', [
     mongoIdValidation('idCategory', 'Category ID')
 ], validate, getProductByCategory);
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   get:
+ *     summary: Obtener producto por ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalle del producto
+ */
 router.get('/products/:id', [
     mongoIdValidation('id', 'Product ID')
 ], validate, getProductById);
 
+/**
+ * @openapi
+ * /products:
+ *   post:
+ *     summary: Crear un nuevo producto (Admin)
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, description, price, variants, category]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               modelo:
+ *                 type: string
+ *               genre:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               variants:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *               imagesUrl:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               category:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Producto creado
+ */
 router.post('/products', authMiddleware, isAdmin, [
     productNameValidation(true),
     productDescriptionValidation(true),
@@ -75,6 +196,30 @@ router.post('/products', authMiddleware, isAdmin, [
     bodyMongoIdValidation('category', 'Category ID')
 ], validate, createProduct);
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   put:
+ *     summary: Actualizar un producto (Admin)
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Producto actualizado
+ */
 router.put('/products/:id', authMiddleware, isAdmin, [
     mongoIdValidation('id', 'Product ID'),
     productNameValidation(false),
@@ -88,6 +233,24 @@ router.put('/products/:id', authMiddleware, isAdmin, [
     bodyMongoIdValidation('category', 'Category ID', true)
 ], validate, updateProduct);
 
+/**
+ * @openapi
+ * /products/{id}:
+ *   delete:
+ *     summary: Eliminar un producto (Admin)
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto eliminado
+ */
 router.delete('/products/:id', authMiddleware, isAdmin, [
     mongoIdValidation('id', 'Product ID')
 ], validate, deleteProduct);

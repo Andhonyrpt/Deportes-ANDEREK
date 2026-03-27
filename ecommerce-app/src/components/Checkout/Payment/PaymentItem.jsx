@@ -1,7 +1,7 @@
 import Button from "../../common/Button";
 import './PaymentItem.css';
 
-export default function PaymentItem({ paymentMethod, isSelected, onSelect, onEdit, onDelete }) {
+export default function PaymentItem({ paymentMethod, isSelected, onSelect, onEdit, onDelete, onSetDefault }) {
 
     const maskCardNumber = (number) => {
         if (!number) return "**** **** **** ****";
@@ -33,7 +33,12 @@ export default function PaymentItem({ paymentMethod, isSelected, onSelect, onEdi
                 <Button variant="third" onClick={() => onEdit(paymentMethod)}>
                     Editar
                 </Button>
-                <Button variant="danger" onClick={() => onDelete(paymentMethod)}>
+                {!paymentMethod.isDefault && onSetDefault && (
+                    <Button variant="secondary" onClick={() => onSetDefault(paymentMethod._id)}>
+                        Hacer Default
+                    </Button>
+                )}
+                <Button variant="danger" onClick={() => onDelete(paymentMethod._id)}>
                     Eliminar
                 </Button>
             </div>

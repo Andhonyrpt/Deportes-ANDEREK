@@ -1,5 +1,5 @@
 .product-details-container {
-    width: 100%;
+    width: 95%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 32px 0;
@@ -9,7 +9,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 32px;
-    background: var(--warm-gray);
+    background: var(--soft-sand);
     border-radius: var(--radius);
     border: 1px solid var(--light-sepia);
     padding: 32px;
@@ -157,4 +157,70 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+}
+
+.product-details-wishlist-btn {
+    background: none;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    color: var(--text-muted, #6b7280);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.product-details-wishlist-btn:hover {
+    border-color: var(--color-primary, #e11d48);
+    background: rgba(225, 29, 72, 0.05);
+}
+
+.product-details-wishlist-btn.active {
+    color: var(--color-primary, #e11d48);
+    border-color: var(--color-primary, #e11d48);
+    background: rgba(225, 29, 72, 0.05);
+}
+
+/* --- ESTILOS PARA ESPECIFICACIONES --- */
+.product-specs {
+    margin: 20px 0;
+    padding: 16px;
+    background-color: var(--pale-olive);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.product-specs-title {
+    margin-bottom: 12px;
+    color: var(--color-primary-600);
+    font-size: 1.1rem;
+}
+
+.product-specs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.spec-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--light-sepia);
+}
+
+.spec-item:last-child {
+    border-bottom: none;
+}
+
+.spec-label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.spec-value {
+    color: var(--text-muted);
 }

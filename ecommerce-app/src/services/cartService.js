@@ -13,8 +13,8 @@ export const getCart = async (userId) => {
 
 export const addToCart = async (userId, productId, quantity, size) => {
     try {
-        console.log("DATOS ENVIADOS:", { userId, productId, quantity, size });
         const response = await http.post("cart/add", { userId, productId, quantity, size });
+
 
         return response.data;
     } catch (error) {
@@ -22,7 +22,7 @@ export const addToCart = async (userId, productId, quantity, size) => {
     }
 };
 
-export const updateCartItem = async (userId, productId, quantity, size, oldSize) => {
+export const updateQuantity = async (userId, productId, quantity, size, oldSize) => {
     try {
 
         const response = await http.put("cart/update-item", {

@@ -9,10 +9,9 @@ export default function AddressList({
     onSelect,
     onEdit,
     onDelete,
+    onSetDefault,
     onAdd
 }) {
-    console.log("DEBUG [AddressList]: Rendering, addresses length:", addresses?.length);
-
     return (
         <div className="address-list">
             <div className="address-list-header">
@@ -30,6 +29,7 @@ export default function AddressList({
                             onSelect={onSelect}
                             onEdit={onEdit}
                             onDelete={onDelete}
+                            onSetDefault={onSetDefault}
                         />
                     )
 

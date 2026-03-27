@@ -1,14 +1,17 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, memo } from "react";
 import { useCart } from "../../context/CartContext";
+
 import Button from "../common/Button";
 import Badge from "../common/Badge";
+import Icon from "../common/Icon";
 import './ProductCard.css';
 
 const ProductCard = memo(({ product, orientation, priority = false }) => {
-
     const { addToCart } = useCart();
     const { name, price, variants, imagesUrl, description } = product;
+
+
 
 
     // Inicializar y Determinar si hay alguna variante disponible (stock > 0)
@@ -71,7 +74,7 @@ const ProductCard = memo(({ product, orientation, priority = false }) => {
                     alt={name}
                     className="product-card-image"
                     loading={priority ? "eager" : "lazy"}
-                    fetchpriority={priority ? "high" : "auto"}
+                    fetchPriority={priority ? "high" : "auto"}
                     decoding="async"
                     onError={(e) => {
                         e.target.src = "/img/products/placeholder.svg";
@@ -129,12 +132,13 @@ const ProductCard = memo(({ product, orientation, priority = false }) => {
 
             <div className="product-card-actions">
 
-                <div style={{ display: "flex", gap: "8px" }}>
-                    <Badge text={stockBadge.text} variant={stockBadge.variant} />
-
-                    {hasDiscount && (
-                        <Badge text={`-${product.discount}%`} variant="warning" />
-                    )}
+                <div className="product-card-badges-container">
+                    <div className="product-card-badges-list">
+                        <Badge text={stockBadge.text} variant={stockBadge.variant} />
+                        {hasDiscount && (
+                            <Badge text={`-${product.discount}%`} variant="warning" />
+                        )}
+                    </div>
                 </div>
 
                 <Button variant="primary" size="sm"

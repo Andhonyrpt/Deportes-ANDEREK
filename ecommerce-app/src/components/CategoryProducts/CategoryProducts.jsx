@@ -28,6 +28,7 @@ export default function CategoryProducts({ categoryId }) {
         setLoading(true);
         setError(null);
         setChildCategories([]);
+        setActiveSubcategoryId(null); // Reseteamos el filtro de subcategoría al cambiar de categoría padre
 
         const loadCategoryAndProducts = async () => {
             try {
@@ -67,16 +68,16 @@ export default function CategoryProducts({ categoryId }) {
         );
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault(); // Prevenir muchos clicks
-        const query = searchQuery.trim();
+    const handleSearch = (e, query) => {
+        e.preventDefault();
+        const trimmedQuery = query.trim();
 
-        if (!query) {
+        if (!trimmedQuery) {
             navigate("/search");
             return;
         }
 
-        navigate(`/search?q=${encodeURIComponent(query)}`);
+        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     };
 
     const displayedProducts = activeSubcategoryId

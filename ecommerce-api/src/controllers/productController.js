@@ -4,30 +4,43 @@ import SubCategory from '../models/subCategory.js';
 async function getProducts(req, res, next) {
 
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const { page, limit } = req.query;
+
+        // Si no hay paginación, devolver todos
+        if (!page && !limit) {
+            const products = await Product.find()
+                .populate({
+                    path: 'category',
+                    populate: { path: 'parentCategory' }
+                })
+                .sort({ name: 1 });
+            return res.json({ products });
+        }
+
+        const pageInt = parseInt(page) || 1;
+        const limitInt = parseInt(limit) || 10;
+        const skip = (pageInt - 1) * limitInt;
 
         const products = await Product.find()
             .populate({
                 path: 'category',
-                populate: { path: 'parentCategory' } // liga
+                populate: { path: 'parentCategory' }
             })
             .skip(skip)
-            .limit(limit)
+            .limit(limitInt)
             .sort({ name: 1 });
 
-        const totalResults = await Product.countDocuments(); // Conocer cuantos productos hay en la base de datos
-        const totalPages = Math.ceil(totalResults / limit);
+        const totalResults = await Product.countDocuments();
+        const totalPages = Math.ceil(totalResults / limitInt);
 
         res.json({
             products,
             pagination: {
-                currentPage: page,
+                currentPage: pageInt,
                 totalPages,
                 totalResults,
-                hasNext: page < totalPages,
-                hasPrev: page > 1
+                hasNext: pageInt < totalPages,
+                hasPrev: pageInt > 1
             }
         });
 
@@ -58,17 +71,44 @@ async function getProductById(req, res, next) {
 };
 
 async function getProductByCategory(req, res, next) {
-
     try {
-
         const id = req.params.idCategory;
-        const products = await Product.find({ category: id }).populate('category').sort({ name: 1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        if (products.length === 0) {
-            return res.status(404).json({ message: 'No products found for this category' });
+        // 1. Buscamos si el ID es una Categoría Padre (Liga/Selección)
+        // Buscamos subcategorías que tengan este ID como parentCategory
+        const subCategories = await SubCategory.find({ parentCategory: id });
+        
+        let categoryFilter = { category: id };
+        
+        // 2. Si encontramos subcategorías, es una Categoría Padre. 
+        // Filtramos productos que pertenezcan a cualquiera de esas subcategorías.
+        if (subCategories.length > 0) {
+            const subCategoryIds = subCategories.map(sc => sc._id);
+            categoryFilter = { category: { $in: subCategoryIds } };
         }
 
-        res.json(products);
+        const products = await Product.find(categoryFilter)
+            .populate('category')
+            .sort({ name: 1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalResults = await Product.countDocuments(categoryFilter);
+        const totalPages = Math.ceil(totalResults / limit);
+
+        res.json({
+            products,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalResults,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        });
 
     } catch (err) {
         next(err);

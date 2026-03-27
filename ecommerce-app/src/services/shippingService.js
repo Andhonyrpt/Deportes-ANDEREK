@@ -39,3 +39,30 @@ export async function deleteShippingAddress(addressId) {
         return null;
     }
 }
+
+/**
+ * @param {string} addressId
+ * @param {Object} addressData - campos a actualizar (nameOptional, city, state, etc.)
+ */
+export async function updateShippingAddress(addressId, addressData) {
+    try {
+        const response = await http.put(`shipping-addresses/user-address/${addressId}`, addressData);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating shipping address:", error);
+        return null;
+    }
+}
+
+/**
+ * @param {string} addressId
+ */
+export async function setDefaultAddress(addressId) {
+    try {
+        const response = await http.patch(`shipping-addresses/default/${addressId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error setting default address:", error);
+        return null;
+    }
+}

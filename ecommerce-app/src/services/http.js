@@ -54,7 +54,7 @@ http.interceptors.response.use(
                 console.error("Error en refresh token", error);
             }
 
-            logoutCallback();
+            if (logoutCallback) logoutCallback();
         }
 
         return Promise.reject(err);

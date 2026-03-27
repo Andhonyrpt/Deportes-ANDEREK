@@ -1,0 +1,91 @@
+/* UsersView.css */
+
+.users-view {
+    padding: var(--gap);
+    background: var(--background);
+    min-height: calc(100vh - 120px);
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.users-header h2 {
+    margin: 0;
+    color: var(--color-primary-900);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.users-table-container {
+    background: #ffffff;
+    border-radius: var(--radius);
+    box-shadow: var(--elev-1);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th, .users-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.users-table th {
+    background: #fafafa;
+    color: var(--color-gray);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.users-table tr:hover {
+    background: #fdfdfd;
+}
+
+.users-table select {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--r1);
+    font-size: 0.85rem;
+    background: white;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.status-badge.active { background: #e8f5e9; color: #2e7d32; }
+.status-badge.inactive { background: #ffebee; color: #c62828; }
+
+/* Pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+}
+
+.pagination-controls span {
+    font-weight: 600;
+    color: var(--color-gray);
+    font-size: 0.9rem;
+}

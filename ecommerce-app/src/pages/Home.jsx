@@ -53,16 +53,16 @@ export default function Home() {
 
     }, []);
 
-    const handleSearch = (e) => {
-        e.preventDefault(); // Prevenir muchos clicks
-        const query = searchQuery.trim();
+    const handleSearch = (e, query) => {
+        e.preventDefault(); 
+        const trimmedQuery = query.trim();
 
-        if (query === 0) {
+        if (trimmedQuery.length === 0) {
             navigate("/search");
             return;
         }
 
-        navigate(`/search?q=${encodeURIComponent(query)}`);
+        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     };
 
     const handleMobileMenuOpen = () => {

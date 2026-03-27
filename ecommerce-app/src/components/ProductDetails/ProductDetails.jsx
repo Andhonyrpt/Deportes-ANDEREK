@@ -1,17 +1,23 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { useAuth } from "../../context/AuthContext";
+import Icon from "../common/Icon";
 import { getProductById } from '../../services/productService';
 import Badge from "../common/Badge";
 import Button from "../common/Button";
 import Loading from '../common/Loading/Loading';
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
+import ProductReviews from './ProductReviews';
 import './ProductDetails.css';
 
 
 export default function ProductDetails({ productId }) {
 
     const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const { isAuth, user } = useAuth();
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -89,12 +95,13 @@ export default function ProductDetails({ productId }) {
 
     if (!product) return null;
 
-    const { name, description, price, variants, imagesUrl, category } = product;
+    const { name, description, price, variants, imagesUrl, category, modelo, genre } = product;
 
     const currentStock = selectedVariant ? selectedVariant.stock : 0;
     const stockBadge = currentStock > 0 ? "success" : "error";
     const stockLabel = currentStock > 0 ? "En stock" : "Agotado";
     const hasAvailableVariants = variants?.some((v) => v.stock > 0);
+    const isFavorite = user ? isInWishlist(product._id) : false;
 
     return (
         <div className="product-details-container">
@@ -146,6 +153,24 @@ export default function ProductDetails({ productId }) {
                     </div>
 
                     <div className="product-details-price">${price}</div>
+                    
+                    <div className="product-specs">
+                        <h3 className="product-specs-title">Especificaciones</h3>
+                        <div className="product-specs-list">
+                            {modelo && (
+                                <div className="spec-item">
+                                    <span className="spec-label">Modelo: </span>
+                                    <span className="spec-value">{modelo}</span>
+                                </div>
+                            )}
+                            {genre && (
+                                <div className="spec-item">
+                                    <span className="spec-label">Género: </span>
+                                    <span className="spec-value">{genre}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     {variants && variants.length > 0 && (
                         <div className="product-details-variant-selector">
@@ -183,9 +208,22 @@ export default function ProductDetails({ productId }) {
                         <Link to="/cart" className="btn btn-outline btn-lg">
                             Ver carrito
                         </Link>
+
+                        {isAuth && (
+                            <button 
+                                className={`product-details-wishlist-btn ${isFavorite ? 'active' : ''}`}
+                                onClick={() => toggleWishlist(product._id)}
+                                aria-label={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+                            >
+                                <Icon name={isFavorite ? "heart" : "heartOutline"} size={26} />
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
+            
+            {/* Componente de Reseñas Integrado al Detalle del Producto */}
+            <ProductReviews productId={product._id} />
         </div>
     );
 };

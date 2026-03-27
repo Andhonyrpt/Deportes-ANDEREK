@@ -79,3 +79,16 @@ export const checkEmail = async (email) => {
         return false;
     }
 };
+
+export const logout = async () => {
+    try {
+        await http.post("auth/logout");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userData");
+        return true;
+    } catch (error) {
+        console.error("Error al cerrar sesión", error);
+        return false;
+    }
+};

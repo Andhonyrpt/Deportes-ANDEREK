@@ -18,31 +18,112 @@ import {
 
 const router = express.Router();
 
-// Obtener la wishlist del usuario
+/**
+ * @openapi
+ * /wishlist:
+ *   get:
+ *     summary: Obtener wishlist del usuario
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de deseos }
+ */
 router.get('/wishlist', authMiddleware, getUserWishList);
 
-// Agregar producto a la wishlist
+/**
+ * @openapi
+ * /wishlist/add:
+ *   post:
+ *     summary: Agregar producto a wishlist
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId: { type: string }
+ *     responses:
+ *       200: { description: Producto agregado }
+ */
 router.post('/wishlist/add', authMiddleware, [
     bodyMongoIdValidation('productId', 'Product ID')
 ], validate, addToWishList);
 
-// Verificar si un producto está en la wishlist
+/**
+ * @openapi
+ * /wishlist/check/{productId}:
+ *   get:
+ *     summary: Verificar si un producto está en wishlist
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: true o false }
+ */
 router.get('/wishlist/check/:productId', authMiddleware, [
     mongoIdValidation('productId', 'Product ID')
 ], validate, checkProductInWishList);
 
-// Remover producto de la wishlist
+/**
+ * @openapi
+ * /wishlist/remove/{productId}:
+ *   delete:
+ *     summary: Remover producto de wishlist
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Producto removido }
+ */
 router.delete('/wishlist/remove/:productId', authMiddleware, [
     mongoIdValidation('productId', 'Product ID')
 ], validate, removeFromWishList);
 
-// Mover producto al carrito
+/**
+ * @openapi
+ * /wishlist/move-to-cart:
+ *   post:
+ *     summary: Mover producto a carrito
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId: { type: string }
+ *               size: { type: string }
+ *     responses:
+ *       200: { description: Movido al carrito }
+ */
 router.post('/wishlist/move-to-cart', authMiddleware, [
     bodyMongoIdValidation('productId', 'Product ID'),
     sizeValidation('size')
 ], validate, moveToCart);
 
-// Limpiar toda la wishlist
+/**
+ * @openapi
+ * /wishlist/clear:
+ *   delete:
+ *     summary: Limpiar wishlist
+ *     tags: [Wishlist]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Wishlist vaciada }
+ */
 router.delete('/wishlist/clear', authMiddleware, clearWishList);
 
 export default router;

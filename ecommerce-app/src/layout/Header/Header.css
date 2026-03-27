@@ -1,7 +1,7 @@
 .header {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 /* Main header */
@@ -349,6 +349,201 @@
     min-width: 16px;
     text-align: center;
     line-height: 1;
+}
+
+/* Notifications & Wishlist Enhancements */
+.notifications-container {
+    position: relative;
+}
+
+.notif-btn {
+    margin-right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: inherit;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.notif-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notif-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    padding: 16px;
+    overflow-y: auto;
+    background: linear-gradient(10deg, var(--color-primary-900), var(--color-primary-600));
+    border: 1px solid var(--color-primary-600);
+    border-radius: 12px;
+    z-index: 1000;
+    animation: dropdownSlide 0.2s ease-out;
+    color: var(--color-light-gray);
+    box-shadow: var(--elev-3);
+}
+
+.notif-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+.notif-dropdown-title {
+    margin: 0;
+    font-size: 16px;
+    color: var(--color-light-gray);
+}
+
+.notif-mark-read-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary-400);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.notif-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+}
+
+.notif-item.unread {
+    background: rgba(var(--color-primary-400-rgb, 46, 163, 74), 0.1);
+    border-left: 3px solid var(--color-primary-400);
+}
+
+.notif-message {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-strong-gray);
+    line-height: 1.4;
+}
+
+.notif-mark-item-read-btn {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: var(--color-primary-400);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.notif-mark-read-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary-600);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.notif-mark-read-btn:hover {
+    background: rgba(var(--color-primary-600-rgb), 0.1);
+}
+
+.notif-empty-msg {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 24px 0;
+}
+
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notif-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.notif-item.unread {
+    background: rgba(var(--color-primary-600-rgb, 225, 29, 72), 0.05);
+    border-left: 3px solid var(--color-primary-600);
+}
+
+.notif-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.notif-item-title {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.notif-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.notif-remove-btn:hover {
+    opacity: 1;
+    color: var(--color-danger);
+}
+
+.notif-message {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.notif-mark-item-read-btn {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: var(--color-primary-600);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.notif-mark-item-read-btn:hover {
+    text-decoration: underline;
+}
+
+.wishlist-nav-btn {
+    margin-right: 8px;
 }
 
 /* Responsive Controls */

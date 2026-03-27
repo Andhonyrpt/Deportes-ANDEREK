@@ -9,7 +9,7 @@ import {
     setDefaultAddress,
     deleteShippingAddress
 } from '../controllers/shippingAddressController.js';
-import authMiddleware from '../middlewares/authMiddleware.js'; // Middleware de autenticación
+import authMiddleware from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validations.js';
 import {
     nameValidation,
@@ -32,7 +32,7 @@ import {
 
 const router = express.Router();
 
-// Validaciones comunes para crear/actualizar dirección
+// Validaciones comunes
 const addressValidations = [
     nameValidation(),
     addressLineValidation(),
@@ -45,22 +45,76 @@ const addressValidations = [
     addressTypeValidation(),
 ];
 
-
-// Crear una nueva dirección
+/**
+ * @openapi
+ * /shipping-addresses/new-address:
+ *   post:
+ *     summary: Crear nueva dirección
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       201: { description: Dirección creada }
+ */
 router.post('/shipping-addresses/new-address', authMiddleware, addressValidations, validate, createShippingAddress);
 
-// Obtener todas las direcciones del usuario
+/**
+ * @openapi
+ * /shipping-addresses/user-addresses:
+ *   get:
+ *     summary: Obtener todas las direcciones del usuario
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de direcciones }
+ */
 router.get('/shipping-addresses/user-addresses', authMiddleware, getUserAddresses);
 
-// Obtener la dirección por defecto
+/**
+ * @openapi
+ * /shipping-addresses/default:
+ *   get:
+ *     summary: Obtener dirección por defecto
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Dirección por defecto }
+ */
 router.get('/shipping-addresses/default', authMiddleware, getDefaultAddress);
 
-// Obtener una dirección específica (requiere autenticación)
+/**
+ * @openapi
+ * /shipping-addresses/user-address/{addressId}:
+ *   get:
+ *     summary: Obtener dirección específica
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Detalle dirección }
+ */
 router.get('/shipping-addresses/user-address/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
 ], validate, getAddressById);
 
-// Actualizar una dirección (requiere autenticación)
+/**
+ * @openapi
+ * /shipping-addresses/user-address/{addressId}:
+ *   put:
+ *     summary: Actualizar dirección
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Actualizada }
+ */
 router.put('/shipping-addresses/user-address/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID'),
     nameOptionalValidation(),
@@ -74,14 +128,42 @@ router.put('/shipping-addresses/user-address/:addressId', authMiddleware, [
     addressTypeValidation(),
 ], validate, updateShippingAddress);
 
-// Marcar dirección como default
-router.patch('/shipping-addresses/default/:addressId',authMiddleware, [
+/**
+ * @openapi
+ * /shipping-addresses/default/{addressId}:
+ *   patch:
+ *     summary: Establecer dirección como default
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Actualizada }
+ */
+router.patch('/shipping-addresses/default/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
-], validate,  setDefaultAddress);
+], validate, setDefaultAddress);
 
-// Eliminar una dirección
-router.delete('/shipping-addresses/delete-address/:addressId',authMiddleware, [
+/**
+ * @openapi
+ * /shipping-addresses/delete-address/{addressId}:
+ *   delete:
+ *     summary: Eliminar dirección
+ *     tags: [ShippingAddresses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Eliminada }
+ */
+router.delete('/shipping-addresses/delete-address/:addressId', authMiddleware, [
     mongoIdValidation('addressId', 'Address ID')
-], validate,  deleteShippingAddress);
+], validate, deleteShippingAddress);
 
 export default router;

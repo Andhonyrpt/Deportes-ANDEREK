@@ -2,7 +2,7 @@ import Button from "../../common/Button";
 import './AddressItem.css';
 
 
-export default function AddressItem({ address, isSelected, onSelect, onEdit, onDelete }) {
+export default function AddressItem({ address, isSelected, onSelect, onEdit, onDelete, onSetDefault }) {
 
     console.log(address);
 
@@ -34,7 +34,12 @@ export default function AddressItem({ address, isSelected, onSelect, onEdit, onD
                 <Button variant="third" onClick={() => onEdit(address)}>
                     Editar
                 </Button>
-                <Button variant="danger" onClick={() => onDelete(address)}>
+                {!address.default && onSetDefault && (
+                    <Button variant="secondary" onClick={() => onSetDefault(address._id)}>
+                        Hacer Default
+                    </Button>
+                )}
+                <Button variant="danger" onClick={() => onDelete(address._id)}>
                     Eliminar
                 </Button>
             </div>
