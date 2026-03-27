@@ -27,6 +27,9 @@ export function NotificationProvider({ children }) {
     useEffect(() => {
         if (user?._id) {
             loadNotifications();
+            // Implementar polling simple para tiempo real (ej. cada 10 segundos para mayor inmediatez)
+            const interval = setInterval(loadNotifications, 10000);
+            return () => clearInterval(interval);
         } else {
             setNotifications([]);
             setUnreadCount(0);
