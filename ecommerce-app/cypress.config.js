@@ -9,7 +9,7 @@ module.exports = defineConfig({
         video: false,
         chromeWebSecurity: false,
         env: {
-            apiUrl: process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:4000/api",
+            apiUrl: (process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:4000/api").replace(/\/$/, ''),
         },
         setupNodeEvents(on, config) {
             on('before:browser:launch', (browser = {}, launchOptions) => {

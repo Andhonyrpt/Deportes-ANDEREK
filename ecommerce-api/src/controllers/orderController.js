@@ -1,5 +1,6 @@
 import Order from '../models/order.js';
 import Product from '../models/product.js';
+import Notification from '../models/notification.js';
 import { calculateOrderFinancials } from '../utils/orderHelper.js';
 
 async function getOrders(req, res, next) {
@@ -205,6 +206,17 @@ async function createOrder(req, res, next) {
       await newOrder.populate('shippingAddress');
       await newOrder.populate('paymentMethod');
 
+      // Create notification
+      try {
+        await Notification.create({
+          user: user,
+          message: `Tu orden #${newOrder._id} ha sido creada exitosamente.`,
+          isRead: false
+        });
+      } catch (notifErr) {
+        console.error("Failed to create notification:", notifErr);
+      }
+
       res.status(201).json(newOrder);
     } catch (createErr) {
       // ROLLBACK: Si falla la creación de la orden o la población, restaurar stock
@@ -370,6 +382,16 @@ async function updateOrderStatus(req, res, next) {
       .populate("paymentMethod");
 
     if (updatedOrder) {
+      // Create notification
+      try {
+        await Notification.create({
+          user: updatedOrder.user._id,
+          message: `El estado de tu orden #${updatedOrder._id} ha cambiado a: ${status}.`,
+          isRead: false
+        });
+      } catch (notifErr) {
+        console.error("Failed to create notification:", notifErr);
+      }
       return res.status(200).json(updatedOrder);
     } else {
       return res.status(404).json({ message: 'Order not found' });
