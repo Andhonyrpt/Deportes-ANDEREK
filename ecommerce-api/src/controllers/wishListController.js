@@ -8,7 +8,7 @@ const getUserWishList = async (req, res, next) => {
         const userId = req.user.userId; // Asumiendo que tienes middleware de autenticación
 
         let wishList = await WishList.findOne({ user: userId })
-            .populate('products.product', 'name price images category variants')
+            .populate('products.product', 'name price imagesUrl category variants')
             .lean();
 
         if (!wishList) {
@@ -54,7 +54,7 @@ const addToWishList = async (req, res, next) => {
 
             if (alreadyInList) {
                 // Idempotent: product already in wishlist, return current state
-                await wishList.populate('products.product', 'name price images category variants');
+                await wishList.populate('products.product', 'name price imagesUrl category variants');
                 return res.status(200).json({
                     message: 'Product already in wishlist',
                     wishList,
@@ -67,11 +67,11 @@ const addToWishList = async (req, res, next) => {
                 { user: userId },
                 { $push: { products: { product: productId } } },
                 { new: true }
-            ).populate('products.product', 'name price images category variants');
+            ).populate('products.product', 'name price imagesUrl category variants');
         } else {
             // Create the wishlist for the first time
             wishList = await WishList.create({ user: userId, products: [{ product: productId }] });
-            await wishList.populate('products.product', 'name price images category variants');
+            await wishList.populate('products.product', 'name price imagesUrl category variants');
         }
 
         res.status(200).json({
@@ -94,7 +94,7 @@ const removeFromWishList = async (req, res, next) => {
             { user: userId },
             { $pull: { products: { product: productId } } },
             { new: true }
-        ).populate("products.product", "name price images category variants");
+        ).populate("products.product", "name price imagesUrl category variants");
 
         if (!updated) {
             return res.status(404).json({ message: "Wishlist not found" });
@@ -180,7 +180,7 @@ const moveToCart = async (req, res, next) => {
             { user: userId },
             { $pull: { products: { product: productId } } },
             { new: true }
-        ).populate("products.product", "name price images category variants");
+        ).populate("products.product", "name price imagesUrl category variants");
 
         if (!updated) return res.status(404).json({ message: "Wishlist not found" });
 

@@ -16,24 +16,27 @@ const generateRefreshToken = (userId, displayName, role) => {
     );
 };
 
+const checkUserExist = async (email) => {
+    const user = await User.findOne({ email });
+    console.log(user);
+    return user;
+};
+
 const generatePassword = async (password) => {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
 };
 
 async function register(req, res, next) {
+
     try {
-        const { displayName, email: rawEmail, password, phone } = req.body;
-        const email = rawEmail.trim().toLowerCase();
-        
-        // Solo bloquear si el email YA existe
-        const emailExists = await User.findOne({ email });
-        
-        if (emailExists) {
-            console.log("Register: Email already exists, pretending success");
+        const { displayName, email, password, phone } = req.body;
+
+        const userExist = await checkUserExist(email);
+        if (userExist) {
             return res.status(201).json({ displayName, email, phone });
         }
-        
+
         let role = 'customer';
         const hashPassword = await generatePassword(password);
 
@@ -45,28 +48,21 @@ async function register(req, res, next) {
             phone
         });
         await newUser.save();
-        console.log("Register: User saved successfully with email:", email);
 
         res.status(201).json({ displayName, email, phone });
+
     } catch (err) {
         next(err);
     }
+
 };
 
 async function login(req, res, next) {
+
     try {
-        const { email: rawEmail, password } = req.body;
-        const email = rawEmail ? rawEmail.trim().toLowerCase() : "";
+        const { email, password } = req.body;
 
-        console.log("Login: Attempting login for", JSON.stringify(email));
-
-        // Debug: buscar todos los usuarios para ver si el email existe realmente en la DB
-        const allEmails = await User.find({}, 'email').limit(5);
-        console.log("Login: DB sample emails:", allEmails.map(u => u.email));
-
-        const userExist = await User.findOne({ email });
-        console.log("Login: User found?", !!userExist);
-        
+        const userExist = await checkUserExist(email);
         if (!userExist) {
             return res.status(400).json({ message: "User doesn't exist. You have to sign in" });
         }
@@ -92,6 +88,7 @@ async function login(req, res, next) {
     } catch (err) {
         next(err);
     }
+
 };
 
 async function checkEmail(req, res, next) {
@@ -138,4 +135,8 @@ async function refreshToken(req, res, next) {
     }
 }
 
-export { register, login, checkEmail, refreshToken };
+async function logout(req, res) {
+    res.status(200).json({ message: "Logged out successfully" });
+}
+
+export { register, login, checkEmail, refreshToken, logout };

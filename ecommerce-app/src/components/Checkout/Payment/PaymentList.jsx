@@ -9,6 +9,7 @@ export default function PaymentList({
     onSelect,
     onEdit,
     onDelete,
+    onSetDefault,
     onAdd
 }) {
     return (
@@ -27,6 +28,7 @@ export default function PaymentList({
                         onSelect={onSelect}
                         onEdit={onEdit}
                         onDelete={onDelete}
+                        onSetDefault={onSetDefault}
                     />
                 ))}
             </div>

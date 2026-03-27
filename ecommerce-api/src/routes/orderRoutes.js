@@ -28,20 +28,95 @@ import {
 
 const router = express.Router();
 
-// Obtener todas las órdenes (admin)
+/**
+ * @openapi
+ * /orders:
+ *   get:
+ *     summary: Obtener todas las órdenes (Amin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de órdenes devuelta con éxito
+ */
 router.get('/orders', authMiddleware, isAdmin, getOrders);
 
-// Obtener órdenes por usuario
+/**
+ * @openapi
+ * /orders/user/{userId}:
+ *   get:
+ *     summary: Obtener órdenes por usuario
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Órdenes del usuario
+ */
 router.get('/orders/user/:userId', authMiddleware, [
   mongoIdValidation('userId', 'User ID')
 ], validate, getOrdersByUser);
 
-// Obtener orden por ID
+/**
+ * @openapi
+ * /orders/{id}:
+ *   get:
+ *     summary: Obtener orden por ID
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalle de orden
+ */
 router.get('/orders/:id', authMiddleware, [
   mongoIdValidation('id', 'Order ID')
 ], validate, getOrderById);
 
-// Crear nueva orden
+/**
+ * @openapi
+ * /orders:
+ *   post:
+ *     summary: Crear nueva orden
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user: 
+ *                 type: string
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *               shippingAddress:
+ *                 type: string
+ *               paymentMethod:
+ *                 type: string
+ *               shippingCost:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Orden creada
+ */
 router.post('/orders', authMiddleware, [
   bodyMongoIdValidation('user', 'User ID'),
   body('products').notEmpty()
@@ -57,24 +132,110 @@ router.post('/orders', authMiddleware, [
   shippingCostValidation()
 ], validate, createOrder);
 
-// Cancelar orden (función especial)
+/**
+ * @openapi
+ * /orders/{id}/cancel:
+ *   patch:
+ *     summary: Cancelar orden (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Orden cancelada
+ */
 router.patch('/orders/:id/cancel', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID')
 ], validate, cancelOrder);
 
-// Actualizar solo el estado de la orden (admin)
+/**
+ * @openapi
+ * /orders/{id}/status:
+ *   patch:
+ *     summary: Actualizar estado de orden (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Estado actualizado
+ */
 router.patch('/orders/:id/status', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID'),
   orderStatusValidation()
 ], validate, updateOrderStatus);
 
-// Actualizar solo el estado de pago (admin)
+/**
+ * @openapi
+ * /orders/{id}/payment-status:
+ *   patch:
+ *     summary: Actualizar estado de pago (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               paymentStatus:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Estado de pago actualizado
+ */
 router.patch('/orders/:id/payment-status', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID'),
   paymentStatusValidation()
 ], validate, updatePaymentStatus);
 
-// Actualizar orden completa (admin)
+/**
+ * @openapi
+ * /orders/{id}:
+ *   put:
+ *     summary: Actualizar orden completa (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Orden actualizada
+ */
 router.put('/orders/:id', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID'),
   orderStatusValidation(true),
@@ -82,12 +243,49 @@ router.put('/orders/:id', authMiddleware, isAdmin, [
   shippingCostValidation()
 ], validate, updateOrder);
 
-// Eliminar orden (solo si está cancelada) (admin)
+/**
+ * @openapi
+ * /orders/{id}:
+ *   delete:
+ *     summary: Eliminar orden cancelada (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Orden eliminada
+ */
 router.delete('/orders/:id', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Order ID')
 ], validate, deleteOrder);
 
-// Previsualizar orden (Cálculos de servidor)
+/**
+ * @openapi
+ * /orders/preview:
+ *   post:
+ *     summary: Previsualizar orden (Cálculo de servidor)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               products:
+ *                 type: array
+ *     responses:
+ *       200:
+ *         description: Resumen de totales devuelto
+ */
 router.post('/orders/preview', authMiddleware, [
   body('products').notEmpty()
     .withMessage('Products are required')

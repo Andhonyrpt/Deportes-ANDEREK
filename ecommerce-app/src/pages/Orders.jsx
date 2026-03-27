@@ -5,6 +5,7 @@ import Icon from "../components/common/Icon";
 import Loading from "../components/common/Loading/Loading";
 import { getMyOrders } from "../services/orderService";
 import { useAuth } from "../context/AuthContext";
+import { formatPaymentMethod } from "../utils/paymentText";
 import "./Orders.css";
 
 const formatMoney = (value = 0) =>
@@ -75,11 +76,13 @@ export default function Orders() {
     const totalOrderPrice = selectedOrder?.totalPrice || 0;
     const shippingPrice = selectedOrder?.shippingCost || 0;
     const calculatedSubtotal = useMemo(() => {
-        return selectedOrder?.subtotal || ((totalOrderPrice - shippingPrice) / 1.16);
+        // Usar subtotal persistido por el servidor; fallback aritmético para órdenes antiguas
+        return selectedOrder?.subtotal ?? ((totalOrderPrice - shippingPrice) / 1.16);
     }, [selectedOrder, totalOrderPrice, shippingPrice]);
 
     const calculatedTax = useMemo(() => {
-        return selectedOrder?.tax || ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
+        // Usar tax persistido por el servidor; fallback aritmético para órdenes antiguas
+        return selectedOrder?.tax ?? ((totalOrderPrice - shippingPrice) - calculatedSubtotal);
     }, [selectedOrder, totalOrderPrice, shippingPrice, calculatedSubtotal]);
 
     if (loading) {
@@ -106,20 +109,6 @@ export default function Orders() {
     }
 
     const selectedPayment = selectedOrder?.paymentMethod || null;
-
-    const paymentText = () => {
-        if (!selectedPayment) return "No seleccionado";
-
-        const lastFour = selectedPayment.cardNumber?.slice(-4);
-        const type = selectedPayment.type;
-
-        if (type === 'credit_card') return `Tarjeta de Crédito **** ${lastFour}`;
-        if (type === 'debit_card') return `Tarjeta de Débito **** ${lastFour}`;
-        if (type === 'paypal') return `PayPal (${selectedPayment.paypalEmail})`;
-        if (type === 'bank_transfer') return `Transferencia Bancaria (${selectedPayment.bankName})`;
-
-        return type; // Por si es 'paypal' o 'efectivo'
-    };
 
 
 
@@ -247,7 +236,7 @@ export default function Orders() {
                                 <h3>Método de pago</h3>
                                 {selectedOrder?.paymentMethod ? (
                                     <div>
-                                        <p>{paymentText()}</p>
+                                        <p>{formatPaymentMethod(selectedPayment)}</p>
                                     </div>
                                 ) : (
                                     <p className="muted">Sin método de pago registrado.</p>

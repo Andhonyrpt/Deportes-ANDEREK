@@ -3,8 +3,40 @@ import SubCategory from '../models/subCategory.js';
 
 async function getCategories(req, res, next) {
     try {
-        const categories = await Category.find().populate("parentCategory").sort({ name: 1 });
-        res.status(200).json(categories);
+        const { page, limit } = req.query;
+
+        // Si no se solicita paginación, devolver todos
+        if (!page && !limit) {
+            const categories = await Category.find()
+                .populate("parentCategory")
+                .sort({ name: 1 });
+            return res.status(200).json({ categories });
+        }
+
+        // Si hay parámetros de paginación, aplicar
+        const pageInt = parseInt(page) || 1;
+        const limitInt = parseInt(limit) || 10;
+        const skip = (pageInt - 1) * limitInt;
+
+        const categories = await Category.find()
+            .populate("parentCategory")
+            .sort({ name: 1 })
+            .skip(skip)
+            .limit(limitInt);
+
+        const totalResults = await Category.countDocuments();
+        const totalPages = Math.ceil(totalResults / limitInt);
+
+        res.status(200).json({
+            categories,
+            pagination: {
+                currentPage: pageInt,
+                totalPages,
+                totalResults,
+                hasNext: pageInt < totalPages,
+                hasPrev: pageInt > 1
+            }
+        });
     } catch (err) {
         next(err);
     }
@@ -137,8 +169,8 @@ async function searchCategories(req, res, next) {
             parentCategory,
             sort,
             order,
-            limit = 10,
-            page = 1
+            limit,
+            page
         } = req.query;
 
         let filters = {};
@@ -164,25 +196,35 @@ async function searchCategories(req, res, next) {
             sortOptions.name = -1;
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        // Si no hay paginación, devolver todos
+        if (!page && !limit) {
+            const categories = await Category.find(filters)
+                .populate('parentCategory')
+                .sort(sortOptions);
+            return res.status(200).json({ categories });
+        }
+
+        const limitInt = parseInt(limit) || 10;
+        const pageInt = parseInt(page) || 1;
+        const skip = (pageInt - 1) * limitInt;
 
         const categories = await Category.find(filters)
             .populate('parentCategory')
             .sort(sortOptions)
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limitInt);
 
         const totalResults = await Category.countDocuments(filters);
-        const totalPages = Math.ceil(totalResults / parseInt(limit));
+        const totalPages = Math.ceil(totalResults / limitInt);
 
         res.status(200).json({
             categories,
             pagination: {
-                currentPage: parseInt(page),
+                currentPage: pageInt,
                 totalPages,
                 totalResults,
-                hasNext: parseInt(page) < totalPages,
-                hasPrev: parseInt(page) > 1
+                hasNext: pageInt < totalPages,
+                hasPrev: pageInt > 1
             },
             filters: {
                 searchTerm: q || null,

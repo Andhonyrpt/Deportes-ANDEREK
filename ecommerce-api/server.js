@@ -1,4 +1,5 @@
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import express from "express";
@@ -9,6 +10,8 @@ import setupGlobalErrorHandlers from "./src/middlewares/globalerrorHandler.js";
 import logger from './src/middlewares/logger.js';
 import { apiLimiter } from "./src/middlewares/rateLimiter.js";
 import routes from './src/routes/index.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './src/config/swagger.js';
 
 dotenv.config(); // Poder utilizar el archivo ".env" e instalar su dependencia con "npm install dotenv"
 
@@ -21,7 +24,7 @@ app.set('trust proxy', 1);
 
 dbConnection();
 
-
+app.use(cookieParser());
 app.use(helmet());
 
 app.use(cors({
@@ -66,6 +69,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', routes);
+
+// Swagger Documentation Route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: "Deportes ANDEREK - API Docs"
+}));
 
 app.use((req, res) => {
     res.status(404).json({

@@ -4,13 +4,32 @@ import { calculateOrderFinancials } from '../utils/orderHelper.js';
 
 async function getOrders(req, res, next) {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const orders = await Order.find()
       .populate('user')
       .populate('products.productId')
       .populate('shippingAddress')
       .populate('paymentMethod')
-      .sort({ status: 1 });
-    res.json(orders);
+      .sort({ status: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalResults = await Order.countDocuments();
+    const totalPages = Math.ceil(totalResults / limit);
+
+    res.json({
+      orders,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalResults,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -36,14 +55,32 @@ async function getOrderById(req, res, next) {
 async function getOrdersByUser(req, res, next) {
   try {
     const userId = req.params.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const orders = await Order.find({ user: userId })
       .populate('user')
       .populate('products.productId')
       .populate('shippingAddress')
       .populate('paymentMethod')
-      .sort({ status: 1 });
+      .sort({ status: 1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json(orders);
+    const totalResults = await Order.countDocuments({ user: userId });
+    const totalPages = Math.ceil(totalResults / limit);
+
+    res.json({
+      orders,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalResults,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -156,6 +193,8 @@ async function createOrder(req, res, next) {
         shippingAddress,
         paymentMethod,
         shippingCost,
+        subtotal,
+        tax,
         totalPrice,
         status: 'pending',
         paymentStatus: 'pending'

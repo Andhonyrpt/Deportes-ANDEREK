@@ -28,25 +28,100 @@ import {
 
 const router = express.Router();
 
-// Obtener todos los métodos de pago activos (admin)
+/**
+ * @openapi
+ * /payment-methods:
+ *   get:
+ *     summary: Obtener todos los métodos de pago (Admin)
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de métodos de pago }
+ */
 router.get('/payment-methods', authMiddleware, isAdmin, getPaymentMethods);
 
-// Obtener método de pago predeterminado de un usuario
+/**
+ * @openapi
+ * /payment-methods/default/{userId}:
+ *   get:
+ *     summary: Obtener método de pago predeterminado
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Método predeterminado }
+ */
 router.get('/payment-methods/default/:userId', [
   mongoIdValidation('userId', 'User ID')
 ], validate, authMiddleware, getDefaultPaymentMethod);
 
-// Obtener métodos de pago de un usuario
+/**
+ * @openapi
+ * /payment-methods/user/{userId}:
+ *   get:
+ *     summary: Obtener métodos de pago de un usuario
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Métodos de pago del usuario }
+ */
 router.get('/payment-methods/user/:userId', [
   mongoIdValidation('userId', 'User ID')
 ], validate, authMiddleware, getPaymentMethodsByUser);
 
-// Obtener método de pago por ID
+/**
+ * @openapi
+ * /payment-methods/{id}:
+ *   get:
+ *     summary: Obtener método de pago por ID
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Detalle método de pago }
+ */
 router.get('/payment-methods/:id', authMiddleware, [
   mongoIdValidation('id', 'Payment Method ID')
 ], validate, getPaymentMethodById);
 
-// Crear nuevo método de pago
+/**
+ * @openapi
+ * /payment-methods:
+ *   post:
+ *     summary: Crear nuevo método de pago
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type: { type: string }
+ *               cardNumber: { type: string }
+ *               cardHolderName: { type: string }
+ *               expiryDate: { type: string }
+ *               paypalEmail: { type: string }
+ *               bankName: { type: string }
+ *               accountNumber: { type: string }
+ *               isDefault: { type: boolean }
+ *     responses:
+ *       201: { description: Método de pago creado }
+ */
 router.post('/payment-methods', authMiddleware, [
   paymentTypeValidation(),
   cardNumberValidation(),
@@ -58,17 +133,59 @@ router.post('/payment-methods', authMiddleware, [
   booleanValidation('isDefault'),
 ], validate, createPaymentMethod);
 
-// Establecer método de pago como predeterminado
+/**
+ * @openapi
+ * /payment-methods/{id}/set-default:
+ *   patch:
+ *     summary: Establecer método como predeterminado
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Método actualizado }
+ */
 router.patch('/payment-methods/:id/set-default', authMiddleware, [
   mongoIdValidation('id', 'Payment Method ID')
 ], validate, setDefaultPaymentMethod);
 
-// Desactivar método de pago
+/**
+ * @openapi
+ * /payment-methods/{id}/deactivate:
+ *   patch:
+ *     summary: Desactivar método de pago
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Método desactivado }
+ */
 router.patch('/payment-methods/:id/deactivate', authMiddleware, [
   mongoIdValidation('id', 'Payment Method ID')
 ], validate, deactivatePaymentMethod);
 
-// Actualizar método de pago
+/**
+ * @openapi
+ * /payment-methods/{id}:
+ *   put:
+ *     summary: Actualizar método de pago
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Método actualizado }
+ */
 router.put('/payment-methods/:id', authMiddleware, [
   mongoIdValidation('id', 'Payment Method ID'),
   cardHolderNameValidation(),
@@ -80,7 +197,21 @@ router.put('/payment-methods/:id', authMiddleware, [
   booleanValidation('isActive')
 ], validate, updatePaymentMethod);
 
-// Eliminar método de pago permanentemente
+/**
+ * @openapi
+ * /payment-methods/{id}:
+ *   delete:
+ *     summary: Eliminar método de pago
+ *     tags: [PaymentMethods]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Eliminado }
+ */
 router.delete('/payment-methods/:id', authMiddleware, [
   mongoIdValidation('id', 'Payment Method ID')
 ], validate, deletePaymentMethod);

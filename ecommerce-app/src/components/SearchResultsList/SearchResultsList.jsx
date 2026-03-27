@@ -104,7 +104,7 @@ export default function SearchResultsList() {
         setSearchParams({ q: value });
     };
 
-    const handleSearch = (e) => {
+    const handleSearch = (e, query) => {
         e.preventDefault();
 
         if (query.length === 0) {

@@ -3,25 +3,22 @@ import { describe, it, expect } from 'vitest';
 import { app } from '../../server.js';
 import jwt from 'jsonwebtoken';
 
-describe('Authentication Security Tests', () => {
+describe('Authentication Security Tests (Cookie Based)', () => {
 
-    it('should REJECT a JWT with "alg: none" (Algorithm Confusion)', async () => {
+    it('should REJECT a JWT with "alg: none" in cookie', async () => {
         const payload = { userId: '654321654321654321654321', role: 'customer' };
-
-        // Constructing an "alg: none" token manually
         const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
         const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-        const token = `${header}.${body}.`; // The trailing dot is for the empty signature
+        const token = `${header}.${body}.`;
 
         const response = await request(app)
             .get('/api/users/profile')
-            .set('Authorization', `Bearer ${token}`);
+            .set('Cookie', [`authToken=${token}`]);
 
-        // The authMiddleware returns 403 Forbidden if jwt.verify fails
         expect(response.status).toBe(403);
     });
 
-    it('should REJECT an expired token', async () => {
+    it('should REJECT an expired token in cookie', async () => {
         const expiredToken = jwt.sign(
             { userId: '654321654321654321654321', role: 'customer' },
             process.env.JWT_SECRET || 'secret',
@@ -30,7 +27,7 @@ describe('Authentication Security Tests', () => {
 
         const response = await request(app)
             .get('/api/users/profile')
-            .set('Authorization', `Bearer ${expiredToken}`);
+            .set('Cookie', [`authToken=${expiredToken}`]);
 
         expect(response.status).toBe(403);
     });
@@ -43,7 +40,7 @@ describe('Authentication Security Tests', () => {
 
         const response = await request(app)
             .get('/api/users/profile')
-            .set('Authorization', `Bearer ${fakeToken}`);
+            .set('Cookie', [`authToken=${fakeToken}`]);
 
         expect(response.status).toBe(403);
     });

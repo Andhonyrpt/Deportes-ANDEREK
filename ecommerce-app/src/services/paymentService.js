@@ -39,3 +39,43 @@ export async function deletePaymentMethod(paymentId) {
         return null;
     }
 }
+
+/**
+ * @param {string} paymentId
+ * @param {Object} paymentData - campos a actualizar (cardHolderName, expiryDate, etc.)
+ */
+export async function updatePaymentMethod(paymentId, paymentData) {
+    try {
+        const response = await http.put(`payment-methods/${paymentId}`, paymentData);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating payment method:", error);
+        return null;
+    }
+}
+
+/**
+ * @param {string} paymentId
+ */
+export async function setDefaultPaymentMethod(paymentId) {
+    try {
+        const response = await http.patch(`payment-methods/${paymentId}/set-default`);
+        return response.data;
+    } catch (error) {
+        console.error("Error setting default payment method:", error);
+        return null;
+    }
+}
+
+/**
+ * @param {string} paymentId
+ */
+export async function deactivatePaymentMethod(paymentId) {
+    try {
+        const response = await http.patch(`payment-methods/${paymentId}/deactivate`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deactivating payment method:", error);
+        return null;
+    }
+}

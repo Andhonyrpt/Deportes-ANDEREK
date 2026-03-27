@@ -134,9 +134,10 @@ export const stockValidation = (field = "stock") =>
     .isInt({ min: 0 })
     .withMessage(`${field} must be a non-negative integer`);
 
-// Validación de order status
 export const orderStatusValidation = (optional = false) => {
   const validator = body("status")
+    .trim()
+    .toLowerCase()
     .isIn(["pending", "processing", "shipped", "delivered", "cancelled"])
     .withMessage("Invalid status value");
 
@@ -146,6 +147,8 @@ export const orderStatusValidation = (optional = false) => {
 // Validación de payment status
 export const paymentStatusValidation = (optional = false) => {
   const validator = body("paymentStatus")
+    .trim()
+    .toLowerCase()
     .isIn(["pending", "paid", "failed", "refunded"])
     .withMessage("Invalid payment status value");
 
@@ -367,29 +370,31 @@ export const stockOptionalValidation = () =>
 
 // Validación de array de URLs de imágenes
 export const imagesUrlValidation = (required = true) => {
-  const validators = [
-    body("imagesUrl").isArray({ min: 1 }).withMessage("At least one image URL is required"),
-    body("imagesUrl.*").isURL().withMessage("Each image must be a valid URL"),
-  ];
+  const imagesUrlValidationBase = body("imagesUrl")
+    .isArray({ min: 1 })
+    .withMessage("At least one image URL is required");
 
   if (required) {
-    validators[0] = body("imagesUrl")
-      .notEmpty()
-      .withMessage("Images URL is required")
-      .isArray({ min: 1 })
-      .withMessage("At least one image URL is required");
+    imagesUrlValidationBase.notEmpty().withMessage("Images URL is required");
   } else {
-    validators[0] = body("imagesUrl")
-      .optional()
-      .isArray({ min: 1 })
-      .withMessage("At least one image URL is required");
-    validators[1] = body("imagesUrl.*")
-      .optional()
-      .isURL()
-      .withMessage("Each image must be a valid URL");
+    imagesUrlValidationBase.optional();
   }
 
-  return validators;
+  const itemValidation = body("imagesUrl.*").custom((value) => {
+    if (typeof value !== "string" || value.trim().length === 0) {
+      throw new Error("Each image must be a non-empty string");
+    }
+    // Permitir rutas relativas (/). NOTA: isURL falla con rutas locales.
+    const isRelative = value.trim().startsWith("/");
+    const isFullUrl = /^(https?:\/\/)/.test(value);
+
+    if (!isRelative && !isFullUrl) {
+      throw new Error("Each image must be a valid URL or a relative path starting with /");
+    }
+    return true;
+  });
+
+  return [imagesUrlValidationBase, itemValidation];
 };
 
 // Validación de nombre de producto

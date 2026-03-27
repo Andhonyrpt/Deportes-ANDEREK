@@ -1,0 +1,216 @@
+/* ProductsView.css */
+
+.products-view {
+    padding: var(--gap);
+    background: var(--background);
+    min-height: calc(100vh - 120px);
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.products-header h2 {
+    margin: 0;
+    color: var(--color-primary-900);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* Tooltip Customizado e Instantáneo */
+.stock-badge-container {
+    position: relative;
+    display: inline-block;
+}
+
+.stock-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--color-light-gray);
+    color: var(--color-dark);
+    cursor: default;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    transition: background 0.2s;
+}
+
+.stock-badge:hover {
+    background: var(--color-strong-gray);
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 160px;
+    background-color: var(--color-darker);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+    font-size: 0.8rem;
+    font-weight: 400;
+    box-shadow: var(--elev-2);
+    pointer-events: none;
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-darker) transparent transparent transparent;
+}
+
+.stock-badge-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Tabla Admin */
+.products-table-container {
+    background: #ffffff;
+    border-radius: var(--radius);
+    box-shadow: var(--elev-1);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th, .products-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.products-table th {
+    background: #fafafa;
+    color: var(--color-gray);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* Formulario Admin Overlay */
+.products-form-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.products-form {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: var(--r4);
+    box-shadow: var(--elev-4);
+    width: 600px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.products-form h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary-900);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-gray);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    font-size: 0.95rem;
+}
+
+.form-variants {
+    margin-bottom: 1.5rem;
+    background: var(--color-light-gray);
+    padding: 1rem;
+    border-radius: var(--r3);
+}
+
+.variants-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.variant-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 8px;
+    border-radius: var(--r1);
+    border: 1px solid var(--border);
+}
+
+.variant-input span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-gray);
+    margin-bottom: 4px;
+}
+
+.variant-input input {
+    width: 100%;
+    border: none;
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}

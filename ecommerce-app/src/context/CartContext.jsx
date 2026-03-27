@@ -2,8 +2,13 @@ import { createContext, useContext, useEffect, useMemo, useReducer, useState, us
 import { useAuth } from "./AuthContext";
 import * as cartService from "../services/cartService";
 import { CART_ACTIONS, cartInitialState, cartReducer } from "./cartReducer";
+import storageService from "../services/storageService";
 
 const CartContext = createContext();
+
+const STORAGE_KEYS = {
+    CART: "cart",
+};
 
 export function CartProvider({ children }) {
 
@@ -16,9 +21,8 @@ export function CartProvider({ children }) {
 
     const { user, isAuth } = useAuth();
     const [cartId, setCartId] = useState(null);
-    const initializedRef = useRef(false); // Flag para evitar re-fetch usando ref
+    const initializedRef = useRef(false);
 
-    // Funciones auxiliares
     const getTotalItems = () => state.items.reduce((sum, i) => sum + (i.quantity || 0), 0);
     const getTotalPrice = () => state.items.reduce((sum, i) => {
         const price = i.product?.price || i.price || 0;
@@ -26,28 +30,43 @@ export function CartProvider({ children }) {
         return sum + (price * qty);
     }, 0);
 
-    // Actualizar localStorage SOLO para invitados (Guest Mode)
+    // Actualizar storage SOLO para invitados (Guest Mode)
     useEffect(() => {
         if (!isAuth) {
-            localStorage.setItem("cart", JSON.stringify(state.items));
+            storageService.set(STORAGE_KEYS.CART, state.items);
         }
     }, [state.items, isAuth]);
 
     useEffect(() => {
         const initializeCart = async () => {
-            // Solo inicializar si está autenticado, tenemos ID, y no ha sido inicializado aún
             if (isAuth && user?._id && !initializedRef.current) {
                 try {
-                    console.log("DEBUG [CartContext]: Initializing cart for user", user._id);
-                    initializedRef.current = true; // Bloquear re-inicialización
-                    
-                    // 1. Obtener el carrito desde el backend
+                    initializedRef.current = true;
+
+                    // 1. Leer carrito de invitado del storage sado el servicio unificado
+                    const guestItems = storageService.get(STORAGE_KEYS.CART) || [];
+
+                    // 2. Si hay items de invitado, hacer merge en el backend primero
+                    if (guestItems.length > 0) {
+                        const mergeProducts = guestItems.map(item => ({
+                            productId: item._id,
+                            quantity: item.quantity || 1,
+                            size: item.selectedSize || 'M',
+                        }));
+                        try {
+                            await cartService.mergeCart(mergeProducts);
+                        } catch (mergeError) {
+                            console.warn('[CartContext]: merge falló', mergeError);
+                        }
+                        // Limpiar el carrito de invitado tras el merge
+                        storageService.remove(STORAGE_KEYS.CART);
+                    }
+
+                    // 3. Obtener el carrito actualizado desde el backend
                     const backendCart = await cartService.getCart(user._id);
-                    console.log("DEBUG [CartContext]: Backend response", backendCart);
 
                     if (backendCart?.products) {
                         setCartId(backendCart._id);
-                        // Normalizar y sumar duplicados
                         const normalizedItemsMap = new Map();
                         backendCart.products.forEach(p => {
                             const key = `${p.product._id}-${p.size}`;
@@ -68,8 +87,8 @@ export function CartProvider({ children }) {
                         dispatch({ type: CART_ACTIONS.INIT, payload: normalizedItems });
                     }
                 } catch (error) {
-                    console.error("DEBUG [CartContext]: Error", error);
-                    initializedRef.current = false; // Permitir reintento si falló
+                    console.error('[CartContext]: Error al inicializar carrito', error);
+                    initializedRef.current = false;
                 }
             } else if (!isAuth) {
                 setCartId(null);
@@ -77,93 +96,85 @@ export function CartProvider({ children }) {
             }
         }
         initializeCart();
-    }, [isAuth, user?._id]); // Ya no depende de 'initialized' porque es un ref mutable
+    }, [isAuth, user?._id]);
 
     const syncToBackend = async (syncFn) => {
         if (!isAuth) return;
-
-        setSyncState({
-            syncing: true,
-            lastSyncError: null
-        });
-
+        setSyncState(prev => ({ ...prev, syncing: true, lastSyncError: null }));
         try {
             await syncFn();
-            setSyncState({
-                syncing: false,
-                lastSyncError: null
-            });
         } catch (error) {
-            console.error(error)
-            setSyncState({
-                syncing: false,
-                lastSyncError: error
-            });
+            console.error('[CartContext]: Error syncing to backend:', error);
+            setSyncState(prev => ({ ...prev, lastSyncError: error.message }));
+        } finally {
+            setSyncState(prev => ({ ...prev, syncing: false }));
         }
     };
 
-    const removeFromCart = (productId, size) => {
-        dispatch({ type: CART_ACTIONS.REMOVE, payload: { _id: productId, selectedSize: size } });
+    const addToCart = async (product, quantity = 1, selectedSize = 'M') => {
+        const item = { ...product, quantity, selectedSize };
+        dispatch({ type: CART_ACTIONS.ADD, payload: item });
 
-        syncToBackend(async () => {
-            await cartService.removeFromCart(user._id, productId, size)
-        });
+        if (isAuth && user?._id) {
+            await syncToBackend(() => cartService.addToCart(user._id, product._id, quantity, selectedSize));
+        }
     };
 
-    const updateQuantity = (productId, size, newQuantity) => {
-        console.log("DEBUG [CartContext]: Updating quantity", { productId, size, newQuantity });
-        dispatch({ type: CART_ACTIONS.SET_QTY, payload: { _id: productId, selectedSize: size, quantity: newQuantity } });
+    const removeFromCart = async (productId, selectedSize) => {
+        dispatch({ type: CART_ACTIONS.REMOVE, payload: { _id: productId, selectedSize } });
 
-        syncToBackend(async () => {
-            await cartService.updateCartItem(user._id, productId, newQuantity, size, null);
-        })
+        if (isAuth && user?._id) {
+            await syncToBackend(() => cartService.removeFromCart(user._id, productId, selectedSize));
+        }
     };
 
-    const addToCart = (product, quantity = 1, size = 'M') => {
-        dispatch({ type: CART_ACTIONS.ADD, payload: { ...product, quantity, selectedSize: size } });
+    const updateQuantity = async (productId, selectedSize, quantity) => {
+        dispatch({ type: CART_ACTIONS.SET_QTY, payload: { _id: productId, selectedSize, quantity } });
 
-        syncToBackend(async () => {
-            await cartService.addToCart(user._id, product._id, quantity, size);
-        });
+        if (isAuth && user?._id) {
+            await syncToBackend(() => cartService.updateQuantity(user._id, productId, quantity, selectedSize, selectedSize));
+        }
     };
 
-    const changeItemSize = (productId, quantity, oldSize, newSize,) => {
+    const changeItemSize = async (productId, quantity, oldSize, newSize) => {
         dispatch({ type: CART_ACTIONS.CHANGE_SIZE, payload: { _id: productId, oldSize, newSize } });
 
-        syncToBackend(async () => {
-            await cartService.updateCartItem(user._id, productId, quantity, newSize, oldSize)
-        });
+        if (isAuth && user?._id) {
+            await syncToBackend(() => cartService.updateQuantity(user._id, productId, quantity, newSize, oldSize));
+        }
     };
 
-    const clearCart = () => {
-        dispatch({ type: CART_ACTIONS.CLEAR })
-
-        syncToBackend(async () => {
-            await cartService.clearCart(user._id)
-        });
+    const clearCart = async () => {
+        dispatch({ type: CART_ACTIONS.CLEAR });
+        if (isAuth && user?._id) {
+            await syncToBackend(() => cartService.clearCart(user._id));
+        }
     };
 
-    const value = useMemo(() => ({
+    const value = {
+        items: state.items,
         cartItems: state.items,
-        total: getTotalPrice(),
+        totalItems: getTotalItems(),
+        getTotalItems,
+        totalPrice: getTotalPrice(),
+        getTotalPrice,
+        syncing: syncState.syncing,
+        lastSyncError: syncState.lastSyncError,
         addToCart,
         removeFromCart,
         updateQuantity,
         changeItemSize,
         clearCart,
-        getTotalItems,
-        getTotalPrice
-    }), [state.items]);
+        cartId
+    };
 
-    return <CartContext.Provider value={value}>{children}</CartContext.Provider>
-
-};
+    return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+}
 
 export function useCart() {
-
     const context = useContext(CartContext);
-
-    if (!context) throw new Error("useCart must be used within a CartProvider");
-
+    if (!context) {
+        throw new Error("useCart debe usarse dentro de un CartProvider");
+    }
     return context;
-};
+}

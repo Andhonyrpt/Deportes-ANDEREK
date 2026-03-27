@@ -14,9 +14,7 @@ export function AuthProvider({ children }) {
         const saved = localStorage.getItem("userData");
         return saved ? JSON.parse(saved) : null;
     });
-    const [isAuth, setIsAuth] = useState(() => {
-        return !!localStorage.getItem("authToken") && !!localStorage.getItem("userData");
-    });
+    const [isAuth, setIsAuth] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const saveToken = (token) => {
@@ -61,20 +59,9 @@ export function AuthProvider({ children }) {
 
             } catch (error) {
                 console.error("Error en autentificación", error);
-                // Solo cerramos sesión automática si el error es de autorización (401/403)
-                // Si es por red, 500 o rate-limit (429), no borramos la sesión del usuario.
-                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                    removeToken();
-                    setUser(null);
-                    setIsAuth(false);
-                } else {
-                    // Si el perfil falla por red, mantenemos autenticación basada en caché
-                    const cachedUser = getUserData();
-                    if (cachedUser) {
-                        setUser(cachedUser);
-                        setIsAuth(true);
-                    }
-                }
+                removeToken();
+                setUser(null);
+                setIsAuth(false);
             } finally {
                 setLoading(false);
             }

@@ -16,29 +16,18 @@ export const fetchCategories = async () => {
 
         // 2. Vamos por los Equipos (SubCategorías Hijas)
         const subCatResponse = await http.get("subcategories");
-        const subCategorias = subCatResponse.data?.subcategories || subCatResponse.data || [];
+        const subCategorias = subCatResponse.data?.subCategories || subCatResponse.data || [];
 
         // 3. ¡Fusión! Juntamos ambos arreglos en uno solo para que el frontend sea feliz
         const combinadas = [...categorias, ...subCategorias];
-        console.log("🕵️‍♂️ TODAS las categorías fusionadas (Ligas + Equipos):", combinadas);
         return combinadas;
+
     } catch (error) {
         console.error("Error fetching categories", error);
         return [];
     }
 };
 
-export const fetchProducts = async () => {
-    try {
-        const response = await http.get("products");
-        const data = response.data?.products || response.data || [];
-        console.log("🕵️‍♂️ Productos reales recibidos:", data);
-        return Array.isArray(data) ? data : [];
-    } catch (error) {
-        console.error("Error fetching products", error);
-        return [];
-    }
-};
 
 export const searchCategories = async (query) => {
     const lowerQuery = query.trim().toLowerCase();
@@ -82,46 +71,25 @@ export const getChildCategories = async (parentCategoryId) => {
     );
 };
 
-// Obtener productos por categoría específica
+// Obtener productos por categoría — usar endpoint dedicado del servidor
 export const getProductsByCategory = async (categoryId) => {
-    const trimmedId = categoryId.toString().trim();
-
-    return fetchProducts().then((data) =>
-        data.filter((product) => extractId(product.category) === trimmedId)
-    );
+    try {
+        const trimmedId = categoryId.toString().trim();
+        const response = await http.get(`products/category/${trimmedId}`);
+        const data = response.data?.products || response.data || [];
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error('Error fetching products by category', error);
+        return [];
+    }
 };
 
 // Obtener productos de una categoría incluyendo sus subcategorías
 export const getProductsByCategoryAndChildren = async (categoryId) => {
-    const allProducts = await fetchProducts();
-    const allCategories = await fetchCategories();
-    const trimmedId = categoryId.toString().trim();
-
-    // Encontrar la categoría
-    const category = await getCategoryById(trimmedId);
-
-    if (!category) return [];
-
-    // Si es una categoría padre (parentCategory is null)
-    if (!category.parentCategory) {
-        // Obtener IDs de todas las categorías hijas
-        const childCategoryIds = allCategories
-            .filter((cat) => cat.parentCategory && extractId(cat.parentCategory) === trimmedId)
-            .map((cat) => extractId(cat));
-
-        // Incluir el ID de la categoría padre también
-        const allCategoryIds = [trimmedId, ...childCategoryIds];
-
-        // Retornar productos de la categoría padre y sus hijas
-        return allProducts.filter((product) =>
-            product.category && allCategoryIds.includes(extractId(product.category))
-        );
-    }
-
-    // Si es una categoría hija, solo retornar sus productos
-    return allProducts.filter((product) => product.category && extractId(product.category) === trimmedId
-    );
-
+    // Simplificamos: Llamamos directamente al endpoint del backend, 
+    // el cual ahora es lo suficientemente inteligente para devolver 
+    // los productos de la categoría y de sus subcategorías.
+    return getProductsByCategory(categoryId);
 };
 
 // Obtener categorías principales (sin padre)
@@ -129,4 +97,53 @@ export const getParentCategories = async () => {
     return fetchCategories().then((data) =>
         data.filter((cat) => cat.parentCategory === null)
     );
+};
+
+/**
+ * [ADMIN ONLY]
+ */
+export const createCategory = async (categoryData) => {
+    const res = await http.post('categories', categoryData);
+    return res.data;
+};
+
+/**
+ * [ADMIN ONLY]
+ */
+export const updateCategory = async (id, categoryData) => {
+    const res = await http.put(`categories/${id}`, categoryData);
+    return res.data;
+};
+
+/**
+ * [ADMIN ONLY] subcategories CRUD
+ */
+export const createSubCategoryByAdmin = async (subCategoryData) => {
+    const res = await http.post('subcategories', subCategoryData);
+    return res.data;
+};
+
+export const updateSubCategoryByAdmin = async (id, subCategoryData) => {
+    const res = await http.put(`subcategories/${id}`, subCategoryData);
+    return res.data;
+};
+
+export const deleteSubCategoryByAdmin = async (id) => {
+    const res = await http.delete(`subcategories/${id}`);
+    return res.data;
+};
+
+export const fetchSubCategories = async () => {
+    const res = await http.get('subcategories');
+    const data = res.data?.subCategories || []; // Solo retornar el array
+    console.log("DEBUG: fetchSubCategories returns array:", data);
+    return data;
+};
+
+/**
+ * [ADMIN ONLY]
+ */
+export const deleteCategory = async (id) => {
+    const res = await http.delete(`categories/${id}`);
+    return res.data;
 };

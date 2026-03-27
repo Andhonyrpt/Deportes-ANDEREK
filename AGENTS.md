@@ -16,14 +16,18 @@ For tasks requiring build, lint, or test operations, always navigate to the appr
 
 ### `ecommerce-api`
 - **Lint**: `npm run lint`
-- **Run Tests**: `npm run test`
+- **Run Tests**: `npm run test` (uses `vitest`)
 - **Run Single Test**: `npx vitest run <test-file-or-pattern>`
+- **Watch Mode**: `npm run test:watch`
 - **Coverage**: `npm run test:coverage`
+- **UI Mode**: `npm run test:ui`
 
 ### `ecommerce-app`
 - **Lint**: `npm run lint`
-- **Run Tests (Vitest/Cypress)**: `npm run test`
-- **Open Cypress UI**: `npm run cypress:open`
+- **Run Tests (Vitest/Jest)**: `npm run test`
+- **Run Cypress (Headless)**: `npm run cy:run`
+- **Run Cypress (UI)**: `npm run cy:open`
+- **Build**: `npm run build`
 
 ---
 
@@ -80,12 +84,42 @@ For tasks requiring build, lint, or test operations, always navigate to the appr
 - `routes/`: Express route definitions.
 - `models/`: Mongoose schemas.
 - `validators/`: Input validation logic (`express-validator`).
+- `tests/`: Vitest test files.
 
 ### `ecommerce-app/`
 - `components/`: UI components (common, layout).
 - `context/`: State management (Auth, Cart).
 - `services/`: API communication (`http.js`).
 - `hooks/`: Custom React hooks (`useFormReducer`).
+- `cypress/`: E2E tests.
+
+---
+
+## 7. Git Commit Guidelines
+- Use [Conventional Commits](https://www.conventionalcommits.org/):
+  - `feat`: New feature.
+  - `fix`: Bug fix.
+  - `docs`: Documentation updates.
+  - `style`: Formatting, missing semicolons, etc.
+  - `refactor`: Code changes that neither fix bugs nor add features.
+  - `test`: Adding missing tests or correcting existing tests.
+  - `chore`: Maintenance tasks (build scripts, dependencies).
+- Keep commit messages concise, summarizing the *why*, not just the *what*.
+
+---
+
+## 8. Security Checklist
+- **No Secrets**: NEVER commit `.env` files or hardcoded credentials.
+- **Validation**: Ensure all user inputs are sanitized in `validators/` (API).
+- **Dependencies**: Periodically run `npm audit`.
+- **Dependencies**: Avoid introducing unnecessary packages.
+
+---
+
+## 9. Troubleshooting
+- **Database Issues**: If tests fail, ensure the test database is clean (see `cleanup_db.js` in `ecommerce-api`).
+- **API Connection**: Check that the `REACT_APP_API_URL` environment variable is correctly set in `ecommerce-app`.
+- **Cypress Failures**: Check `cy_terminal_output.txt` or `cy_log.txt` in `ecommerce-app/` for detailed logs.
 
 ---
 *End of documentation. Refer to sub-directory AGENTS.md files for granular component/API documentation.*

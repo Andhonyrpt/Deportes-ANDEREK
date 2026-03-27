@@ -23,48 +23,207 @@ import {
 
 const router = express.Router();
 
-// Obtener todas las notificaciones (admin)
+/**
+ * @openapi
+ * /notifications:
+ *   get:
+ *     summary: Obtener todas las notificaciones (Admin)
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista completa
+ */
 router.get('/notifications', authMiddleware, isAdmin, getNotifications);
 
-// Obtener notificaciones no leídas por usuario
+/**
+ * @openapi
+ * /notifications/unread/{userId}:
+ *   get:
+ *     summary: Obtener notificaciones no leídas
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Conteo/listado de no leídas
+ */
 router.get('/notifications/unread/:userId', authMiddleware, [
   mongoIdValidation('userId', 'User ID')
 ], validate, getUnreadNotificationsByUser);
 
-// Obtener notificaciones por usuario
+/**
+ * @openapi
+ * /notifications/user/{userId}:
+ *   get:
+ *     summary: Obtener notificaciones por usuario
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Historial de notificaciones
+ */
 router.get('/notifications/user/:userId', authMiddleware, [
   mongoIdValidation('userId', 'User ID')
 ], validate, getNotificationByUser);
 
-// Obtener notificación por ID
+/**
+ * @openapi
+ * /notifications/{id}:
+ *   get:
+ *     summary: Obtener notificación por ID
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalle notification
+ */
 router.get('/notifications/:id', authMiddleware, [
   mongoIdValidation('id', 'Notification ID')
 ], validate, getNotificationById);
 
-// Crear nueva notificación (admin)
+/**
+ * @openapi
+ * /notifications:
+ *   post:
+ *     summary: Crear nueva notificación (Admin)
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [user, message]
+ *             properties:
+ *               user:
+ *                 type: string
+ *               message:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Notificación enviada
+ */
 router.post('/notifications', authMiddleware, [
   bodyMongoIdValidation('user', 'User ID'),
   messageValidation()
 ], validate, createNotification);
 
-// Marcar una notificación como leída
+/**
+ * @openapi
+ * /notifications/{id}/mark-read:
+ *   patch:
+ *     summary: Marcar como leída
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Notification marcada
+ */
 router.patch('/notifications/:id/mark-read', authMiddleware, [
   mongoIdValidation('id', 'Notification ID')
 ], validate, markAsRead);
 
-// Marcar todas las notificaciones de un usuario como leídas
+/**
+ * @openapi
+ * /notifications/user/{userId}/mark-all-read:
+ *   patch:
+ *     summary: Marcar todas como leídas
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Historial marcado
+ */
 router.patch('/notifications/user/:userId/mark-all-read', authMiddleware, [
   mongoIdValidation('userId', 'User ID')
 ], validate, markAllAsReadByUser);
 
-// Actualizar notificación (admin)
+/**
+ * @openapi
+ * /notifications/{id}:
+ *   put:
+ *     summary: Actualizar notificación (Admin)
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Registro modificado
+ */
 router.put('/notifications/:id', authMiddleware, isAdmin, [
   mongoIdValidation('id', 'Notification ID'),
   messageValidation(500).optional(),
   booleanValidation('isRead')
 ], validate, updateNotification);
 
-// Eliminar notificación
+/**
+ * @openapi
+ * /notifications/{id}:
+ *   delete:
+ *     summary: Eliminar notificación
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Eliminación exitosa
+ */
 router.delete('/notifications/:id', authMiddleware, [
   mongoIdValidation('id', 'Notification ID')
 ], validate, deleteNotification);

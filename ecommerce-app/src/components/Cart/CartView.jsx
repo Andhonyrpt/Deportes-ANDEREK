@@ -3,7 +3,6 @@ import Button from "../common/Button";
 import Icon from "../common/Icon";
 
 export default function CartView() {
-    console.log("DEBUG [CartView]: Rendering");
     
     const {
         cartItems,
@@ -12,8 +11,6 @@ export default function CartView() {
         changeItemSize,
         getTotalItems
     } = useCart();
-
-    console.log("DEBUG [CartView]: cartItems", cartItems);
 
     return (
 
@@ -29,8 +26,6 @@ export default function CartView() {
                 const p = item.product || item;
                 const currentSize = item.size || item.selectedSize;
                 const currentItemId = `${p._id}-${currentSize}`;
-                
-                console.log("DEBUG [CartView]: Rendering item", currentItemId, "Index:", index);
                 
                 // ... rest of the component ...
                 const currentVariant = p.variants?.find((v) => v.size === currentSize);

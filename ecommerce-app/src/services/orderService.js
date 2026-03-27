@@ -41,3 +41,29 @@ export const previewOrder = async (products) => {
         throw error;
     }
 };
+
+/**
+ * [ADMIN ONLY]
+ */
+export const getAllOrders = async (page = 1, limit = 10) => {
+    try {
+        const response = await http.get(`orders`, { params: { page, limit } });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * [ADMIN ONLY]
+ */
+export const updateOrderStatusAdmin = async (orderId, status) => {
+    try {
+        const response = await http.patch(`orders/${orderId}/status`, { status });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
