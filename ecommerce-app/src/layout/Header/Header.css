@@ -427,9 +427,10 @@
 }
 
 .notif-item.unread {
-    background: rgba(var(--color-primary-400-rgb, 46, 163, 74), 0.1);
-    border-left: 3px solid var(--color-primary-400);
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--color-primary-400);
 }
+
 
 .notif-message {
     margin: 0;
@@ -489,9 +490,44 @@
 }
 
 .notif-item.unread {
-    background: rgba(var(--color-primary-600-rgb, 225, 29, 72), 0.05);
-    border-left: 3px solid var(--color-primary-600);
+    background: var(--soft-sand); /* Usando color de la paleta (soft-sand) */
+    border-left: 4px solid var(--color-primary-400); /* Borde verde destacado */
+    color: var(--text); /* Texto oscuro para máxima legibilidad */
 }
+
+.notif-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 8px;
+    /* Estilo para LEÍDAS: Usando --soft-sand para un tono elegante */
+    background: var(--soft-sand);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    color: var(--text);
+}
+
+.notif-item.unread {
+    /* Estilo para NO LEÍDAS: Usando --color-light-gray para diferenciar del fondo */
+    background: var(--color-light-gray);
+    color: var(--color-darker);
+    border-left: 4px solid var(--color-primary-400); /* Borde verde destacado */
+    font-weight: 600;
+}
+
+.notif-message {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted); /* Color estándar para mensajes */
+    line-height: 1.4;
+}
+
+.notif-item.unread .notif-message {
+    color: var(--text); /* Texto un poco más oscuro para mejor contraste en fondo gris */
+}
+
+
 
 .notif-item-header {
     display: flex;

@@ -20,7 +20,7 @@ export default function Header() {
     const wishlistCount = wishlistItems ? wishlistItems.length : 0;
     const navigate = useNavigate();
     const { user, isAuth, logout } = useAuth();
-    const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotification();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification, refreshNotifications } = useNotification();
 
     // Referencias para manejo de clicks fuera
     const userMenuRef = useRef(null);
@@ -159,7 +159,13 @@ export default function Header() {
                                 <div className="notifications-container desktop-only" ref={notifMenuRef}>
                                     <button 
                                         className='notif-btn'
-                                        onClick={() => setIsNotifMenuOpen(!isNotifMenuOpen)}
+                                        onClick={async () => {
+                                            setIsNotifMenuOpen(!isNotifMenuOpen);
+                                            if (!isNotifMenuOpen) {
+                                                await refreshNotifications();
+                                                await markAllAsRead();
+                                            }
+                                        }}
                                         aria-label='Ver notificaciones'
                                     >
                                         <Icon name="bell" size={24} />
@@ -184,19 +190,27 @@ export default function Header() {
                                             ) : (
                                                 <div className="notif-list">
                                                     {notifications.map(n => (
-                                                        <div key={n._id} className={`notif-item ${!n.isRead ? 'unread' : ''}`}>
+                                                        <div 
+                                                            key={n._id} 
+                                                            className={`notif-item ${!n.isRead ? 'unread' : ''}`}
+                                                            onClick={async () => {
+                                                                await markAsRead(n._id);
+                                                                if (n.orderId) {
+                                                                    navigate(`/orders/${n.orderId}`);
+                                                                } else {
+                                                                    navigate('/orders');
+                                                                }
+                                                                setIsNotifMenuOpen(false);
+                                                            }}
+                                                            style={{ cursor: 'pointer' }}
+                                                        >
                                                             <div className="notif-item-header">
                                                                 <strong className="notif-item-title">{n.title}</strong>
-                                                                <button onClick={() => removeNotification(n._id)} className="notif-remove-btn">
+                                                                <button onClick={(e) => { e.stopPropagation(); removeNotification(n._id); }} className="notif-remove-btn">
                                                                     <Icon name="x" size={14} />
                                                                 </button>
                                                             </div>
                                                             <p className="notif-message">{n.message}</p>
-                                                            {!n.isRead && (
-                                                                <button onClick={() => markAsRead(n._id)} className="notif-mark-item-read-btn">
-                                                                    Marcar leída
-                                                                </button>
-                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
