@@ -14,7 +14,9 @@ export function AuthProvider({ children }) {
         const saved = localStorage.getItem("userData");
         return saved ? JSON.parse(saved) : null;
     });
-    const [isAuth, setIsAuth] = useState(false);
+    const [isAuth, setIsAuth] = useState(() => {
+        return !!localStorage.getItem("authToken");
+    });
     const [loading, setLoading] = useState(true);
 
     const saveToken = (token) => {
@@ -46,14 +48,18 @@ export function AuthProvider({ children }) {
                 const token = getToken();
 
                 if (token) {
-                    const userData = await getUserProfile();
+                    try {
+                        const userData = await getUserProfile();
 
-                    if (userData) {
-                        setUser(userData);
-                        setIsAuth(true);
-                        saveUserData(userData);
-                    } else {
-                        removeToken();
+                        if (userData) {
+                            setUser(userData);
+                            setIsAuth(true);
+                            saveUserData(userData);
+                        } else {
+                            removeToken();
+                        }
+                    } catch (serviceError) {
+                        throw serviceError; // Para que el catch principal lo atrape
                     }
                 }
 

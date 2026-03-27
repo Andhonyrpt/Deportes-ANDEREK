@@ -35,11 +35,11 @@ const SubCategoriesView = lazy(() => import('../../pages/Admin/views/SubCategori
 
 function App() {
   // Limpieza de llaves obsoletas (Legacy/Zombie Keys)
-  useEffect(() => {
-    const legacyKeys = ["authToken", "refreshToken", "userData", "shippingAddresses", "paymentMethods", "orders", "cart"];
-    legacyKeys.forEach(key => storageService.removeRaw(key));
-    console.info("Storage cleanup: Legacy keys removed.");
-  }, []);
+  // useEffect(() => {
+  //   const legacyKeys = ["authToken", "refreshToken", "userData", "shippingAddresses", "paymentMethods", "orders", "cart"];
+  //   legacyKeys.forEach(key => storageService.removeRaw(key));
+  //   console.info("Storage cleanup: Legacy keys removed.");
+  // }, []);
 
   return (
     <CartProvider>
