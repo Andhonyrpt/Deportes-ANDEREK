@@ -1,62 +1,49 @@
 describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
-    const testUser = {
-        email: "andhonyrpt@gmail.mx",
+    // Usamos el usuario administrador que acabas de configurar
+    const adminUser = {
+        email: "cypress_admin_test@anderek.com",
         password: "Password123!" 
     };
     const product = { _id: "69b1183fd947069ecb02061b", name: "Jersey Manchester United Local 2024", price: 1249 };
 
     before(() => {
+        // Login con el usuario administrador configurado
         cy.request({
             method: "POST",
-            url: `${Cypress.env("apiUrl")}/auth/register`,
-            headers: { 'x-load-test': 'true' }, // Header para saltar el rate limiter
-            body: testUser,
+            url: `${Cypress.env("apiUrl")}/auth/login`,
+            headers: { 'x-load-test': 'true' },
+            body: adminUser,
             failOnStatusCode: false
-        }).then((regRes) => {
-            cy.log("Registro Status:", regRes.status);
-            
-            cy.request({
-                method: "POST",
-                url: `${Cypress.env("apiUrl")}/auth/login`,
-                headers: { 'x-load-test': 'true' }, // Header para saltar el rate limiter
-                body: { email: testUser.email, password: testUser.password },
-                failOnStatusCode: false
-            }).then((loginRes) => {
-                if (loginRes.status === 200) {
-                    const token = loginRes.body.token;
-                    cy.request({
-                        method: "GET",
-                        url: `${Cypress.env("apiUrl")}/users/profile`,
-                        headers: { 
-                            Authorization: `Bearer ${token}`,
-                            'x-load-test': 'true' // Header para saltar el rate limiter
-                        }
-                    }).then((profileRes) => {
-                        Cypress.env("authToken", token);
-                        Cypress.env("userData", JSON.stringify(profileRes.body.user));
-                    });
-                } else {
-                    cy.log("Login falló:", JSON.stringify(loginRes.body));
-                }
-            });
-        });
-    });
-
+        }).then((loginRes) => {
+            cy.log("Login Status (Admin):", loginRes.status);
+            if (loginRes.status === 200) {
+                const token = loginRes.body.token;
+                cy.request({
+                    method: "GET",
+                    url: `${Cypress.env("apiUrl")}/users/profile`,
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'x-load-test': 'true'
+                    }
+                }).then((profileRes) => {
+                    Cypress.env("authToken", token);
+                    Cypress.env("userData", JSON.stringify(profileRes.body.user));
+                    cy.log("Administrador autenticado exitosamente");
+                });
             } else {
-                throw new Error("El login con usuario existente falló: " + JSON.stringify(loginRes.body));
+                throw new Error("El login con el administrador falló: " + JSON.stringify(loginRes.body));
             }
         });
     });
 
+
     beforeEach(() => {
         cy.clearLocalStorage();
         
-        // Inyectar las credenciales
-        cy.window().then((win) => {
-            win.localStorage.setItem("authToken", Cypress.env("authToken"));
-            win.localStorage.setItem("userData", Cypress.env("userData"));
-        });
+        // Login usando el comando que ya funciona en otros tests
+        cy.loginByApi(testUser.email, testUser.password);
         
+        // Limpiar datos transaccionales
         cy.clearDataByApi();
 
         cy.intercept("GET", "**/users/profile", (req) => { req.headers['x-load-test'] = 'true'; }).as("getUserProfile");
@@ -110,8 +97,10 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.wait("@getPayments");
         cy.get(".selected-payment").should("contain", "BBVA");
 
-        cy.get('[data-testid="pay-button"]').click();
+        // Fase 4: Pagar
+        cy.get('.pay-button').click();
         cy.wait("@placeOrder").its("response.statusCode").should("eq", 201);
+
 
         cy.url().should("include", "/order-confirmation");
         cy.contains("¡Gracias por tu compra!").should("be.visible");
