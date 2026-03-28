@@ -12,7 +12,9 @@ Cypress.Commands.add("registerUser", (userData) => {
     }).then((res) => {
         cy.log(`Register response: ${res.status}`);
         cy.log(`Register body: ${JSON.stringify(res.body)}`);
-        if (res.status !== 201 && res.status !== 400 && res.status !== 429) {
+        // Si el usuario ya existe (201 en este caso por lógica de backend), es exitoso.
+        // Si es 400, asumimos que existe y seguimos.
+        if (res.status !== 201 && res.status !== 400 && res.status !== 200) {
             throw new Error(`Registration failed: ${res.status} ${JSON.stringify(res.body)}`);
         }
     });
@@ -60,9 +62,12 @@ Cypress.Commands.add("clearDataByApi", () => {
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
         const userStr = win.localStorage.getItem("userData");
-        const user = userStr ? JSON.parse(userStr) : null;
+        
+        // CORRECCIÓN: Evitar JSON.parse si es "undefined"
+        if (!token || !userStr || userStr === "undefined") return;
 
-        if (!token || !user) return;
+        const user = JSON.parse(userStr);
+        if (!user) return;
 
         // Limpiar carrito
         cy.request({
@@ -117,10 +122,15 @@ Cypress.Commands.add("addProductToCart", (productId, quantity = 1, size = "M") =
     return cy.window().then((win) => {
         const token = win.localStorage.getItem("authToken");
         const userStr = win.localStorage.getItem("userData");
-        const user = userStr ? JSON.parse(userStr) : null;
+        
+        // CORRECCIÓN: Evitar parsear cadenas inválidas
+        let user = null;
+        if (userStr && userStr !== "undefined" && userStr !== "null") {
+            user = JSON.parse(userStr);
+        }
 
         if (!token || !user) {
-            throw new Error("Cannot add to cart: No auth token or user data in localStorage");
+            throw new Error(`Cannot add to cart: No valid auth token or user data. Token: ${token}, UserStr: ${userStr}`);
         }
 
         return cy.request({

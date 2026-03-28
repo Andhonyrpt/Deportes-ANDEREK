@@ -1,15 +1,62 @@
 describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
     const testUser = {
-        email: "customer@test.com",
-        password: "Password123!"
+        email: "andhonyrpt@gmail.mx",
+        password: "Password123!" 
     };
     const product = { _id: "69b1183fd947069ecb02061b", name: "Jersey Manchester United Local 2024", price: 1249 };
 
+    before(() => {
+        cy.request({
+            method: "POST",
+            url: `${Cypress.env("apiUrl")}/auth/register`,
+            headers: { 'x-load-test': 'true' }, // Header para saltar el rate limiter
+            body: testUser,
+            failOnStatusCode: false
+        }).then((regRes) => {
+            cy.log("Registro Status:", regRes.status);
+            
+            cy.request({
+                method: "POST",
+                url: `${Cypress.env("apiUrl")}/auth/login`,
+                headers: { 'x-load-test': 'true' }, // Header para saltar el rate limiter
+                body: { email: testUser.email, password: testUser.password },
+                failOnStatusCode: false
+            }).then((loginRes) => {
+                if (loginRes.status === 200) {
+                    const token = loginRes.body.token;
+                    cy.request({
+                        method: "GET",
+                        url: `${Cypress.env("apiUrl")}/users/profile`,
+                        headers: { 
+                            Authorization: `Bearer ${token}`,
+                            'x-load-test': 'true' // Header para saltar el rate limiter
+                        }
+                    }).then((profileRes) => {
+                        Cypress.env("authToken", token);
+                        Cypress.env("userData", JSON.stringify(profileRes.body.user));
+                    });
+                } else {
+                    cy.log("Login falló:", JSON.stringify(loginRes.body));
+                }
+            });
+        });
+    });
+
+            } else {
+                throw new Error("El login con usuario existente falló: " + JSON.stringify(loginRes.body));
+            }
+        });
+    });
+
     beforeEach(() => {
         cy.clearLocalStorage();
-        cy.loginByApi(testUser.email, testUser.password);
         
-        // Limpiar direcciones, pagos y carrito en API para cada test
+        // Inyectar las credenciales
+        cy.window().then((win) => {
+            win.localStorage.setItem("authToken", Cypress.env("authToken"));
+            win.localStorage.setItem("userData", Cypress.env("userData"));
+        });
+        
         cy.clearDataByApi();
 
         cy.intercept("GET", "**/users/profile", (req) => { req.headers['x-load-test'] = 'true'; }).as("getUserProfile");
@@ -21,21 +68,17 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.intercept("POST", "**/orders", (req) => { req.headers['x-load-test'] = 'true'; }).as("placeOrder");
 
         cy.visit("/");
-
-        cy.log("Agregando al carrito y visitando Checkout...");
+        
         cy.addProductToCart(product._id, 1, "M");
         cy.visit("/checkout");
 
-        // Esperas robustas para el PRIMER conjunto de llamadas (las que hace /checkout al cargar)
         cy.wait(["@getUserProfile", "@getCart", "@getAddresses", "@getPayments"], { timeout: 30000 });
         cy.contains("Sincronizando con el servidor...", { timeout: 15000 }).should("not.exist");
     });
 
     it("corre el flujo completo exitosamente", () => {
-        // Verificación inicial: El producto debe estar en el resumen
         cy.get(".cart-view", { timeout: 10000 }).should("contain", "Manchester United");
         
-        // Fase 1: Dirección
         cy.get('body').then(($body) => {
             if ($body.find('[data-testid="add-address-button"]').length === 0) {
                 cy.contains("1. Dirección de envío").click();
@@ -55,7 +98,6 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.wait("@getAddresses");
         cy.get(".selected-address").should("contain", "Juan Pérez");
 
-        // Fase 2: Pago
         cy.get('[data-testid="add-payment-button"]').click();
         cy.get('[data-testid="payment-cardNumber"]').type("4242424242424242");
         cy.get('[data-testid="payment-cardHolderName"]').type("Juan Pérez");
@@ -68,11 +110,9 @@ describe("INTEGRATION TEST V3 - Full Checkout Flow", () => {
         cy.wait("@getPayments");
         cy.get(".selected-payment").should("contain", "BBVA");
 
-        // Fase 4: Pagar
         cy.get('[data-testid="pay-button"]').click();
         cy.wait("@placeOrder").its("response.statusCode").should("eq", 201);
 
-        // Éxito final
         cy.url().should("include", "/order-confirmation");
         cy.contains("¡Gracias por tu compra!").should("be.visible");
     });

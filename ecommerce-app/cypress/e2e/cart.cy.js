@@ -1,22 +1,30 @@
 describe("Flujo de Carrito de Compras", () => {
-    // Productos reales de la DB (Render API)
+    // Definición de productos al nivel del describe para que sean accesibles
     const product1 = { 
         _id: "69b1183fd947069ecb02061b", 
-        name: "Jersey Manchester United Local 2024", 
-        price: 1249,
-        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 2}]
+        name: "Jersey Manchester United Local 2024"
     };
-    const product2 = { 
-        _id: "69b1183fd947069ecb02061d", 
-        name: "Jersey Liverpool Visitante 2024", 
-        price: 1199,
-        variants: [{size: "S", stock: 10}, {size: "M", stock: 15}, {size: "L", stock: 5}, {size: "XL", stock: 2}]
+
+    const testUser = {
+        displayName: "Cart Test User",
+        email: `cart_test_${Date.now()}@anderek.com`,
+        password: "Password123!",
+        phone: "5555555555"
     };
+
+    before(() => {
+        cy.request({
+            method: "POST",
+            url: `${Cypress.env("apiUrl")}/auth/register`,
+            body: testUser,
+            failOnStatusCode: false
+        });
+    });
 
     beforeEach(() => {
         cy.clearLocalStorage();
-        // Login con usuario existente
-        cy.loginByApi("customer@test.com", "Password123!");
+        // Usamos el usuario dinámico recién creado
+        cy.loginByApi(testUser.email, testUser.password);
         
         // Limpiar carrito en API para cada test
         cy.clearDataByApi();
