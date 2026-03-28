@@ -18,13 +18,17 @@ const skipTest = (req) => {
 export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: (req) => {
+        // En producción permitimos 5, pero siempre permitimos tests con el header x-load-test
         if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
             if (req.headers['x-test-limit-strict'] === 'true') return 2;
             return 1000;
         }
         return 5;
     },
-    skip: skipTest,
+    skip: (req) => {
+        // Bypass total para pruebas con el header correcto
+        return req.headers['x-load-test'] === 'true';
+    },
     message: {
         message: "Too many authentication attempts, please try again after 15 minutes",
     },

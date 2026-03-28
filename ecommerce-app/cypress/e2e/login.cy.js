@@ -1,13 +1,15 @@
 describe("Flujo de Login", () => {
+    // Generamos un email dinámico y único para cada ejecución del test suite
+    const uniqueId = Date.now();
     const testUser = {
         displayName: "Login Test User",
-        email: "customer@test.com",
+        email: `login_test_${uniqueId}@anderek.com`,
         password: "Password123!",
         phone: "1234567890"
     };
 
     before(() => {
-        // Asegurar que el usuario existe
+        // Asegurar que el usuario único se registra correctamente
         cy.request({
             method: "POST",
             url: `${Cypress.env("apiUrl")}/auth/register`,
@@ -15,12 +17,13 @@ describe("Flujo de Login", () => {
             body: testUser,
             failOnStatusCode: false
         }).then((res) => {
-            cy.log("Registro de prueba (Pre-login):", JSON.stringify(res.body));
+            cy.log("Registro de prueba (Pre-login) Status:", res.status);
         });
     });
 
     beforeEach(() => {
         cy.clearLocalStorage();
+        
         cy.intercept("POST", "**/auth/login", (req) => {
             req.headers['x-load-test'] = 'true';
         }).as("loginRequest");
@@ -56,9 +59,8 @@ describe("Flujo de Login", () => {
         cy.get('[data-testid="login-submit"]').click();
 
         cy.wait("@loginRequest").then((interception) => {
-            if (interception.response.statusCode !== 200) {
-                cy.log("Login failed with response:", JSON.stringify(interception.response.body));
-            }
+            cy.log("INTERCEPTION OBJECT:", JSON.stringify(interception));
+            console.log("INTERCEPTION OBJECT:", JSON.stringify(interception));
             expect(interception.response.statusCode).to.eq(200);
         });
 
