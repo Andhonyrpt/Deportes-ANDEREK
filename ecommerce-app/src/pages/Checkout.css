@@ -69,6 +69,15 @@
     .checkout-container {
         flex-direction: column;
     }
+
+    .checkout-right {
+        flex: unset;
+        width: 100%;
+    }
+
+    .checkout-summary {
+        position: static;
+    }
 }
 
 .checkout-overlay {

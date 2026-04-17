@@ -3,6 +3,7 @@
     max-width: 1200px;
     margin: 0 auto;
     min-height: 80vh;
+    margin-bottom: 60px;
 }
 
 .wishlist-header {
@@ -54,6 +55,17 @@
 }
 
 /* Ajustes responsivos */
+@media (max-width: 1024px) {
+    .wishlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+    }
+
+    .wishlist-page {
+        padding: 24px 16px;
+    }
+}
+
 @media (max-width: 768px) {
     .wishlist-header {
         flex-direction: column;
