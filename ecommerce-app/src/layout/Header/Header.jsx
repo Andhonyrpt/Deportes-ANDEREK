@@ -350,6 +350,14 @@ export default function Header() {
                                                         <Icon name="heart" size={16} />
                                                         Lista de Deseos
                                                     </Link>
+                                                    {user?.role === 'admin' && (
+                                                        <Link to="/admin"
+                                                            className="user-link"
+                                                        >
+                                                            <Icon name="shield" size={16} />
+                                                            Panel de Administración
+                                                        </Link>
+                                                    )}
                                                     <Link to="/settings"
                                                         className="user-link"
                                                     >
@@ -486,6 +494,16 @@ export default function Header() {
                                         <Icon name="heart" size={20} />
                                         Lista de Deseos
                                     </Link>
+                                    {user?.role === 'admin' && (
+                                        <Link
+                                            to="/admin"
+                                            className="mobile-nav-link"
+                                            onClick={handleMobileMenuClose}
+                                        >
+                                            <Icon name="shield" size={20} />
+                                            Panel de Administración
+                                        </Link>
+                                    )}
                                     <Link
                                         to="/settings"
                                         className="mobile-nav-link"

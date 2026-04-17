@@ -79,3 +79,62 @@
 .admin-content::-webkit-scrollbar-thumb:hover {
     background: var(--color-gray);
 }
+
+@media (max-width: 768px) {
+    .admin-dashboard {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        padding: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 10;
+    }
+
+    .admin-sidebar-title {
+        margin-bottom: 1rem;
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .admin-sidebar nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0 1rem 0.5rem 1rem;
+        gap: 0.5rem;
+        /* Hide scrollbar for a cleaner look */
+        scrollbar-width: none;
+    }
+    
+    .admin-sidebar nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .admin-nav-link {
+        white-space: nowrap;
+        padding: 0.5rem 1rem;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .admin-nav-link:hover {
+        padding-left: 1rem; /* reset hover from desktop */
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .admin-nav-link.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--color-primary-400);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-content {
+        padding: 1rem;
+        max-height: none; /* Let it flow normally */
+        overflow-y: visible;
+    }
+}
