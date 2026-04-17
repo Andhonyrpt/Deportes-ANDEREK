@@ -26,10 +26,7 @@
     border-radius: var(--r2);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 4px 0;
-    width: max-content;
-    min-width: unset;
     box-sizing: border-box;
-
 }
 
 .categories-dropdown-menu a {
