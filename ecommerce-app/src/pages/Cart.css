@@ -215,50 +215,112 @@
 /* Responsive */
 @media (max-width: 768px) {
     .cart {
-        padding: 1rem;
+        padding: 16px;
+    }
+
+    .cart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .cart-header-title {
+        flex-wrap: wrap;
+    }
+
+    .cart-header-info {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cart-empty {
+        padding: 32px 16px;
+        margin: 16px auto;
     }
 
     .cart-item {
-        grid-template-columns: 60px 1fr;
-        gap: 0.75rem;
+        grid-template-columns: 80px 1fr;
+        grid-template-areas:
+            "img info"
+            "qty qty"
+            "total action";
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .cart-item-image {
+        grid-area: img;
     }
 
     .cart-item-image img {
-        width: 65px;
-        height: 65px;
+        width: 80px;
+        height: 80px;
+    }
+
+    .cart-item-info {
+        grid-area: info;
     }
 
     .cart-item-info h3 {
-        max-width: 220px;
+        max-width: none;
     }
 
     .cart-item-size-selector {
-        max-width: 220px;
+        max-width: none;
+        flex-wrap: wrap;
     }
 
     .cart-item-size-selector select {
-        width: 40%;
+        width: auto;
+        min-width: 80px;
     }
 
-    .cart-item-price{
-        max-width: 220px;
+    .cart-item-price {
+        max-width: none;
     }
 
-    .cart-item-quantity,
-    .cart-item-total {
-        grid-column: 1 / -1;
+    .cart-item-quantity {
+        grid-area: qty;
         justify-self: start;
+        align-self: center;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        margin: 8px 0;
     }
 
-    .cart-item button:last-child {
-        grid-column: 1 / -1;
+    .cart-item-quantity button {
+        padding: 8px;
+    }
+
+    .cart-item-total {
+        grid-area: total;
+        justify-self: start;
+        align-self: center;
+    }
+
+    .cart-item > button:last-child {
+        grid-area: action;
         justify-self: end;
+        align-self: center;
     }
 
     .cart-summary {
         flex-direction: column;
-        gap: 1rem;
+        gap: 16px;
         align-items: stretch;
+        padding: 24px 16px;
+        margin-top: 16px;
+    }
+
+    .cart-actions button {
+        width: 100%;
+        justify-content: center;
     }
 }
 
