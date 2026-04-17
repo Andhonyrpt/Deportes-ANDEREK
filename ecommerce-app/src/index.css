@@ -2,9 +2,8 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
+html, body {
+  min-height: 100%;
 }
 
 body {
@@ -98,7 +97,13 @@ code {
 
 .container {
   max-width: 1300px;
-  padding: 30px 0 0 34px;
+  padding: 30px 34px 0 34px;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 20px 16px 0 16px;
+  }
 }
 
 /* Tipografía */

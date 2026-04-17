@@ -83,7 +83,27 @@
 }
 
 
-/* responsivo */
+/* Tablet: 1024px */
+@media (max-width: 1024px) {
+    .navigation-content {
+        gap: 16px;
+    }
+
+    .dropdown-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .subcategories-dropdown .dropdown-btn {
+        width: 180px;
+    }
+
+    .categories-dropdown {
+        width: 150px;
+    }
+}
+
+/* Móvil: 480px */
 @media (max-width: 480px) {
 
     /* Aquí van tus estilos para móvil */
