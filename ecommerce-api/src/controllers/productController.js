@@ -6,7 +6,7 @@ async function getProducts(req, res, next) {
     try {
         const { page, limit } = req.query;
 
-        // Si no hay paginación, devolver todos
+        // Si no hay paginación, devolver todos con metadata básica
         if (!page && !limit) {
             const products = await Product.find()
                 .populate({
@@ -14,7 +14,17 @@ async function getProducts(req, res, next) {
                     populate: { path: 'parentCategory' }
                 })
                 .sort({ name: 1 });
-            return res.json({ products });
+            const total = products.length;
+            return res.json({ 
+                products,
+                pagination: {
+                    currentPage: 1,
+                    totalPages: 1,
+                    totalResults: total,
+                    hasNext: false,
+                    hasPrev: false
+                }
+            });
         }
 
         const pageInt = parseInt(page) || 1;

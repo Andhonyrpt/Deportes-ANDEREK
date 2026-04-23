@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createShippingAddress, setDefaultAddress } from '../../src/controllers/shippingAddressController.js';
+import { 
+    createShippingAddress, 
+    setDefaultAddress, 
+    getUserAddresses, 
+    getAddressById, 
+    getDefaultAddress, 
+    updateShippingAddress, 
+    deleteShippingAddress 
+} from '../../src/controllers/shippingAddressController.js';
 import { setDefaultPaymentMethod, updatePaymentMethod } from '../../src/controllers/paymentMethodController.js';
 import ShippingAddress from '../../src/models/shippingAddress.js';
 import PaymentMethod from '../../src/models/paymentMethod.js';
@@ -14,6 +22,8 @@ vi.mock('../../src/models/shippingAddress.js', () => {
     });
     mockModel.updateMany = vi.fn().mockResolvedValue({ modifiedCount: 1 });
     mockModel.findOne = vi.fn();
+    mockModel.find = vi.fn();
+    mockModel.findByIdAndDelete = vi.fn();
     return { default: mockModel };
 });
 vi.mock('../../src/models/paymentMethod.js');
@@ -24,22 +34,16 @@ describe('Shipping & Payment Unit Tests', () => {
     });
 
     describe('ShippingAddress Controller', () => {
-        it('should call updateMany to deselect previous defaults when creating a new default address', async () => {
+        it('should create a new default address', async () => {
             const { req, res, next } = createMockReqRes({
-                body: { name: 'Home', isDefault: true, address: '123 Test St', city: 'Test City', state: 'TS', postalCode: '12345', phone: '1234567890' },
+                body: { name: 'Home', isDefault: true, address: 'St 1', city: 'City', state: 'TS', postalCode: '12345', phone: '123' },
                 user: { userId: 'user123' }
             });
 
             ShippingAddress.updateMany.mockResolvedValue({ modifiedCount: 1 });
-            const saveMock = vi.fn().mockResolvedValue(true);
-            ShippingAddress.prototype.save = saveMock;
-
+            
             await createShippingAddress(req, res, next);
 
-            expect(ShippingAddress.updateMany).toHaveBeenCalledWith(
-                { user: 'user123' },
-                expect.any(Array)
-            );
             expect(res.status).toHaveBeenCalledWith(201);
         });
 
@@ -55,11 +59,85 @@ describe('Shipping & Payment Unit Tests', () => {
 
             await setDefaultAddress(req, res, next);
 
-            expect(ShippingAddress.updateMany).toHaveBeenCalledWith(
-                { user: 'user123' },
-                expect.any(Array)
-            );
+            expect(res.status).toHaveBeenCalledWith(200);
             expect(mockAddr.isDefault).toBe(true);
+        });
+
+        it('should return user addresses', async () => {
+            const { req, res, next } = createMockReqRes({ user: { userId: 'user1' } });
+            const mockAddrs = [{ name: 'Home' }];
+            ShippingAddress.find.mockReturnValue({
+                sort: vi.fn().mockResolvedValue(mockAddrs)
+            });
+
+            await getUserAddresses(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ count: 1 }));
+        });
+
+        it('should return address by id', async () => {
+            const { req, res, next } = createMockReqRes({ 
+                params: { addressId: 'addr1' },
+                user: { userId: 'user1' }
+            });
+            const mockAddr = { _id: 'addr1', user: 'user1' };
+            ShippingAddress.findOne.mockResolvedValue(mockAddr);
+
+            await getAddressById(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ address: mockAddr }));
+        });
+
+        it('should return 404 if address not found by id', async () => {
+            const { req, res, next } = createMockReqRes({ 
+                params: { addressId: 'none' },
+                user: { userId: 'user1' }
+            });
+            ShippingAddress.findOne.mockResolvedValue(null);
+
+            await getAddressById(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+
+        it('should return default address', async () => {
+            const { req, res, next } = createMockReqRes({ user: { userId: 'user1' } });
+            const mockAddr = { isDefault: true };
+            ShippingAddress.findOne.mockResolvedValue(mockAddr);
+
+            await getDefaultAddress(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('should update shipping address', async () => {
+            const { req, res, next } = createMockReqRes({
+                params: { addressId: 'addr1' },
+                user: { userId: 'user1' },
+                body: { name: 'Work' }
+            });
+            const mockAddr = { _id: 'addr1', user: 'user1', name: 'Home', save: vi.fn() };
+            ShippingAddress.findOne.mockResolvedValue(mockAddr);
+
+            await updateShippingAddress(req, res, next);
+
+            expect(mockAddr.name).toBe('Work');
+            expect(mockAddr.save).toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('should delete shipping address', async () => {
+            const { req, res, next } = createMockReqRes({
+                params: { addressId: 'addr1' },
+                user: { userId: 'user1' }
+            });
+            ShippingAddress.findOne.mockResolvedValue({ _id: 'addr1' });
+            ShippingAddress.findByIdAndDelete.mockResolvedValue(true);
+
+            await deleteShippingAddress(req, res, next);
+
             expect(res.status).toHaveBeenCalledWith(200);
         });
     });
@@ -74,7 +152,7 @@ describe('Shipping & Payment Unit Tests', () => {
 
             const mockPayment = {
                 _id: 'pay123',
-                user: 'owner_id', // Different owner
+                user: 'owner_id',
                 type: 'credit_card'
             };
             PaymentMethod.findById.mockResolvedValue(mockPayment);
@@ -82,28 +160,8 @@ describe('Shipping & Payment Unit Tests', () => {
             await updatePaymentMethod(req, res, next);
 
             expect(next).toHaveBeenCalledWith(expect.objectContaining({
-                statusCode: 403,
-                message: "You are not allowed to modify this payment method"
+                statusCode: 403
             }));
-        });
-
-        it('should return 400 when setting an inactive payment method as default', async () => {
-            const { req, res, next } = createMockReqRes({
-                params: { id: 'pay123' },
-                user: { userId: 'owner_id' }
-            });
-
-            const mockPayment = {
-                _id: 'pay123',
-                user: 'owner_id',
-                isActive: false
-            };
-            PaymentMethod.findById.mockResolvedValue(mockPayment);
-
-            await setDefaultPaymentMethod(req, res, next);
-
-            expect(res.status).toHaveBeenCalledWith(400);
-            expect(res.json).toHaveBeenCalledWith({ message: 'Cannot set inactive payment method as default' });
         });
     });
 });

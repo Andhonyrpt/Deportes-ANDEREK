@@ -18,7 +18,6 @@ const generateRefreshToken = (userId, displayName, role) => {
 
 const checkUserExist = async (email) => {
     const user = await User.findOne({ email });
-    console.log(user);
     return user;
 };
 
@@ -28,7 +27,6 @@ const generatePassword = async (password) => {
 };
 
 async function register(req, res, next) {
-
     try {
         const { displayName, email, password, phone } = req.body;
 
@@ -50,15 +48,12 @@ async function register(req, res, next) {
         await newUser.save();
 
         res.status(201).json({ displayName, email, phone });
-
     } catch (err) {
         next(err);
     }
-
-};
+}
 
 async function login(req, res, next) {
-
     try {
         const { email, password } = req.body;
 
@@ -84,12 +79,33 @@ async function login(req, res, next) {
             userExist.role
         );
 
-        res.status(200).json({ token, refreshToken });
+        // Set cookies
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000 // 1h
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 3600000 // 7d
+        });
+
+        res.status(200).json({ 
+            token, 
+            refreshToken,
+            user: {
+                id: userExist._id,
+                displayName: userExist.displayName,
+                email: userExist.email,
+                role: userExist.role
+            }
+        });
     } catch (err) {
         next(err);
     }
-
-};
+}
 
 async function checkEmail(req, res, next) {
     try {
@@ -102,40 +118,52 @@ async function checkEmail(req, res, next) {
     } catch (err) {
         next(err);
     }
-};
+}
 
 async function refreshToken(req, res, next) {
     try {
-        const token = req.body.refreshToken;
+        let token = req.body?.refreshToken || req.cookies?.refreshToken;
 
-        if (!token) return res.status(401).json({ message: "No refresh token provider" });
+        if (!token) {
+            return res.status(401).json({ message: "No refresh token provided" });
+        }
 
-        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            if (err) return res.status(403).json({ message: "Invalid refresh token" });
+        // Si el token es un string tipo "refreshToken=xxx", limpiarlo
+        if (typeof token === 'string' && token.includes('refreshToken=')) {
+            token = token.split('refreshToken=')[1].split(';')[0];
+        }
 
-            const newAccessToken = generateToken(
-                decoded.userId,
-                decoded.displayName,
-                decoded.role
-            );
-
-            // // OPCIONAL.
-            // //Esto sirve como en las redes sociales para nunca pedir el inicio de sesion y sea un refresh infinito 
-            // const newRefreshToken = generateRefreshToken(
-            //   decoded.userId,
-            //   decoded.displayName,
-            //   decoded.role,
-            // );
-
-            res.status(200).json({ token: newAccessToken, refreshToken: token });
-            // .json({ token: newAccessToken, refreshToken: newRefreshToken });
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+                if (err) reject(err);
+                else resolve(decoded);
+            });
         });
+
+        const newAccessToken = generateToken(
+            decoded.userId,
+            decoded.displayName,
+            decoded.role
+        );
+
+        res.cookie('authToken', newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000 // 1h
+        });
+
+        res.status(200).json({ token: newAccessToken, refreshToken: token });
     } catch (error) {
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(403).json({ message: "Invalid or expired refresh token" });
+        }
         next(error);
     }
 }
 
 async function logout(req, res) {
+    res.clearCookie('authToken');
+    res.clearCookie('refreshToken');
     res.status(200).json({ message: "Logged out successfully" });
 }
 

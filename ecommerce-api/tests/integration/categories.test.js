@@ -30,8 +30,8 @@ describe('Category & SubCategory Integration Tests', () => {
             const response = await request(app).get('/api/categories');
 
             expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
-            expect(response.body.length).toBeGreaterThanOrEqual(1);
+            expect(Array.isArray(response.body.categories)).toBe(true);
+            expect(response.body.categories.length).toBeGreaterThanOrEqual(1);
         });
     });
 
@@ -145,7 +145,7 @@ describe('Category & SubCategory Integration Tests', () => {
             const response = await request(app).get('/api/subcategories');
 
             expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
+            expect(Array.isArray(response.body.subCategories)).toBe(true);
         });
     });
 });
