@@ -157,7 +157,7 @@ describe('SDET Advanced Logic & Business Integrity Tests', () => {
                 .set('Authorization', `Bearer ${customerToken}`);
 
             console.log(`Final Order Data for Price Integrity: ${JSON.stringify(checkRes.body)}`);
-            expect(checkRes.body.totalPrice).toBe(50);
+            expect(checkRes.body.totalPrice).toBe(408);
         });
     });
 

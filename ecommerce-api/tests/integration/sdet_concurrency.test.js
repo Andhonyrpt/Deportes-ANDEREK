@@ -152,7 +152,7 @@ describe('SDET Advanced Concurrency Tests', () => {
             await Promise.all(
                 Array.from({ length: 6 }).map((_, i) =>
                     request(app)
-                        .post('/api/new-address')
+                        .post('/api/shipping-addresses/new-address')
                         .set('Authorization', `Bearer ${customerToken}`)
                         .send({
                             name: `Address ${i}`,

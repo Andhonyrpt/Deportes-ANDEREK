@@ -34,7 +34,7 @@ describe('Shipping Address Integration Tests', () => {
     describe('POST /api/new-address', () => {
         it('should create a shipping address successfully', async () => {
             const response = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validAddressPayload);
 
@@ -47,13 +47,13 @@ describe('Shipping Address Integration Tests', () => {
         it('should ensure only one default address exists when setting isDefault: true', async () => {
             // Create first address as default
             await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, isDefault: true });
 
             // Create second address also as default
             const response = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, address: 'Avenida Siempre Viva 742', isDefault: true });
 
@@ -68,7 +68,7 @@ describe('Shipping Address Integration Tests', () => {
 
         it('should return 401 without authentication', async () => {
             const response = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .send(validAddressPayload);
 
             expect(response.status).toBe(401);
@@ -78,17 +78,17 @@ describe('Shipping Address Integration Tests', () => {
     describe('GET /api/user-addresses', () => {
         it('should list user addresses sorted by default first', async () => {
             await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, isDefault: false });
 
             await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, address: '2nd Street', isDefault: true });
 
             const response = await request(app)
-                .get('/api/user-addresses')
+                .get('/api/shipping-addresses/user-addresses')
                 .set('Authorization', `Bearer ${customerToken}`);
 
             expect(response.status).toBe(200);
@@ -102,7 +102,7 @@ describe('Shipping Address Integration Tests', () => {
         it("should return 404 when accessing another user's address", async () => {
             // Customer1 creates an address
             const createRes = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validAddressPayload);
 
@@ -110,7 +110,7 @@ describe('Shipping Address Integration Tests', () => {
 
             // Customer2 tries to access it
             const response = await request(app)
-                .get(`/api/user-address/${addressId}`)
+                .get(`/api/shipping-addresses/user-address/${addressId}`)
                 .set('Authorization', `Bearer ${customerToken2}`);
 
             expect(response.status).toBe(404);
@@ -122,12 +122,12 @@ describe('Shipping Address Integration Tests', () => {
         it('should change default address and unmark previous default', async () => {
             // Create two addresses
             const addr1Res = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, isDefault: true });
 
             const addr2Res = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send({ ...validAddressPayload, address: 'Second Ave', isDefault: false });
 
@@ -136,7 +136,7 @@ describe('Shipping Address Integration Tests', () => {
 
             // Set address 2 as default
             const response = await request(app)
-                .patch(`/api/default/${addr2Id}`)
+                .patch(`/api/shipping-addresses/default/${addr2Id}`)
                 .set('Authorization', `Bearer ${customerToken}`);
 
             expect(response.status).toBe(200);
@@ -151,7 +151,7 @@ describe('Shipping Address Integration Tests', () => {
     describe('DELETE /api/delete-address/:addressId (data isolation)', () => {
         it("should return 404 when deleting another user's address", async () => {
             const createRes = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validAddressPayload);
 
@@ -159,7 +159,7 @@ describe('Shipping Address Integration Tests', () => {
 
             // Customer2 tries to delete it
             const response = await request(app)
-                .delete(`/api/delete-address/${addressId}`)
+                .delete(`/api/shipping-addresses/delete-address/${addressId}`)
                 .set('Authorization', `Bearer ${customerToken2}`);
 
             expect(response.status).toBe(404);
@@ -167,14 +167,14 @@ describe('Shipping Address Integration Tests', () => {
 
         it('should delete own address successfully', async () => {
             const createRes = await request(app)
-                .post('/api/new-address')
+                .post('/api/shipping-addresses/new-address')
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validAddressPayload);
 
             const addressId = createRes.body.address._id;
 
             const response = await request(app)
-                .delete(`/api/delete-address/${addressId}`)
+                .delete(`/api/shipping-addresses/delete-address/${addressId}`)
                 .set('Authorization', `Bearer ${customerToken}`);
 
             expect(response.status).toBe(200);

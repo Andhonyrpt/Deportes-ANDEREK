@@ -29,9 +29,10 @@ const errorHandler = (err, req, res, next) => {
     });
 
     if (!res.headersSent) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Internal Server Error'
+        const statusCode = err.statusCode || err.status || 500;
+        res.status(statusCode).json({
+            status: statusCode >= 500 ? 'error' : 'fail',
+            message: statusCode >= 500 ? 'Internal Server Error' : err.message
         });
     }
 

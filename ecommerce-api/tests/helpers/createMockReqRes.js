@@ -22,6 +22,7 @@ export function createMockReqRes({
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
         cookie: vi.fn().mockReturnThis(),
+        clearCookie: vi.fn().mockReturnThis(),
     };
 
     const next = vi.fn();

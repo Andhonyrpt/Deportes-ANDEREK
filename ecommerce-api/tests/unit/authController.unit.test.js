@@ -90,7 +90,13 @@ describe('authController Unit Tests', () => {
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
                 token: 'mockToken',
-                refreshToken: 'mockToken'
+                refreshToken: 'mockToken',
+                user: {
+                    id: mockUser._id,
+                    displayName: mockUser.displayName,
+                    email: mockUser.email,
+                    role: mockUser.role
+                }
             });
         });
 

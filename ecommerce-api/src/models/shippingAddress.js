@@ -29,8 +29,8 @@ const shippingAddressSchema = new mongoose.Schema({
     postalCode: {
         type: String,
         required: true,
-        min: 4,
-        max: 6,
+        minlength: 4,
+        maxlength: 6,
         trim: true
     },
     country: {

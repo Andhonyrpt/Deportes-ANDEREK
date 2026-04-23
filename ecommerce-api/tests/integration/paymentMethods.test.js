@@ -16,6 +16,7 @@ describe('Payment Method Integration Tests', () => {
         cardNumber: '1111222233334444',
         cardHolderName: 'Test User',
         expiryDate: '12/28',
+        bankName: 'Test Bank',
         isDefault: false
     };
 
@@ -91,13 +92,14 @@ describe('Payment Method Integration Tests', () => {
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validCreditCardPayload);
 
+            expect(createRes.status).toBe(201);
             const methodId = createRes.body._id;
 
             // Customer2 tries to update it
             const response = await request(app)
                 .put(`/api/payment-methods/${methodId}`)
                 .set('Authorization', `Bearer ${customerToken2}`)
-                .send({ cardHolderName: 'Hacker' });
+                .send({ cardHolderName: 'Hacker', bankName: 'Hacker Bank' });
 
             expect(response.status).toBe(403);
         });
@@ -110,6 +112,7 @@ describe('Payment Method Integration Tests', () => {
                 .set('Authorization', `Bearer ${customerToken}`)
                 .send(validCreditCardPayload);
 
+            expect(createRes.status).toBe(201);
             const methodId = createRes.body._id;
 
             const response = await request(app)

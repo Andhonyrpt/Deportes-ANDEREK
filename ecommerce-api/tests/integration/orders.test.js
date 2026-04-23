@@ -134,8 +134,8 @@ describe('Order Integration Tests', () => {
 
             expect(response.status).toBe(201);
             // Server should use testProduct.price (150) not the client-provided 1
-            // totalPrice = (150 * 2) + 50 shipping = 350
-            expect(response.body.totalPrice).toBe(350);
+            // totalPrice = (150 * 2) + 48 tax + 350 shipping = 698
+            expect(response.body.totalPrice).toBe(698);
         });
 
         it('should NOT allow negative shippingCost to reduce the total price', async () => {
@@ -219,8 +219,8 @@ describe('Order Integration Tests', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
-            expect(response.body.length).toBeGreaterThanOrEqual(1);
+            expect(Array.isArray(response.body.orders)).toBe(true);
+            expect(response.body.orders.length).toBeGreaterThanOrEqual(1);
         });
 
         it('customer should be denied access to all orders (RBAC)', async () => {

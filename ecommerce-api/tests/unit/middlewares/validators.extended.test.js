@@ -260,20 +260,20 @@ describe('Extended Validators Unit Tests', () => {
     // ─── cardNumberValidation ─────────────────────────────────────────────────
     describe('cardNumberValidation', () => {
         it('fails if card number is not 16 digits', async () => {
-            const req = { body: { cardNumber: '1234' } };
+            const req = { body: { type: 'credit_card', cardNumber: '1234' } };
             const r = await run(req, v.cardNumberValidation());
             expect(r.isEmpty()).toBe(false);
             expect(r.array()[0].msg).toContain('16 digits');
         });
 
         it('fails if card number contains letters', async () => {
-            const req = { body: { cardNumber: '1234567890123ABC' } };
+            const req = { body: { type: 'credit_card', cardNumber: '1234567890123ABC' } };
             const r = await run(req, v.cardNumberValidation());
             expect(r.isEmpty()).toBe(false);
         });
 
         it('passes with a valid 16-digit number', async () => {
-            const req = { body: { cardNumber: '4111111111111111' } };
+            const req = { body: { type: 'credit_card', cardNumber: '4111111111111111' } };
             const r = await run(req, v.cardNumberValidation());
             expect(r.isEmpty()).toBe(true);
         });
@@ -282,20 +282,20 @@ describe('Extended Validators Unit Tests', () => {
     // ─── expiryDateValidation ─────────────────────────────────────────────────
     describe('expiryDateValidation', () => {
         it('fails if expiry date has wrong format (YYYY-MM)', async () => {
-            const req = { body: { expiryDate: '2025-12' } };
+            const req = { body: { type: 'credit_card', expiryDate: '2025-12' } };
             const r = await run(req, v.expiryDateValidation());
             expect(r.isEmpty()).toBe(false);
             expect(r.array()[0].msg).toContain('MM/YY format');
         });
 
         it('fails if month is 13', async () => {
-            const req = { body: { expiryDate: '13/25' } };
+            const req = { body: { type: 'credit_card', expiryDate: '13/25' } };
             const r = await run(req, v.expiryDateValidation());
             expect(r.isEmpty()).toBe(false);
         });
 
         it('passes with a valid MM/YY format', async () => {
-            const req = { body: { expiryDate: '12/27' } };
+            const req = { body: { type: 'credit_card', expiryDate: '12/27' } };
             const r = await run(req, v.expiryDateValidation());
             expect(r.isEmpty()).toBe(true);
         });
